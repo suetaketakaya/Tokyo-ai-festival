@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(go mod:*)",
+      "Bash(brew install:*)",
+      "Bash(go build:*)",
+      "Bash(./remoteclaude)",
+      "Bash(npx react-native:*)",
+      "Bash(npx @react-native-community/cli init:*)",
+      "Bash(chmod:*)",
+      "Bash(./build.sh)",
+      "Bash(./remoteclaude-macos-arm64)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
