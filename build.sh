@@ -1,170 +1,88 @@
 #!/bin/bash
 
-# RemoteClaude Cross-Platform Build Script
-# Builds executables for Windows, macOS, and Linux
+# RemoteClaude Build Script v2.0
+echo "🚀 Building RemoteClaude v2.0..."
 
-echo "🏗️  Building RemoteClaude for multiple platforms..."
+# Check requirements
+echo "📋 Checking requirements..."
 
-# Create build directory
-mkdir -p dist
-
-# Build information
-VERSION="1.0.0"
-BUILD_TIME=$(date -u +"%Y-%m-%d_%H:%M:%S_UTC")
-GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-
-# Go build flags
-LDFLAGS="-X main.Version=${VERSION} -X main.BuildTime=${BUILD_TIME} -X main.GitCommit=${GIT_COMMIT}"
-
-cd remoteclaude-server
-
-echo "📦 Building for Windows (amd64)..."
-GOOS=windows GOARCH=amd64 go build -ldflags="${LDFLAGS}" -o ../dist/remoteclaude-windows-amd64.exe main.go
-if [ $? -eq 0 ]; then
-    echo "✅ Windows build successful"
-else
-    echo "❌ Windows build failed"
+# Check Go
+if ! command -v go &> /dev/null; then
+    echo "❌ Go is not installed. Please install Go 1.21+"
+    exit 1
 fi
 
-echo "📦 Building for macOS (amd64)..."
-GOOS=darwin GOARCH=amd64 go build -ldflags="${LDFLAGS}" -o ../dist/remoteclaude-macos-amd64 main.go
-if [ $? -eq 0 ]; then
-    echo "✅ macOS Intel build successful"
-else
-    echo "❌ macOS Intel build failed"
+# Check Node.js
+if ! command -v node &> /dev/null; then
+    echo "❌ Node.js is not installed. Please install Node.js 18+"
+    exit 1
 fi
 
-echo "📦 Building for macOS (arm64)..."
-GOOS=darwin GOARCH=arm64 go build -ldflags="${LDFLAGS}" -o ../dist/remoteclaude-macos-arm64 main.go
-if [ $? -eq 0 ]; then
-    echo "✅ macOS Apple Silicon build successful"
-else
-    echo "❌ macOS Apple Silicon build failed"
+# Check Expo CLI
+if ! command -v expo &> /dev/null; then
+    echo "❌ Expo CLI is not installed. Installing..."
+    npm install -g @expo/cli
 fi
 
-echo "📦 Building for Linux (amd64)..."
-GOOS=linux GOARCH=amd64 go build -ldflags="${LDFLAGS}" -o ../dist/remoteclaude-linux-amd64 main.go
-if [ $? -eq 0 ]; then
-    echo "✅ Linux build successful"
-else
-    echo "❌ Linux build failed"
+# Check Claude CLI
+if ! command -v claude &> /dev/null; then
+    echo "❌ Claude CLI is not installed. Installing..."
+    npm install -g @anthropic-ai/claude-code
 fi
 
-echo "📦 Building for Linux (arm64)..."
-GOOS=linux GOARCH=arm64 go build -ldflags="${LDFLAGS}" -o ../dist/remoteclaude-linux-arm64 main.go
-if [ $? -eq 0 ]; then
-    echo "✅ Linux ARM build successful"
-else
-    echo "❌ Linux ARM build failed"
-fi
+echo "✅ All requirements satisfied"
 
+# Build macOS Server
+echo "🛠️ Building macOS server..."
+cd server
+go mod tidy
+go build -o ../build/remoteclaude-server main.go
+if [ $? -ne 0 ]; then
+    echo "❌ Server build failed"
+    exit 1
+fi
 cd ..
 
-# Copy necessary files to dist
-echo "📁 Copying static files..."
-cp -r web-demo dist/
-mkdir -p dist/static
-cp remoteclaude-server/static/* dist/static/ 2>/dev/null || echo "⚠️  No static files found"
-
-# Create startup scripts
-echo "📜 Creating startup scripts..."
-
-# Windows batch script
-cat > dist/start-windows.bat << 'EOF'
-@echo off
-echo Starting RemoteClaude Server...
-echo.
-if exist "remoteclaude-windows-amd64.exe" (
-    remoteclaude-windows-amd64.exe
-) else (
-    echo ERROR: remoteclaude-windows-amd64.exe not found
-    pause
-)
-EOF
-
-# macOS/Linux shell script
-cat > dist/start-unix.sh << 'EOF'
-#!/bin/bash
-echo "🚀 Starting RemoteClaude Server..."
-echo
-
-# Detect architecture
-ARCH=$(uname -m)
-OS=$(uname -s)
-
-if [ "$OS" = "Darwin" ]; then
-    if [ "$ARCH" = "arm64" ]; then
-        EXECUTABLE="./remoteclaude-macos-arm64"
-    else
-        EXECUTABLE="./remoteclaude-macos-amd64"
-    fi
-elif [ "$OS" = "Linux" ]; then
-    if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-        EXECUTABLE="./remoteclaude-linux-arm64"
-    else
-        EXECUTABLE="./remoteclaude-linux-amd64"
-    fi
-else
-    echo "❌ Unsupported OS: $OS"
+# Setup iPhone App
+echo "Setting up iPhone app..."
+cd RemoteClaudeApp
+npm install
+if [ $? -ne 0 ]; then
+    echo "❌ iPhone app setup failed"
     exit 1
 fi
+cd ..
 
-if [ -f "$EXECUTABLE" ]; then
-    chmod +x "$EXECUTABLE"
-    "$EXECUTABLE"
-else
-    echo "❌ Executable not found: $EXECUTABLE"
-    exit 1
-fi
-EOF
-
-chmod +x dist/start-unix.sh
-
-# Create README for distribution
-cat > dist/README.txt << EOF
-# RemoteClaude v${VERSION}
-
-## Quick Start
-
-### Windows:
-   Double-click: start-windows.bat
-
-### macOS/Linux:
-   Run in terminal: ./start-unix.sh
-   
-   Or manually:
-   - macOS Intel: ./remoteclaude-macos-amd64
-   - macOS Apple Silicon: ./remoteclaude-macos-arm64
-   - Linux x64: ./remoteclaude-linux-amd64
-   - Linux ARM: ./remoteclaude-linux-arm64
-
-## What happens next:
-1. Server starts and shows QR code in terminal
-2. Install RemoteClaude mobile app
-3. Scan QR code with mobile app
-4. Start coding remotely!
-
-## Requirements:
-- Claude Code CLI installed (https://claude.ai/code)
-- Network connection between PC and mobile device
-
-## Web Demo:
-Open http://localhost:8080/demo/ in your browser to test
-
-Build: ${BUILD_TIME}
-Commit: ${GIT_COMMIT}
-EOF
+# Create build directory and copy files
+mkdir -p build
+mkdir -p build/app
+cp -r RemoteClaudeApp/* build/app/
+cp server/remoteclaude-server build/ 2>/dev/null || echo "Server executable already copied"
 
 echo ""
-echo "✅ Build completed successfully!"
-echo "📂 Files available in ./dist/"
+echo "🎉 Build completed successfully!"
 echo ""
-echo "📋 Distribution files:"
-ls -la dist/
-
+echo "🚀 Quick Start:"
+echo "1. Start server (default port 8090):"
+echo "   ./build/remoteclaude-server"
 echo ""
-echo "🚀 To test locally:"
-echo "   cd dist && ./start-unix.sh"
+echo "   Custom port options:"
+echo "   ./build/remoteclaude-server --port=9000"
+echo "   REMOTECLAUDE_PORT=9000 ./build/remoteclaude-server"
 echo ""
-echo "📱 For mobile app development:"
-echo "   Use the web demo at http://localhost:8080/demo/"
+echo "2. Run iPhone app: cd build/app && expo start"
+echo "3. Scan QR code with iPhone"
+echo ""
+echo "iPhone App Features:"
+echo "  ✅ QR Code Scanner"
+echo "  ✅ Project Management"
+echo "  ✅ Claude CLI Execution"
+echo "  ✅ Real-time Terminal"
+echo ""
+echo "🖥️ macOS Server Features:"
+echo "  ✅ WebSocket Communication"
+echo "  ✅ QR Code Generation"
+echo "  ✅ Claude CLI Integration"
+echo "  ✅ Project Management"
+echo ""
+echo "🌟 RemoteClaude v2.0 is ready for action!"

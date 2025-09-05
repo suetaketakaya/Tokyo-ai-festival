@@ -3,15 +3,12 @@
     "allow": [
       "Bash(mkdir:*)",
       "Bash(go mod:*)",
-      "Bash(brew install:*)",
       "Bash(go build:*)",
-      "Bash(./remoteclaude)",
-      "Bash(npx react-native:*)",
-      "Bash(npx @react-native-community/cli init:*)",
+      "Bash(timeout:*)",
       "Bash(chmod:*)",
       "Bash(./build.sh)",
-      "Bash(./remoteclaude-macos-arm64)",
-      "Bash(git init:*)",
+      "Bash(./remoteclaude-server --help)",
+      "Bash(npx expo start:*)",
       "Bash(git add:*)"
     ],
     "deny": [],
