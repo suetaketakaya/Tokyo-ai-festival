@@ -123,8 +123,8 @@ func (dm *DockerManager) createContainer(project *Project) (string, error) {
 		args = append(args, "--env", fmt.Sprintf("%s=%s", key, value))
 	}
 
-	// Add image name and command
-	args = append(args, project.Image, "/bin/bash", "-c", "project-init && tail -f /dev/null")
+	// Add image name and command - start with simple bash to keep container running
+	args = append(args, project.Image, "/bin/bash", "-c", "tail -f /dev/null")
 
 	cmd := exec.Command("docker", args...)
 	output, err := cmd.CombinedOutput()

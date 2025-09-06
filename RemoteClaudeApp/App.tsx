@@ -8,6 +8,7 @@ import { StyleSheet, View } from 'react-native';
 import QRScannerScreen from './src/screens/QRScannerScreen';
 import ProjectListScreen from './src/screens/ProjectListScreen';
 import DevelopmentScreen from './src/screens/DevelopmentScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 // Types
 import { RootStackParamList } from './src/types/Navigation';
@@ -45,6 +46,16 @@ export default function App() {
             component={DevelopmentScreen}
             options={{
               title: '🛠️ Development',
+              headerStyle: { backgroundColor: '#007AFF' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
+          <Stack.Screen
+            name="Settings"
+            component={SettingsScreen}
+            options={{
+              title: '⚙️ Settings',
               headerStyle: { backgroundColor: '#007AFF' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },

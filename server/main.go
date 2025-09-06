@@ -243,6 +243,12 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 	case "claude_execute_stream":
 		s.handleDockerClaudeExecuteStream(conn, msg)
 
+	case "settings_update":
+		s.handleSettingsUpdate(conn, msg)
+
+	case "settings_get":
+		s.handleSettingsGet(conn, msg)
+
 	default:
 		s.sendError(conn, fmt.Sprintf("Unknown message type: %s", msgType))
 	}

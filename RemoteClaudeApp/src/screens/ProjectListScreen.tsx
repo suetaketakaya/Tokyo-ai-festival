@@ -104,7 +104,37 @@ export default function ProjectListScreen({ navigation, route }: Props) {
         }
         break;
         
+      case 'project_create_status':
+        // Show creation progress
+        console.log('Project creation status:', message.data?.message);
+        break;
+        
+      case 'project_create_response':
+        setIsLoading(false);
+        if (message.data?.project) {
+          Alert.alert('Success!', message.data?.message || 'Project created successfully!');
+          // Refresh project list
+          requestProjectList();
+        }
+        break;
+
+      case 'project_start_response':
+        Alert.alert('Success!', message.data?.message || 'Project started successfully!');
+        requestProjectList();
+        break;
+
+      case 'project_stop_response':
+        Alert.alert('Success!', message.data?.message || 'Project stopped successfully!');
+        requestProjectList();
+        break;
+
+      case 'project_remove_response':
+        Alert.alert('Success!', message.data?.message || 'Project removed successfully!');
+        requestProjectList();
+        break;
+        
       case 'error':
+        setIsLoading(false);
         Alert.alert('Server Error', message.data?.message || 'Unknown error occurred.');
         break;
       
@@ -140,16 +170,79 @@ export default function ProjectListScreen({ navigation, route }: Props) {
   };
 
   const handleCreateProject = () => {
-    Alert.alert(
+    Alert.prompt(
       '🚀 Create New Project',
-      'This will create a new Docker-based development environment.',
+      'Enter a name for your new Docker project:',
       [
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Create', 
+          onPress: (projectName) => {
+            if (projectName && projectName.trim()) {
+              createProject(projectName.trim());
+            } else {
+              Alert.alert('Error', 'Project name cannot be empty.');
+            }
+          }
+        },
+      ],
+      'plain-text',
+      '',
+      'default'
+    );
+  };
+
+  const createProject = (projectName: string) => {
+    setIsLoading(true);
+    
+    WebSocketService.send({
+      type: 'project_create_request',
+      data: {
+        name: projectName,
+        type: 'general',  // Default project type
+        config: {},
+        resources: {
+          memory: '2g',
+          cpus: '1.0'
+        }
+      }
+    });
+  };
+
+  const startProject = (projectId: string) => {
+    WebSocketService.send({
+      type: 'project_start_request',
+      data: {
+        project_id: projectId
+      }
+    });
+  };
+
+  const stopProject = (projectId: string) => {
+    WebSocketService.send({
+      type: 'project_stop_request',
+      data: {
+        project_id: projectId
+      }
+    });
+  };
+
+  const removeProject = (projectId: string) => {
+    Alert.alert(
+      'Delete Project',
+      'Are you sure you want to delete this project? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete', 
+          style: 'destructive',
           onPress: () => {
-            // TODO: Implement project creation flow
-            Alert.alert('Coming Soon', 'Project creation will be implemented in the next version.');
+            WebSocketService.send({
+              type: 'project_remove_request',
+              data: {
+                project_id: projectId
+              }
+            });
           }
         },
       ]
@@ -208,7 +301,15 @@ export default function ProjectListScreen({ navigation, route }: Props) {
         }
       >
         <View style={styles.header}>
-          <Text style={styles.title}>RemoteClaude Projects</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>RemoteClaude Projects</Text>
+            <TouchableOpacity 
+              style={styles.settingsButton}
+              onPress={() => navigation.navigate('Settings')}
+            >
+              <Text style={styles.settingsButtonText}>⚙️</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.connectionInfo}>
             🟢 Connected • Session: {sessionKey.substring(0, 8)}...
           </Text>
@@ -230,25 +331,51 @@ export default function ProjectListScreen({ navigation, route }: Props) {
           </View>
         ) : (
           projects.map((project) => (
-            <TouchableOpacity
-              key={project.id}
-              style={styles.projectCard}
-              onPress={() => handleProjectSelect(project)}
-            >
-              <View style={styles.projectHeader}>
-                <Text style={styles.projectName}>{project.name}</Text>
-                <Text style={[styles.projectStatus, { color: getStatusColor(project.status) }]}>
-                  {getStatusText(project.status)}
+            <View key={project.id} style={styles.projectCard}>
+              <TouchableOpacity
+                onPress={() => handleProjectSelect(project)}
+                style={styles.projectContent}
+              >
+                <View style={styles.projectHeader}>
+                  <Text style={styles.projectName}>{project.name}</Text>
+                  <Text style={[styles.projectStatus, { color: getStatusColor(project.status) }]}>
+                    {getStatusText(project.status)}
+                  </Text>
+                </View>
+                <Text style={styles.projectId}>ID: {project.id}</Text>
+                <Text style={styles.lastModified}>
+                  Last modified: {new Date(project.lastModified).toLocaleString()}
                 </Text>
+                {project.path && (
+                  <Text style={styles.projectPath}>📁 {project.path}</Text>
+                )}
+              </TouchableOpacity>
+              
+              <View style={styles.projectActions}>
+                {project.status === 'stopped' ? (
+                  <TouchableOpacity
+                    style={styles.startButton}
+                    onPress={() => startProject(project.id)}
+                  >
+                    <Text style={styles.actionButtonText}>▶️ Start</Text>
+                  </TouchableOpacity>
+                ) : project.status === 'running' ? (
+                  <TouchableOpacity
+                    style={styles.stopButton}
+                    onPress={() => stopProject(project.id)}
+                  >
+                    <Text style={styles.actionButtonText}>⏹️ Stop</Text>
+                  </TouchableOpacity>
+                ) : null}
+                
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => removeProject(project.id)}
+                >
+                  <Text style={styles.actionButtonText}>🗑️ Delete</Text>
+                </TouchableOpacity>
               </View>
-              <Text style={styles.projectId}>ID: {project.id}</Text>
-              <Text style={styles.lastModified}>
-                Last modified: {new Date(project.lastModified).toLocaleString()}
-              </Text>
-              {project.path && (
-                <Text style={styles.projectPath}>📁 {project.path}</Text>
-              )}
-            </TouchableOpacity>
+            </View>
           ))
         )}
       </ScrollView>
@@ -399,5 +526,61 @@ const styles = StyleSheet.create({
   projectPath: {
     fontSize: 12,
     color: '#007AFF',
+  },
+  projectContent: {
+    flex: 1,
+  },
+  projectActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    gap: 10,
+  },
+  startButton: {
+    backgroundColor: '#28a745',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    minWidth: 70,
+    alignItems: 'center',
+  },
+  stopButton: {
+    backgroundColor: '#dc3545',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    minWidth: 70,
+    alignItems: 'center',
+  },
+  deleteButton: {
+    backgroundColor: '#6c757d',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  settingsButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+  },
+  settingsButtonText: {
+    fontSize: 20,
   },
 });

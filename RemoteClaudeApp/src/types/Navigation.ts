@@ -10,4 +10,5 @@ export type RootStackParamList = {
     connectionUrl: string;
     sessionKey: string;
   };
+  Settings: undefined;
 };
