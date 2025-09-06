@@ -68,7 +68,7 @@ func (s *Server) generateQRCode() string {
 	s.Host = s.getLocalIP()
 	connectionURL := fmt.Sprintf("ws://%s:%s/ws?key=%s", s.Host, s.Port, s.SecretKey)
 	
-	fmt.Printf("🚀 RemoteClaude Server Started!\n")
+	fmt.Printf("🚀 ClaudeOps Remote Server Started!\n")
 	fmt.Printf("Connection URL: %s\n", connectionURL)
 	fmt.Printf("🔑 Session Key: %s\n", s.SecretKey)
 	fmt.Printf("\n")
@@ -828,7 +828,7 @@ func main() {
 	// Get port from command line or environment
 	port := getPortFromArgs()
 	
-	log.Printf("🚀 Starting RemoteClaude Server on port %s", port)
+	log.Printf("🚀 Starting ClaudeOps Remote Server on port %s", port)
 	log.Printf("💡 Port options:")
 	log.Printf("   Command line: --port=9000")
 	log.Printf("   Environment:  REMOTECLAUDE_PORT=9000")
@@ -847,21 +847,33 @@ func main() {
 		http.ServeFile(w, r, "./qr-code.png")
 	})
 	
+	// Serve static files (including icon.png)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	
 	// Static files for web interface (optional)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		html := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
 <head>
-    <title>RemoteClaude Server</title>
+    <title>ClaudeOps Remote Server</title>
+    <link rel="icon" href="/static/icon.png" type="image/png">
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
-        .qr-code { text-align: center; background: #f5f5f5; padding: 20px; margin: 20px 0; }
-        .connection-info { background: #e8f4fd; padding: 15px; border-radius: 5px; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f8fafc; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .app-icon { width: 80px; height: 80px; border-radius: 16px; margin-bottom: 10px; }
+        .qr-code { text-align: center; background: #ffffff; padding: 20px; margin: 20px 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .connection-info { background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #007AFF; }
+        h1 { color: #1a365d; margin: 0; }
+        .subtitle { color: #64748b; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <h1>RemoteClaude Server v2.0</h1>
+    <div class="header">
+        <img src="/static/icon.png" alt="ClaudeOps Remote" class="app-icon">
+        <h1>ClaudeOps Remote Server v3.5.0</h1>
+        <p class="subtitle">Mobile-Driven Claude Development Platform</p>
+    </div>
     <div class="connection-info">
         <h2>Connection Information</h2>
         <p><strong>WebSocket URL:</strong> <code>%s</code></p>
