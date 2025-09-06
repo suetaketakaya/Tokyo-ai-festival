@@ -9,7 +9,8 @@
       "Bash(./build.sh)",
       "Bash(./remoteclaude-server --help)",
       "Bash(npx expo start:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(docker build:*)"
     ],
     "deny": [],
     "ask": []

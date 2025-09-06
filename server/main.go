@@ -485,8 +485,18 @@ func (s *Server) handleDockerClaudeExecute(conn *websocket.Conn, msg map[string]
 	
 	log.Printf("🤖 Executing in Docker container %s: %s", projectID, command)
 	
+	// Check if this is a natural language command that should be sent to Claude CLI
+	var actualCommand string
+	if isNaturalLanguageCommand(command) {
+		// Wrap natural language commands with Claude CLI
+		actualCommand = fmt.Sprintf("claude \"%s\"", escapeQuotes(command))
+		log.Printf("🤖 Converting to Claude CLI command: %s", actualCommand)
+	} else {
+		actualCommand = command
+	}
+	
 	// Execute command in Docker container
-	output, err := s.dockerManager.ExecuteCommand(projectID, command)
+	output, err := s.dockerManager.ExecuteCommand(projectID, actualCommand)
 	
 	if err != nil {
 		s.sendMessage(conn, "claude_error", map[string]interface{}{
@@ -694,6 +704,107 @@ func (s *Server) openBrowser(url string) {
 	}
 
 	exec.Command(cmd, args...).Start()
+}
+
+// Helper function to detect if a command is a natural language request for Claude
+func isNaturalLanguageCommand(command string) bool {
+	command = strings.TrimSpace(strings.ToLower(command))
+	
+	// Check for common natural language patterns
+	patterns := []string{
+		"create",
+		"write",
+		"generate",
+		"make",
+		"build",
+		"help me",
+		"can you",
+		"please",
+		"add",
+		"modify",
+		"update",
+		"fix",
+		"explain",
+		"show me",
+		"tell me",
+		"how to",
+		"what is",
+		"implement",
+	}
+	
+	for _, pattern := range patterns {
+		if strings.Contains(command, pattern) {
+			return true
+		}
+	}
+	
+	// If command doesn't start with typical shell command prefixes, treat as natural language
+	shellCommands := []string{
+		"ls", "cd", "pwd", "cat", "echo", "git", "npm", "node", "python", "go", "cargo", "docker",
+		"./", "/", "sudo", "chmod", "chown", "mkdir", "rm", "cp", "mv", "grep", "find", "awk", "sed",
+	}
+	
+	for _, cmd := range shellCommands {
+		if strings.HasPrefix(command, cmd) {
+			return false
+		}
+	}
+	
+	// If it contains spaces and doesn't look like a shell command, it's likely natural language
+	if strings.Contains(command, " ") && !strings.Contains(command, "=") && !strings.Contains(command, "|") {
+		return true
+	}
+	
+	return false
+}
+
+// Helper function to escape quotes in commands for shell execution
+func escapeQuotes(command string) string {
+	// Replace double quotes with escaped quotes
+	command = strings.ReplaceAll(command, "\"", "\\\"")
+	// Replace single quotes with escaped quotes  
+	command = strings.ReplaceAll(command, "'", "\\'")
+	return command
+}
+
+// Settings handler functions (placeholder implementations)
+func (s *Server) handleSettingsUpdate(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("🔧 Handling settings update request")
+	
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid settings update message format")
+		return
+	}
+	
+	// For now, just acknowledge the settings update
+	// In a full implementation, you would persist these settings
+	log.Printf("📝 Settings data received: %+v", data)
+	
+	s.sendMessage(conn, "settings_update_response", map[string]interface{}{
+		"status":  "success",
+		"message": "Settings updated successfully",
+	})
+}
+
+func (s *Server) handleSettingsGet(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("🔧 Handling settings get request")
+	
+	// Return default settings
+	// In a full implementation, you would load these from storage
+	defaultSettings := map[string]interface{}{
+		"claudeApiKey": "",
+		"gitUsername":  "RemoteClaude User",
+		"gitEmail":     "user@remoteclaude.dev",
+		"projectType":  "general",
+		"autoCommit":   true,
+		"notifications": true,
+	}
+	
+	s.sendMessage(conn, "settings_get_response", map[string]interface{}{
+		"status":   "success",
+		"settings": defaultSettings,
+	})
 }
 
 func getPortFromArgs() string {
