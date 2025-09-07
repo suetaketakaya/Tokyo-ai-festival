@@ -1,0 +1,54 @@
+# Distribution files
+*.dmg
+*.pkg
+*.deb
+*.rpm
+*.tar.gz
+*.zip
+
+# Build outputs
+/dist/
+/build/
+remoteclaude-server
+
+# Temporary files
+.DS_Store
+*.log
+*.tmp
+*.temp
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node modules
+node_modules/
+
+# Expo
+.expo/
+
+# Docker
+docker-compose.override.yml
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Project working directories
+/projects/*/
+
+# QR code images
+qr-code.png
+
+# Captures and video
+/captures/
+/captures_resized/
+/video/
+
+# Post form data
+/postform/

@@ -1,41 +1,11 @@
-# RemoteClaude iOS App - スクリーンショット作成ガイド
+# ClaudeOps Remote iOS App - スクリーンショット作成ガイド
 
 ## 📱 App Store用スクリーンショット完全ガイド
 
-**アプリ名:** RemoteClaude  
-**バージョン:** 3.5.0  
-**作成日:** 2024年9月6日
-
----
-
-## 🎯 スクリーンショット要件
-
-### 必須サイズ・デバイス
-```
-iPhone 6.7" (iPhone 14 Pro Max): 1290 x 2796 pixels
-iPhone 6.5" (iPhone 11 Pro Max): 1242 x 2688 pixels
-iPhone 5.5" (iPhone 8 Plus):     1242 x 2208 pixels
-
-iPad 12.9" (iPad Pro):           2048 x 2732 pixels  (オプション)
-iPad 11" (iPad Pro):             1668 x 2388 pixels  (オプション)
-```
-
-### ファイル要件
-```
-フォーマット: PNG または JPEG
-色空間: sRGB または P3
-最大ファイルサイズ: 8MB
-最小品質: 72 DPI
-透明背景: 不可
-```
-
----
-
-## 📸 撮影するスクリーン（5枚セット）
+**アプリ名:** ClaudeOps Remote
 
 ### 1. **メインスクリーン - サーバー管理画面**
 ```
-ファイル名: 01_server_list.png
 画面内容:
 • 「🖥️ Server Connections」ヘッダー
 • 複数のサーバーカード表示
@@ -49,7 +19,7 @@ iPad 11" (iPad Pro):             1668 x 2388 pixels  (オプション)
 • クリーンな状態（エラー表示なし）
 
 重要なUI要素:
-✅ アプリ名「RemoteClaude」
+✅ アプリ名「ClaudeOps Remote」
 ✅ サーバー接続状態の視覚的区別
 ✅ 直感的なボタンデザイン
 ✅ プロフェッショナルな配色
@@ -57,7 +27,6 @@ iPad 11" (iPad Pro):             1668 x 2388 pixels  (オプション)
 
 ### 2. **QRスキャン画面 - カメラ機能**
 ```
-ファイル名: 02_qr_scanner.png
 画面内容:
 • QRコードスキャナーのカメラビュー
 • スキャンフレーム（四角いオーバーレイ）
@@ -67,7 +36,7 @@ iPad 11" (iPad Pro):             1668 x 2388 pixels  (オプション)
 
 撮影タイミング:
 • カメラが起動し、スキャンフレームが表示された瞬間
-• QRコードは画面中央に配置（実際のRemoteClaudeサーバーQRコード）
+• QRコードは画面中央に配置（実際のClaudeOps RemoteサーバーQRコード）
 • スキャン待機状態
 
 重要な要素:
@@ -79,9 +48,8 @@ iPad 11" (iPad Pro):             1668 x 2388 pixels  (オプション)
 
 ### 3. **プロジェクト管理画面 - Docker統合**
 ```
-ファイル名: 03_project_list.png
 画面内容:
-• 「RemoteClaude Projects」ヘッダー
+• 「ClaudeOps Remote Projects」ヘッダー
 • 接続情報表示（🟢 Connected • Session: ab12cd34...）
 • 「+ Create New Project」ボタン
 • プロジェクトカード表示（2-3個）
@@ -103,7 +71,6 @@ iPad 11" (iPad Pro):             1668 x 2388 pixels  (オプション)
 
 ### 4. **開発環境 - リアルタイムターミナル**
 ```
-ファイル名: 04_terminal_development.png
 画面内容:
 • プロジェクト名 ヘッダー
 • QuickCommandsセクション
@@ -131,8 +98,8 @@ drwxr-xr-x  15 user  staff   480 Sep  6 15:25 ..
 $ python3 --version  
 Python 3.9.18
 
-$ echo "Hello RemoteClaude!"
-Hello RemoteClaude!
+$ echo "Hello ClaudeOps Remote!"
+Hello ClaudeOps Remote!
 ```
 
 重要な要素:
@@ -144,7 +111,6 @@ Hello RemoteClaude!
 
 ### 5. **Claude AI統合 - AI支援開発**
 ```
-ファイル名: 05_claude_ai_integration.png
 画面内容:
 • 「🤖 Claude AI」セクション展開状態
 • Claude AI コマンドボタン:
@@ -233,7 +199,7 @@ python main.py
 4. バッテリー残量を100%にするか、ステータスバーを非表示に
 
 # アプリ準備  
-1. RemoteClaude アプリの最新ビルドをインストール
+1. ClaudeOps Remote アプリの最新ビルドをインストール
 2. テスト用サーバーを起動（複数サーバー推奨）
 3. サンプルプロジェクトを2-3個作成
 4. 各種コマンドを事前実行してターミナル履歴を準備
@@ -289,7 +255,7 @@ iPad: トップボタン + 音量上ボタン 同時押し
 ### 品質確認
 - [ ] **文字の可読性**: ズームなしで読める
 - [ ] **色彩バランス**: 統一された見た目
-- [ ] **ブランド一貫性**: RemoteClaude らしさ
+- [ ] **ブランド一貫性**: ClaudeOps Remote らしさ
 - [ ] **競合差別化**: 独自性が表現されている
 - [ ] **ターゲット訴求**: 開発者向けであることが明確
 
@@ -364,14 +330,14 @@ Screenshot 5: "QRコードで瞬時に接続"
 - ✅ **アプリ機能網羅**: 5つの主要機能すべて表現
 - ✅ **ユーザー訴求力**: 開発者にとっての価値が明確
 - ✅ **技術的品質**: 解像度・色彩・ファイルサイズ適切
-- ✅ **ブランド統一**: RemoteClaude らしい一貫したデザイン
+- ✅ **ブランド統一**: ClaudeOps Remote らしい一貫したデザイン
 
 ---
 
-**RemoteClaude v3.5.0 - App Store向け Visual Assets Ready!**
+**ClaudeOps Remote v3.5.0 - App Store向け Visual Assets Ready!**
 
 📸 **Professional Screenshots** | 🎨 **Brand Consistent** | 📱 **Multi-Device** | ⭐ **Store Optimized**
 
 ---
 
-*このスクリーンショットガイドに従って作成された画像は、App Storeでの最大限の訴求力を発揮し、RemoteClaudeの価値を効果的に伝達します。*
+*このスクリーンショットガイドに従って作成された画像は、App Storeでの最大限の訴求力を発揮し、ClaudeOps Remoteの価値を効果的に伝達します。*

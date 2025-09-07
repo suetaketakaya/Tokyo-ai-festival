@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemoteClaude Server Control Panel</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 RemoteClaude Server Control Panel</h1>
+            <div class="version">v3.6.0</div>
+        </header>
+
+        <div class="status-section">
+            <div class="status-card">
+                <h2>📊 Server Status</h2>
+                <div class="status-indicator">
+                    <span id="server-status" class="status-dot running">🟢</span>
+                    <span id="status-text">Running</span>
+                </div>
+                <div class="server-info">
+                    <p><strong>Host:</strong> <span id="current-host">Loading...</span></p>
+                    <p><strong>Port:</strong> <span id="current-port">8090</span></p>
+                    <p><strong>Session Key:</strong> <span id="session-key">Loading...</span></p>
+                </div>
+            </div>
+
+            <div class="clients-card">
+                <h2>📱 Connected Clients</h2>
+                <div id="client-list">
+                    <div class="client-item">
+                        <span>No clients connected</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="connection-section">
+            <div class="mode-selector">
+                <h2>🌐 Connection Mode</h2>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="mode-local" name="connection-mode" value="local" checked>
+                        <label for="mode-local">
+                            <div class="option-header">
+                                <span class="option-icon">🏠</span>
+                                <span class="option-title">Local Network</span>
+                            </div>
+                            <p class="option-description">同じWiFiネットワーク内でのみ接続可能（設定簡単）</p>
+                        </label>
+                    </div>
+                    
+                    <div class="radio-option">
+                        <input type="radio" id="mode-vpn" name="connection-mode" value="vpn">
+                        <label for="mode-vpn">
+                            <div class="option-header">
+                                <span class="option-icon">🔒</span>
+                                <span class="option-title">WireGuard VPN</span>
+                            </div>
+                            <p class="option-description">暗号化されたセキュアな接続（外部からもアクセス可能）</p>
+                        </label>
+                    </div>
+                </div>
+                
+                <button id="switch-mode-btn" class="action-button">
+                    🔄 Connection Mode Switch
+                </button>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <h2>📱 QR Code for Mobile App</h2>
+            <div class="qr-container">
+                <div id="qr-code">
+                    <div class="qr-placeholder">QR Code will appear here</div>
+                </div>
+                <div class="connection-url">
+                    <h3>Connection URL:</h3>
+                    <div id="connection-url" class="url-display">Loading...</div>
+                    <button id="copy-url-btn" class="copy-button">📋 Copy URL</button>
+                </div>
+            </div>
+            <button id="regenerate-qr-btn" class="action-button">
+                🔄 Regenerate QR Code
+            </button>
+        </div>
+
+        <div class="vpn-setup-section" id="vpn-setup" style="display: none;">
+            <h2>🔐 WireGuard VPN Setup</h2>
+            <div class="setup-steps">
+                <div class="step">
+                    <h3>Step 1: iPhone Setup</h3>
+                    <p>1. App StoreからWireGuardアプリ（無料）をダウンロード</p>
+                    <p>2. アプリを開き「+」→「QRコードから作成」を選択</p>
+                    <p>3. 下のQRコードをスキャン</p>
+                </div>
+                
+                <div class="wireguard-qr">
+                    <div id="wireguard-qr-code">
+                        <div class="qr-placeholder">WireGuard QR Code</div>
+                    </div>
+                    <button id="show-wireguard-qr" class="action-button">
+                        📱 Show WireGuard QR Code
+                    </button>
+                </div>
+                
+                <div class="step">
+                    <h3>Step 2: VPN Connection</h3>
+                    <p>1. WireGuardアプリで設定を保存</p>
+                    <p>2. VPN接続をONにする</p>
+                    <p>3. RemoteClaudeアプリで上記のQRコードを使用して接続</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h2>🛠️ Server Controls</h2>
+            <div class="control-buttons">
+                <button id="restart-btn" class="control-button restart">
+                    🔄 Restart Server
+                </button>
+                <button id="logs-btn" class="control-button">
+                    📋 View Logs
+                </button>
+                <button id="settings-btn" class="control-button">
+                    ⚙️ Settings
+                </button>
+            </div>
+        </div>
+
+        <div class="logs-section" id="logs-section" style="display: none;">
+            <h2>📋 Server Logs</h2>
+            <div class="logs-container">
+                <pre id="server-logs">Loading logs...</pre>
+            </div>
+            <div class="logs-controls">
+                <button id="refresh-logs-btn">🔄 Refresh</button>
+                <button id="clear-logs-btn">🗑️ Clear</button>
+                <button id="close-logs-btn">❌ Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

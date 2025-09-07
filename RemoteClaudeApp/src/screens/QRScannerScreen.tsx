@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Alert, TouchableOpacity, TextInput } from 'reac
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/Navigation';
+import { ServerManager } from '../services/ServerManager';
 
 type QRScannerScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -45,7 +46,7 @@ export default function QRScannerScreen({ navigation }: Props) {
     }
   };
 
-  const processConnectionUrl = (url: string) => {
+  const processConnectionUrl = async (url: string) => {
     try {
       console.log('🔍 Processing QR code URL:', url);
       
@@ -96,7 +97,7 @@ export default function QRScannerScreen({ navigation }: Props) {
       
       Alert.alert(
         '🚀 Connection Found!',
-        `Ready to connect to RemoteClaude server.\\n\\nHost: ${host}\\nKey: ${sessionKey.substring(0, 8)}...`,
+        `Ready to add RemoteClaude server.\\n\\nHost: ${host}\\nKey: ${sessionKey.substring(0, 8)}...`,
         [
           {
             text: 'Cancel',
@@ -104,12 +105,28 @@ export default function QRScannerScreen({ navigation }: Props) {
             onPress: () => setScanned(false),
           },
           {
-            text: 'Connect',
-            onPress: () => {
-              navigation.navigate('ProjectList', {
-                connectionUrl: cleanUrl,
-                sessionKey: sessionKey,
-              });
+            text: 'Add Server',
+            onPress: async () => {
+              try {
+                const serverManager = ServerManager.getInstance();
+                await serverManager.initialize();
+                await serverManager.addServer(cleanUrl, `${host}`);
+                
+                Alert.alert(
+                  'Server Added!',
+                  'The server has been added to your connection list.',
+                  [
+                    {
+                      text: 'OK',
+                      onPress: () => navigation.navigate('ServerList'),
+                    },
+                  ]
+                );
+              } catch (error) {
+                console.error('❌ Failed to add server:', error);
+                Alert.alert('Error', 'Failed to add server to your list.');
+                setScanned(false);
+              }
             },
           },
         ]

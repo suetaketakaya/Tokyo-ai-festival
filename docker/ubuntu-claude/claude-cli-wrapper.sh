@@ -13,7 +13,10 @@ mkdir -p "$CLAUDE_CONFIG_DIR" 2>/dev/null || true
 
 # Function to log commands
 log_command() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$CLAUDE_LOG_FILE" 2>/dev/null || true
+    # Only log if directory exists, otherwise skip silently
+    if [ -d "$(dirname "$CLAUDE_LOG_FILE")" ]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$CLAUDE_LOG_FILE" 2>/dev/null || true
+    fi
 }
 
 # Function to process natural language requests
@@ -26,7 +29,7 @@ process_natural_language_request() {
         *"README"*|*"readme"*)
             create_readme_file
             ;;
-        *"Python"*|*"python"*|*"hello world"*)
+        *"Python"*|*"python"*|*"hello world"*python*|*"Write a simple hello world Python script"*)
             create_python_hello_world
             ;;
         *"JavaScript"*|*"javascript"*|*"Node"*|*"node"*)
@@ -40,6 +43,9 @@ process_natural_language_request() {
             ;;
         *"Rust"*|*"rust"*)
             create_rust_hello_world
+            ;;
+        *"simple README"*|*"Create a simple README"*)
+            create_readme_file
             ;;
         *)
             echo "I understand you want me to: $request"

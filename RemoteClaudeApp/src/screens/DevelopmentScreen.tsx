@@ -332,6 +332,112 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
           >
             <Text style={styles.quickCommandText}>🐍 Claude: Python</Text>
           </TouchableOpacity>
+          
+          {/* Linux Commands */}
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('cat /etc/os-release')}
+          >
+            <Text style={styles.quickCommandText}>🐧 OS Info</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('ps aux')}
+          >
+            <Text style={styles.quickCommandText}>⚙️ Processes</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('df -h')}
+          >
+            <Text style={styles.quickCommandText}>💾 Disk Usage</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('free -h')}
+          >
+            <Text style={styles.quickCommandText}>🧠 Memory</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('top -n 1')}
+          >
+            <Text style={styles.quickCommandText}>📊 System Load</Text>
+          </TouchableOpacity>
+          
+          {/* Python Commands */}
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('python3 --version')}
+          >
+            <Text style={styles.quickCommandText}>🐍 Python Ver</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('python3 -c "print(\'Hello from Python!\')"')}
+          >
+            <Text style={styles.quickCommandText}>🐍 Python Hello</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('python3 -c "import sys; print(sys.path)"')}
+          >
+            <Text style={styles.quickCommandText}>🐍 Python Path</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('pip3 list')}
+          >
+            <Text style={styles.quickCommandText}>📦 Pip Packages</Text>
+          </TouchableOpacity>
+          
+          {/* File Operations */}
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('find . -name "*.py" -type f')}
+          >
+            <Text style={styles.quickCommandText}>🔍 Find Python</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('find . -name "*.js" -type f')}
+          >
+            <Text style={styles.quickCommandText}>🔍 Find JS</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('wc -l *.py 2>/dev/null || echo "No Python files found"')}
+          >
+            <Text style={styles.quickCommandText}>📏 Count Lines</Text>
+          </TouchableOpacity>
+          
+          {/* Development Tools */}
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('which python3 node npm git')}
+          >
+            <Text style={styles.quickCommandText}>🛠️ Tools Check</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('env | grep -E "(PATH|PYTHON|NODE)"')}
+          >
+            <Text style={styles.quickCommandText}>🌍 Environment</Text>
+          </TouchableOpacity>
+          
+          {/* Network & System */}
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('curl -s https://httpbin.org/ip')}
+          >
+            <Text style={styles.quickCommandText}>🌐 My IP</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickCommandButton}
+            onPress={() => executeQuickCommand('date')}
+          >
+            <Text style={styles.quickCommandText}>🕐 Date/Time</Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
 
@@ -347,6 +453,10 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
           returnKeyType="send"
           onSubmitEditing={executeCommand}
           editable={!isExecuting}
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoComplete="off"
+          spellCheck={false}
         />
         <TouchableOpacity
           style={[styles.sendButton, { opacity: isExecuting ? 0.5 : 1 }]}

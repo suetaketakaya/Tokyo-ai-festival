@@ -10,7 +10,10 @@
       "Bash(./remoteclaude-server --help)",
       "Bash(npx expo start:*)",
       "Bash(git add:*)",
-      "Bash(docker build:*)"
+      "Bash(docker build:*)",
+      "Read(/Users/suetaketakaya/1.prog/**)",
+      "Bash(sudo mkdir:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

@@ -43,11 +43,36 @@ export default function ProjectListScreen({ navigation, route }: Props) {
   const { connectionUrl, sessionKey } = route.params;
 
   useEffect(() => {
-    connectToServer();
-    return () => {
-      WebSocketService.disconnect();
-    };
+    checkConnection();
   }, []);
+
+  const checkConnection = async () => {
+    console.log('🔍 ProjectListScreen - Checking connection...');
+    const wsConnected = WebSocketService.isConnected();
+    console.log('🔍 WebSocket connected:', wsConnected);
+    
+    if (wsConnected) {
+      setIsConnected(true);
+      setIsLoading(false);
+      
+      // Update WebSocket callbacks to handle messages in this screen
+      WebSocketService.updateCallbacks({
+        onMessage: (message) => {
+          handleServerMessage(message);
+        },
+        onClose: () => {
+          console.log('🔌 Disconnected from server in ProjectList');
+          setIsConnected(false);
+        },
+      });
+      
+      // Request project list
+      requestProjectList();
+    } else {
+      console.log('❌ No WebSocket connection found, attempting to connect...');
+      connectToServer();
+    }
+  };
 
   const connectToServer = async () => {
     try {
@@ -151,7 +176,11 @@ export default function ProjectListScreen({ navigation, route }: Props) {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    requestProjectList();
+    if (WebSocketService.isConnected()) {
+      requestProjectList();
+    } else {
+      await checkConnection();
+    }
     setRefreshing(false);
   };
 
@@ -285,7 +314,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
         <Text style={styles.errorSubText}>
           Unable to connect to the RemoteClaude server.
         </Text>
-        <TouchableOpacity style={styles.retryButton} onPress={connectToServer}>
+        <TouchableOpacity style={styles.retryButton} onPress={checkConnection}>
           <Text style={styles.retryButtonText}>Retry Connection</Text>
         </TouchableOpacity>
       </View>

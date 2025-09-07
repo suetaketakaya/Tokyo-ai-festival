@@ -839,6 +839,11 @@ func main() {
 	// Generate and display QR code
 	connectionURL := server.generateQRCode()
 
+	// Initialize web interface v3.6.0
+	webInterface := NewWebInterface(server)
+	webInterface.StartWebServer()
+	log.Printf("🌐 Web management interface: http://%s:8080", server.getLocalIP())
+
 	// Set up HTTP routes
 	http.HandleFunc("/ws", server.handleWebSocket)
 	
@@ -850,7 +855,7 @@ func main() {
 	// Serve static files (including icon.png)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	
-	// Static files for web interface (optional)
+	// Legacy web interface (fallback)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		html := fmt.Sprintf(`
 <!DOCTYPE html>
@@ -871,7 +876,7 @@ func main() {
 <body>
     <div class="header">
         <img src="/static/icon.png" alt="ClaudeOps Remote" class="app-icon">
-        <h1>ClaudeOps Remote Server v3.5.0</h1>
+        <h1>ClaudeOps Remote Server v3.6.0</h1>
         <p class="subtitle">Mobile-Driven Claude Development Platform</p>
     </div>
     <div class="connection-info">

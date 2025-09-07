@@ -44,7 +44,7 @@
 ### Option 1: DMG Package (Recommended for macOS)
 ```bash
 # Download from GitHub Releases
-1. Go to: https://github.com/your-repo/remote_manual/releases
+1. Go to: https://github.com/suetaketakaya/Tokyo-ai-festival/releases/tag/v3.5.0
 2. Download: RemoteClaude-Server-v3.5.0.dmg
 3. Mount DMG and drag RemoteClaudeServer.app to Applications
 4. Install dependencies (Docker, Claude CLI)
@@ -139,16 +139,6 @@ cd remote_manual/server
 
 ---
 
-## 🔮 Coming Soon (v4.0)
-
-- [ ] SSL/TLS encryption for production deployment
-- [ ] User authentication and role-based access control
-- [ ] Cloud deployment automation scripts
-- [ ] Multi-user collaboration features
-- [ ] Advanced project templates and scaffolding
-- [ ] Container resource monitoring and analytics
-- [ ] Windows Server support
-- [ ] Web-based dashboard interface
 
 ---
 
@@ -165,17 +155,16 @@ We welcome contributions! Please:
 ## 📄 License
 
 MIT License - See LICENSE file for details
-
----
-
-## 🆘 Support
-
-- **Issues**: https://github.com/your-repo/remote_manual/issues
-- **Discussions**: https://github.com/your-repo/remote_manual/discussions
-- **Email**: support@remoteclaude.com
-
----
-
 **RemoteClaude v3.5** - The Ultimate Mobile-Driven Multi-Server Development Platform!
-
 🚀 **Production Ready** | 📱 **Mobile First** | 🐧 **Cross Platform** | 🤖 **AI Powered** | ⚡ **Real Time**
+
+## 🔮 Coming Soon (v4.0)
+
+- [ ] SSL/TLS encryption for production deployment
+- [ ] User authentication and role-based access control
+- [ ] Cloud deployment automation scripts
+- [ ] Multi-user collaboration features
+- [ ] Advanced project templates and scaffolding
+- [ ] Container resource monitoring and analytics
+- [ ] Windows Server support
+- [ ] Web-based dashboard interface

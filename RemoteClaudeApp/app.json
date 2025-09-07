@@ -1,9 +1,10 @@
 {
   "expo": {
-    "name": "RemoteClaude",
+    "name": "ClaudeOps Remote",
     "slug": "remote-claude-app",
-    "version": "2.0.0",
+    "version": "3.5.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "assetBundlePatterns": [
       "**/*"
@@ -11,13 +12,20 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.remoteclaude.app",
+      "icon": "./assets/icon.png",
+      "deploymentTarget": "18.0",
       "infoPlist": {
-        "NSCameraUsageDescription": "This app needs camera access to scan QR codes for connecting to RemoteClaude servers."
+        "NSCameraUsageDescription": "Allow ClaudeOps Remote to access your camera to scan QR codes.",
+        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
       }
     },
     "android": {
       "package": "com.remoteclaude.app",
-      "permissions": ["CAMERA"]
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       [
@@ -32,6 +40,12 @@
           "cameraPermission": "Allow RemoteClaude to access your camera to scan QR codes."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "401cce87-a023-4c11-b36d-f9bd2a3f5834"
+      }
+    },
+    "owner": "takechan"
   }
 }

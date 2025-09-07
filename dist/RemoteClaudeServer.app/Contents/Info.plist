@@ -2,45 +2,33 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleExecutable</key>
-    <string>remoteclaude-server</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.remoteclaude.server</string>
-    <key>CFBundleName</key>
-    <string>RemoteClaude Server</string>
     <key>CFBundleDisplayName</key>
     <string>RemoteClaude Server</string>
-    <key>CFBundleVersion</key>
-    <string>3.5.0</string>
-    <key>CFBundleShortVersionString</key>
-    <string>3.5.0</string>
+    <key>CFBundleExecutable</key>
+    <string>remoteclaude-server</string>
+    <key>CFBundleIconFile</key>
+    <string>icon</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.remoteclaude.server</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>RemoteClaude Server</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
-    <key>CFBundleSignature</key>
-    <string>????</string>
+    <key>CFBundleShortVersionString</key>
+    <string>3.6.0</string>
+    <key>CFBundleVersion</key>
+    <string>3.6.0</string>
     <key>LSMinimumSystemVersion</key>
     <string>10.15</string>
-    <key>LSUIElement</key>
-    <true/>
     <key>NSHighResolutionCapable</key>
     <true/>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
-    <key>CFBundleDocumentTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeName</key>
-            <string>RemoteClaude Project</string>
-            <key>CFBundleTypeExtensions</key>
-            <array>
-                <string>rcproj</string>
-            </array>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-        </dict>
-    </array>
+    <key>CFBundleGetInfoString</key>
+    <string>RemoteClaude Server v3.6.0 - Enterprise Mobile-Driven Development Platform</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2024 RemoteClaude. All rights reserved.</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.developer-tools</string>
 </dict>
 </plist>

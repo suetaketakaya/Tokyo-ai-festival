@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 
 // Screens
 import QRScannerScreen from './src/screens/QRScannerScreen';
+import ServerListScreen from './src/screens/ServerListScreen';
 import ProjectListScreen from './src/screens/ProjectListScreen';
 import DevelopmentScreen from './src/screens/DevelopmentScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
@@ -20,12 +21,22 @@ export default function App() {
     <NavigationContainer>
       <View style={styles.container}>
         <StatusBar style="auto" />
-        <Stack.Navigator initialRouteName="QRScanner">
+        <Stack.Navigator initialRouteName="ServerList">
           <Stack.Screen
             name="QRScanner"
             component={QRScannerScreen}
             options={{
-              title: 'RemoteClaude',
+              title: '📱 QR Scanner',
+              headerStyle: { backgroundColor: '#007AFF' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
+          <Stack.Screen
+            name="ServerList"
+            component={ServerListScreen}
+            options={{
+              title: '🖥️ Servers',
               headerStyle: { backgroundColor: '#007AFF' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },
