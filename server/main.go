@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -13,6 +14,9 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"sync"
+	"time"
+	"unicode"
 
 	"github.com/gorilla/websocket"
 	"github.com/skip2/go-qrcode"
@@ -24,12 +28,34 @@ const (
 	QRHeight    = 50
 )
 
+// ConversationSession stores conversation context for each project
+type ConversationSession struct {
+	ProjectID     string            `json:"project_id"`
+	MessageHistory []ConversationMessage `json:"message_history"`
+	CreatedAt     time.Time         `json:"created_at"`
+	LastActivity  time.Time         `json:"last_activity"`
+	Context       map[string]string `json:"context"`
+	Language      string            `json:"language"` // detected language preference
+}
+
+// ConversationMessage represents a single message in the conversation
+type ConversationMessage struct {
+	Role      string    `json:"role"`      // "user" or "assistant"
+	Content   string    `json:"content"`   
+	Timestamp time.Time `json:"timestamp"`
+	Command   string    `json:"command,omitempty"`   // original command if different from content
+	Output    string    `json:"output,omitempty"`    // command execution output
+}
+
 type Server struct {
 	Host          string
 	Port          string
 	SecretKey     string
 	upgrader      websocket.Upgrader
 	dockerManager *DockerManager
+	// Session management
+	sessions      map[string]*ConversationSession
+	sessionsMutex sync.RWMutex
 }
 
 func NewServer(port string) *Server {
@@ -45,35 +71,184 @@ func NewServer(port string) *Server {
 		Port:          port,
 		SecretKey:     secretKey,
 		dockerManager: dockerManager,
+		sessions:      make(map[string]*ConversationSession),
 		upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
-				return true // Allow all origins for development
+				return true // Allow all origins for mobile app connection
 			},
+			EnableCompression: true,
+			HandshakeTimeout:  30 * time.Second,
 		},
 	}
 }
 
 func (s *Server) getLocalIP() string {
+	// Method 1: Try to get IP via external connection (works for most cases including tethering)
 	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err == nil {
+		defer conn.Close()
+		localAddr := conn.LocalAddr().(*net.UDPAddr)
+		ip := localAddr.IP.String()
+		
+		// Validate that we got a proper IP (not localhost)
+		if ip != "127.0.0.1" && ip != "::1" && ip != "" {
+			log.Printf("🌐 Detected IP via external connection: %s", ip)
+			return ip
+		}
+	}
+	
+	// Method 2: Fallback - scan network interfaces for best IP
+	log.Printf("⚠️ External connection method failed, scanning interfaces...")
+	
+	interfaces, err := net.Interfaces()
 	if err != nil {
+		log.Printf("❌ Failed to get network interfaces: %v", err)
 		return "localhost"
 	}
-	defer conn.Close()
+	
+	var candidateIPs []string
+	
+	for _, iface := range interfaces {
+		// Skip loopback and down interfaces
+		if iface.Flags&net.FlagLoopback != 0 || iface.Flags&net.FlagUp == 0 {
+			continue
+		}
+		
+		addrs, err := iface.Addrs()
+		if err != nil {
+			continue
+		}
+		
+		for _, addr := range addrs {
+			if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil { // IPv4 only
+					ip := ipnet.IP.String()
+					
+					// Prioritize different IP ranges
+					if isPrivateIP(ip) {
+						candidateIPs = append(candidateIPs, ip)
+						log.Printf("🔍 Found interface IP: %s (%s)", ip, iface.Name)
+					}
+				}
+			}
+		}
+	}
+	
+	// Select best IP based on priority
+	bestIP := selectBestIP(candidateIPs)
+	log.Printf("🎯 Selected best IP: %s", bestIP)
+	return bestIP
+}
 
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	return localAddr.IP.String()
+// Check if IP is in private ranges
+func isPrivateIP(ip string) bool {
+	parsedIP := net.ParseIP(ip)
+	if parsedIP == nil {
+		return false
+	}
+	
+	// Common private ranges
+	privateRanges := []string{
+		"10.0.0.0/8",     // Class A private
+		"172.16.0.0/12",  // Class B private  
+		"192.168.0.0/16", // Class C private
+		"169.254.0.0/16", // Link-local
+	}
+	
+	for _, cidr := range privateRanges {
+		_, network, _ := net.ParseCIDR(cidr)
+		if network != nil && network.Contains(parsedIP) {
+			return true
+		}
+	}
+	
+	return false
+}
+
+// Select the best IP from candidates based on priority
+func selectBestIP(candidates []string) string {
+	if len(candidates) == 0 {
+		return "localhost"
+	}
+	
+	// Priority order for different network types
+	priorities := []string{
+		"192.168.", // Home/office WiFi (highest priority)
+		"10.",      // Corporate/tethering networks
+		"172.",     // Docker/corporate networks
+		"169.254.", // Link-local (lowest priority)
+	}
+	
+	// Check each priority level
+	for _, prefix := range priorities {
+		for _, ip := range candidates {
+			if strings.HasPrefix(ip, prefix) {
+				log.Printf("✅ Selected IP with prefix %s: %s", prefix, ip)
+				return ip
+			}
+		}
+	}
+	
+	// If no priority match, return first candidate
+	log.Printf("✅ No priority match, using first candidate: %s", candidates[0])
+	return candidates[0]
+}
+
+// Check if WireGuard VPN is active by looking for 10.0.0.1 interface
+func (s *Server) isWireGuardActive() bool {
+	// Method 1: Check using ifconfig for 10.0.0.1 address
+	cmd := exec.Command("ifconfig")
+	output, err := cmd.Output()
+	if err == nil {
+		outputStr := string(output)
+		if strings.Contains(outputStr, "10.0.0.1") {
+			return true
+		}
+	}
+	
+	// Method 2: Check using wg command (no sudo needed for status check)
+	wgCmd := exec.Command("wg", "show")
+	if err := wgCmd.Run(); err == nil {
+		return true
+	}
+	
+	return false
 }
 
 func (s *Server) generateQRCode() string {
-	s.Host = s.getLocalIP()
+	// Determine the appropriate host based on VPN status
+	if s.isWireGuardActive() {
+		s.Host = "10.0.0.1"
+		fmt.Printf("🔒 VPN Mode: Server binding to VPN interface\n")
+	} else {
+		s.Host = s.getLocalIP()
+		fmt.Printf("🏠 Local Mode: Server binding to local interface\n")
+	}
+	
 	connectionURL := fmt.Sprintf("ws://%s:%s/ws?key=%s", s.Host, s.Port, s.SecretKey)
 	
 	fmt.Printf("🚀 ClaudeOps Remote Server Started!\n")
 	fmt.Printf("Connection URL: %s\n", connectionURL)
 	fmt.Printf("🔑 Session Key: %s\n", s.SecretKey)
+	
+	// Always show both URLs for reference
+	localURL := fmt.Sprintf("ws://%s:%s/ws?key=%s", s.getLocalIP(), s.Port, s.SecretKey)
+	vpnURL := fmt.Sprintf("ws://10.0.0.1:%s/ws?key=%s", s.Port, s.SecretKey)
+	
+	if s.isWireGuardActive() {
+		fmt.Printf("✅ WireGuard VPN is active\n")
+		fmt.Printf("🔒 Primary (VPN): %s\n", vpnURL)
+		fmt.Printf("🏠 Fallback (Local): %s\n", localURL)
+		fmt.Printf("📱 Use VPN URL for mobile connection through WireGuard\n")
+	} else {
+		fmt.Printf("⚠️  WireGuard VPN not active\n")
+		fmt.Printf("🏠 Primary (Local): %s\n", localURL)
+		fmt.Printf("🔒 VPN (when active): %s\n", vpnURL)
+		fmt.Printf("📱 Start VPN with: sudo wg-quick up ~/.remoteclaude/wireguard/wg0.conf\n")
+	}
 	fmt.Printf("\n")
 	
-	// Generate actual scannable QR code
+	// Generate QR code with the primary connection URL
 	s.printRealQRCode(connectionURL)
 	
 	// Also save QR code as image file
@@ -171,28 +346,42 @@ func (s *Server) saveQRCodeImage(url string) {
 }
 
 func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
+	log.Printf("🔗 WebSocket connection attempt from: %s", r.RemoteAddr)
+	
 	// Validate secret key
 	key := r.URL.Query().Get("key")
+	if key == "" {
+		log.Printf("❌ Missing secret key in WebSocket request")
+		http.Error(w, "Missing authentication key", http.StatusUnauthorized)
+		return
+	}
+	
 	if key != s.SecretKey {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		log.Printf("❌ Invalid secret key provided: %s", key)
+		http.Error(w, "Invalid authentication key", http.StatusUnauthorized)
 		return
 	}
 
+	// Set headers for mobile app compatibility
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+
 	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("WebSocket upgrade error: %v", err)
+		log.Printf("❌ WebSocket upgrade error: %v", err)
 		return
 	}
 	defer conn.Close()
 
-	log.Printf("iPhone connected from: %s", conn.RemoteAddr())
+	log.Printf("✅ Mobile app connected from: %s", conn.RemoteAddr())
 
 	// Send welcome message
 	welcome := map[string]interface{}{
 		"type": "connection_established",
 		"data": map[string]interface{}{
-			"server_version": "2.0",
-			"capabilities":   []string{"project_management", "claude_execution", "git_integration"},
+			"server_version": "3.6.0",
+			"api_version":    "3.5",  // Compatible with v3.5.0 apps
+			"capabilities":   []string{"project_management", "claude_execution", "git_integration", "docker_support", "web_management"},
 		},
 	}
 	conn.WriteJSON(welcome)
@@ -202,11 +391,15 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		var msg map[string]interface{}
 		err := conn.ReadJSON(&msg)
 		if err != nil {
-			log.Printf("WebSocket read error: %v", err)
+			if websocket.IsCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("📱 Mobile app disconnected: %v", err)
+			} else {
+				log.Printf("❌ WebSocket read error: %v", err)
+			}
 			break
 		}
 
-		log.Printf("Received: %+v", msg)
+		log.Printf("📱 Received from app: %+v", msg)
 		s.handleMessage(conn, msg)
 	}
 }
@@ -248,6 +441,15 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 
 	case "settings_get":
 		s.handleSettingsGet(conn, msg)
+
+	case "conversation_history":
+		s.handleConversationHistory(conn, msg)
+
+	case "conversation_clear":
+		s.handleConversationClear(conn, msg)
+
+	case "conversation_continue":
+		s.handleConversationContinue(conn, msg)
 
 	default:
 		s.sendError(conn, fmt.Sprintf("Unknown message type: %s", msgType))
@@ -485,20 +687,28 @@ func (s *Server) handleDockerClaudeExecute(conn *websocket.Conn, msg map[string]
 	
 	log.Printf("🤖 Executing in Docker container %s: %s", projectID, command)
 	
-	// Check if this is a natural language command that should be sent to Claude CLI
-	var actualCommand string
-	if isNaturalLanguageCommand(command) {
-		// Wrap natural language commands with Claude CLI
-		actualCommand = fmt.Sprintf("claude \"%s\"", escapeQuotes(command))
-		log.Printf("🤖 Converting to Claude CLI command: %s", actualCommand)
-	} else {
-		actualCommand = command
+	// Get or create conversation session
+	session := s.getOrCreateSession(projectID)
+	
+	// Detect and update language preference
+	detectedLang := s.detectLanguage(command)
+	if detectedLang != "auto" && session.Language == "auto" {
+		session.Language = detectedLang
+		log.Printf("🌐 Detected language for session %s: %s", projectID, detectedLang)
 	}
 	
-	// Execute command in Docker container
-	output, err := s.dockerManager.ExecuteCommand(projectID, actualCommand)
+	// Add user message to session
+	s.addMessageToSession(projectID, "user", command, command, "")
 	
+	// Get conversation context
+	sessionContext := s.getSessionContext(projectID)
+	
+	// Use the enhanced command router for unified command processing
+	output, err := s.processEnhancedCommand(projectID, command, sessionContext)
 	if err != nil {
+		// Add error to session
+		s.addMessageToSession(projectID, "assistant", "", command, fmt.Sprintf("Error: %s", err.Error()))
+		
 		s.sendMessage(conn, "claude_error", map[string]interface{}{
 			"project_id": projectID,
 			"error":      err.Error(),
@@ -508,8 +718,21 @@ func (s *Server) handleDockerClaudeExecute(conn *websocket.Conn, msg map[string]
 		return
 	}
 	
+	// Add successful output to session
+	s.addMessageToSession(projectID, "assistant", "", command, output)
+	
+	log.Printf("📤 Sending claude_output to iOS app. Output length: %d", len(output))
+	previewLen := 200
+	if len(output) < previewLen {
+		previewLen = len(output)
+	}
+	log.Printf("📤 Output preview: %s", output[:previewLen])
+	
 	s.sendMessage(conn, "claude_output", map[string]interface{}{
-		"project_id": projectID,
+		"project_id":      projectID,
+		"session_id":      fmt.Sprintf("session_%s", projectID),
+		"language":        session.Language,
+		"message_count":   len(session.MessageHistory),
 		"output":     output,
 		"command":    command,
 		"status":     "completed",
@@ -541,19 +764,74 @@ func (s *Server) handleDockerClaudeExecuteStream(conn *websocket.Conn, msg map[s
 	
 	log.Printf("🚀 Streaming execution in Docker container %s: %s", projectID, command)
 	
+	// Get or create conversation session
+	session := s.getOrCreateSession(projectID)
+	
+	// Detect and update language preference
+	detectedLang := s.detectLanguage(command)
+	if detectedLang != "auto" && session.Language == "auto" {
+		session.Language = detectedLang
+		log.Printf("🌐 Detected language for streaming session %s: %s", projectID, detectedLang)
+	}
+	
+	// Add user message to session
+	s.addMessageToSession(projectID, "user", command, command, "")
+	
+	// Get conversation context
+	sessionContext := s.getSessionContext(projectID)
+	
+	// Build enhanced command with context for streaming
+	var actualCommand string
+	if isNaturalLanguageCommand(command) {
+		var claudeCommand string
+		if sessionContext != "" {
+			claudeCommand = fmt.Sprintf("Context from previous conversation:\n%s\nCurrent request: %s", sessionContext, command)
+		} else {
+			claudeCommand = command
+		}
+		
+		// For streaming, add --stream flag for better real-time experience
+		if containsNonASCII(claudeCommand) {
+			// Use safe file-based processing for streaming
+			tempFile := fmt.Sprintf("/tmp/claude_stream_input_%d.txt", time.Now().UnixNano())
+			actualCommand = fmt.Sprintf(`cat > %s << 'CLAUDE_EOF'
+%s
+CLAUDE_EOF
+claude --stream "$(cat %s)" && rm %s`, tempFile, claudeCommand, tempFile, tempFile)
+		} else {
+			actualCommand = fmt.Sprintf("claude --stream \"%s\"", escapeQuotes(claudeCommand))
+		}
+		log.Printf("🌊 Converting to streaming Claude CLI command with context")
+	} else {
+		actualCommand = command
+	}
+	
 	// Send stream start notification
 	s.sendMessage(conn, "claude_stream_start", map[string]interface{}{
+		"session_id":    fmt.Sprintf("session_%s", projectID),
+		"language":      session.Language,
+		"message_count": len(session.MessageHistory),
 		"project_id": projectID,
 		"command":    command,
 	})
 	
 	// Start streaming command execution
 	ctx := context.TODO() // In production, use proper context with timeout
-	outputChan, errorChan := s.dockerManager.StreamCommand(ctx, projectID, command)
+	outputChan, errorChan := s.dockerManager.StreamCommand(ctx, projectID, actualCommand)
 	
 	// Stream output in separate goroutine
 	go func() {
+		var streamedOutput strings.Builder
+		var streamError error
+		
 		defer func() {
+			// Add streamed result to session
+			if streamError != nil {
+				s.addMessageToSession(projectID, "assistant", "", actualCommand, fmt.Sprintf("Error: %s", streamError.Error()))
+			} else {
+				s.addMessageToSession(projectID, "assistant", "", actualCommand, streamedOutput.String())
+			}
+			
 			s.sendMessage(conn, "claude_stream_end", map[string]interface{}{
 				"project_id": projectID,
 				"command":    command,
@@ -566,6 +844,9 @@ func (s *Server) handleDockerClaudeExecuteStream(conn *websocket.Conn, msg map[s
 				if !ok {
 					return // Channel closed
 				}
+				
+				// Accumulate output for session
+				streamedOutput.WriteString(output)
 				
 				// Send streamed output
 				s.sendMessage(conn, "claude_stream_output", map[string]interface{}{
@@ -580,6 +861,7 @@ func (s *Server) handleDockerClaudeExecuteStream(conn *websocket.Conn, msg map[s
 				}
 				
 				if err != nil {
+					streamError = err
 					s.sendMessage(conn, "claude_stream_error", map[string]interface{}{
 						"project_id": projectID,
 						"error":      err.Error(),
@@ -635,8 +917,15 @@ func (s *Server) handleClaudeExecute(conn *websocket.Conn, msg map[string]interf
 		cmd = exec.Command("sh", "-c", command)
 		log.Printf("🔧 Executing shell command: %s", command)
 	} else {
-		// Treat as Claude prompt
-		cmd = exec.Command("claude", "-p", command)
+		// Treat as Claude prompt - handle Japanese/Unicode text properly
+		if containsNonASCII(command) {
+			log.Printf("🗾 Detected non-ASCII characters, using safe encoding")
+			// Use stdin to pass the command to avoid shell encoding issues
+			cmd = exec.Command("claude")
+			cmd.Stdin = strings.NewReader(command)
+		} else {
+			cmd = exec.Command("claude", "-p", command)
+		}
 		log.Printf("🤖 Executing Claude with prompt: %s", command)
 	}
 
@@ -675,7 +964,21 @@ func (s *Server) sendMessage(conn *websocket.Conn, msgType string, data interfac
 		"type": msgType,
 		"data": data,
 	}
-	conn.WriteJSON(msg)
+	log.Printf("📤 Attempting to send message type: %s", msgType)
+	
+	// Log the actual JSON content for debugging
+	jsonBytes, _ := json.Marshal(msg)
+	previewLen := 300
+	if len(jsonBytes) < previewLen {
+		previewLen = len(jsonBytes)
+	}
+	log.Printf("📤 JSON content preview: %s", string(jsonBytes)[:previewLen])
+	
+	if err := conn.WriteJSON(msg); err != nil {
+		log.Printf("❌ Failed to send WebSocket message: %v", err)
+	} else {
+		log.Printf("✅ Successfully sent WebSocket message type: %s", msgType)
+	}
 }
 
 func (s *Server) sendError(conn *websocket.Conn, errMsg string) {
@@ -708,51 +1011,168 @@ func (s *Server) openBrowser(url string) {
 
 // Helper function to detect if a command is a natural language request for Claude
 func isNaturalLanguageCommand(command string) bool {
-	command = strings.TrimSpace(strings.ToLower(command))
+	command = strings.TrimSpace(command)
+	commandLower := strings.ToLower(command)
 	
-	// Check for common natural language patterns
-	patterns := []string{
-		"create",
-		"write",
-		"generate",
-		"make",
-		"build",
-		"help me",
-		"can you",
-		"please",
-		"add",
-		"modify",
-		"update",
-		"fix",
-		"explain",
-		"show me",
-		"tell me",
-		"how to",
-		"what is",
-		"implement",
+	// Empty command
+	if command == "" {
+		return false
 	}
 	
-	for _, pattern := range patterns {
-		if strings.Contains(command, pattern) {
-			return true
-		}
+	// First check for Japanese characters - if found, it's definitely natural language
+	if containsJapanese(command) {
+		return true
 	}
 	
-	// If command doesn't start with typical shell command prefixes, treat as natural language
+	// Check if it starts with clear Linux/shell commands (priority check)
 	shellCommands := []string{
-		"ls", "cd", "pwd", "cat", "echo", "git", "npm", "node", "python", "go", "cargo", "docker",
-		"./", "/", "sudo", "chmod", "chown", "mkdir", "rm", "cp", "mv", "grep", "find", "awk", "sed",
+		// Basic Unix commands
+		"ls", "cd", "pwd", "cat", "echo", "grep", "find", "awk", "sed", "sort", "uniq", "wc", "head", "tail",
+		"mkdir", "rmdir", "rm", "cp", "mv", "chmod", "chown", "chgrp", "ln", "touch", "file", "which", "whereis",
+		"ps", "top", "htop", "kill", "killall", "jobs", "bg", "fg", "nohup", "screen", "tmux",
+		"tar", "gzip", "gunzip", "zip", "unzip", "curl", "wget", "ssh", "scp", "rsync",
+		
+		// Programming language executables  
+		"python", "python3", "node", "npm", "npx", "yarn", "go", "cargo", "rustc", "gcc", "g++", "clang",
+		"java", "javac", "ruby", "php", "perl", "bash", "zsh", "sh", "csh", "tcsh",
+		
+		// Development tools
+		"git", "docker", "docker-compose", "kubectl", "helm", "terraform", "ansible",
+		"make", "cmake", "ninja", "bazel", "gradle", "maven", "ant",
+		
+		// System commands
+		"sudo", "su", "systemctl", "service", "crontab", "mount", "umount", "df", "du", "free", "uname",
+		"env", "export", "alias", "history", "man", "info", "help",
+		
+		// Text editors and viewers
+		"vim", "vi", "nano", "emacs", "less", "more", "pager",
 	}
 	
-	for _, cmd := range shellCommands {
-		if strings.HasPrefix(command, cmd) {
+	// Check path-like commands
+	pathPrefixes := []string{"./", "../", "/", "~/", "\\", ".\\"}
+	for _, prefix := range pathPrefixes {
+		if strings.HasPrefix(command, prefix) {
 			return false
 		}
 	}
 	
-	// If it contains spaces and doesn't look like a shell command, it's likely natural language
-	if strings.Contains(command, " ") && !strings.Contains(command, "=") && !strings.Contains(command, "|") {
+	// Check for shell command prefixes
+	words := strings.Fields(commandLower)
+	if len(words) == 0 {
+		return false
+	}
+	firstWord := words[0]
+	for _, cmd := range shellCommands {
+		if firstWord == cmd {
+			return false
+		}
+	}
+	
+	// Check for shell-specific syntax patterns
+	shellPatterns := []string{
+		"|", "&&", "||", ";", ">", ">>", "<", "<<", "`", "$(", "${", "$(",
+		"2>", "&>", "2>&1", ">/dev/null",
+	}
+	for _, pattern := range shellPatterns {
+		if strings.Contains(command, pattern) {
+			return false
+		}
+	}
+	
+	// Check for variable assignments
+	if strings.Contains(command, "=") && !strings.Contains(command, " == ") && !strings.Contains(command, " != ") {
+		return false
+	}
+	
+	// Check for common natural language patterns (English)
+	englishPatterns := []string{
+		"create", "write", "generate", "make a", "build a", "help me", "can you", "please",
+		"add", "modify", "update", "fix", "explain", "show me", "tell me", "how to",
+		"what is", "what are", "what does", "why", "when", "where", "who", "which",
+		"implement", "develop", "design", "refactor", "optimize", "improve",
+		"debug", "test", "review", "analyze", "check", "search", "list all",
+		"delete", "remove", "install", "setup", "configure", "deploy", "start",
+		"stop", "restart", "enable", "disable", "convert", "transform", "migrate",
+		"backup", "restore", "clean", "organize", "sort", "filter", "format",
+		"validate", "verify", "compare", "merge", "split", "combine", "extract",
+		"compress", "decompress", "encrypt", "decrypt", "parse", "render",
+		"i want", "i need", "i would like", "could you", "would you", "should i",
+		"how do i", "how can i", "is it possible", "can i", "may i",
+	}
+	
+	// Check for Japanese natural language patterns
+	japanesePatterns := []string{
+		"つくって", "作って", "書いて", "かいて", "生成して", "せいせいして",
+		"作成して", "さくせいして", "実行して", "じっこうして", "実装して", "じっそうして",
+		"修正して", "しゅうせいして", "説明して", "せつめいして", "教えて", "おしえて",
+		"見せて", "みせて", "確認して", "かくにんして", "テストして", "てすとして",
+		"削除して", "さくじょして", "追加して", "ついかして", "更新して", "こうしんして",
+		"ファイルを", "ふぁいるを", "コードを", "こーどを", "プログラムを", "ぷろぐらむを",
+		"アプリを", "あぷりを", "データを", "でーたを", "設定を", "せっていを",
+		"について", "につい", "方法", "ほうほう", "やり方", "やりかた", "手順", "てじゅん",
+		"エラー", "えらー", "問題", "もんだい", "バグ", "ばぐ", "修正", "しゅうせい",
+		"どうやって", "どのように", "なぜ", "いつ", "どこで", "だれが", "どれが",
+	}
+	
+	// Check English patterns
+	for _, pattern := range englishPatterns {
+		if strings.Contains(commandLower, pattern) {
+			return true
+		}
+	}
+	
+	// Check Japanese patterns
+	for _, pattern := range japanesePatterns {
+		if strings.Contains(command, pattern) || strings.Contains(commandLower, pattern) {
+			return true
+		}
+	}
+	
+	// Check for question patterns
+	questionStarters := []string{"what", "how", "why", "when", "where", "who", "which", "can", "could", "would", "should", "is", "are", "do", "does", "did"}
+	questionEnders := []string{"?"}
+	
+	for _, starter := range questionStarters {
+		if strings.HasPrefix(commandLower, starter+" ") {
+			return true
+		}
+	}
+	
+	for _, ender := range questionEnders {
+		if strings.HasSuffix(command, ender) {
+			return true
+		}
+	}
+	
+	// Default behavior: if it contains spaces and doesn't match shell patterns, treat as natural language
+	if strings.Contains(command, " ") {
+		// Additional shell command patterns to exclude
+		words := strings.Fields(commandLower)
+		if len(words) >= 2 {
+			// Check for patterns like "npm install", "git clone", etc.
+			combinedCommands := []string{
+				"npm install", "npm run", "npm start", "npm test", "npm build",
+				"git clone", "git add", "git commit", "git push", "git pull", "git checkout", "git branch",
+				"docker run", "docker build", "docker exec", "docker ps", "docker images",
+				"python -m", "node -e", "go run", "cargo run", "cargo build",
+			}
+			
+			firstTwoWords := strings.Join(words[:2], " ")
+			for _, cmd := range combinedCommands {
+				if strings.HasPrefix(firstTwoWords, cmd) {
+					return false
+				}
+			}
+		}
 		return true
+	}
+	
+	// Single word commands - default to shell command unless it's clearly conversational
+	conversationalWords := []string{"hello", "hi", "hey", "thanks", "thank", "yes", "no", "ok", "okay"}
+	for _, word := range conversationalWords {
+		if commandLower == word {
+			return true
+		}
 	}
 	
 	return false
@@ -765,6 +1185,133 @@ func escapeQuotes(command string) string {
 	// Replace single quotes with escaped quotes  
 	command = strings.ReplaceAll(command, "'", "\\'")
 	return command
+}
+
+// Helper function to detect non-ASCII characters (Japanese, Unicode, etc.)
+func containsNonASCII(s string) bool {
+	for _, r := range s {
+		if r > unicode.MaxASCII {
+			return true
+		}
+	}
+	return false
+}
+
+// Helper function to specifically detect Japanese characters
+func containsJapanese(s string) bool {
+	for _, r := range s {
+		if (r >= 0x3040 && r <= 0x309F) || // Hiragana
+		   (r >= 0x30A0 && r <= 0x30FF) || // Katakana
+		   (r >= 0x4E00 && r <= 0x9FAF) {  // CJK Unified Ideographs (Kanji)
+			return true
+		}
+	}
+	return false
+}
+
+// Session management methods
+func (s *Server) getOrCreateSession(projectID string) *ConversationSession {
+	s.sessionsMutex.Lock()
+	defer s.sessionsMutex.Unlock()
+	
+	session, exists := s.sessions[projectID]
+	if !exists {
+		session = &ConversationSession{
+			ProjectID:      projectID,
+			MessageHistory: make([]ConversationMessage, 0),
+			CreatedAt:      time.Now(),
+			LastActivity:   time.Now(),
+			Context:        make(map[string]string),
+			Language:       "auto", // will be detected from first message
+		}
+		s.sessions[projectID] = session
+		log.Printf("💬 Created new conversation session for project: %s", projectID)
+	} else {
+		session.LastActivity = time.Now()
+	}
+	
+	return session
+}
+
+func (s *Server) addMessageToSession(projectID, role, content, command, output string) {
+	s.sessionsMutex.Lock()
+	defer s.sessionsMutex.Unlock()
+	
+	session := s.sessions[projectID]
+	if session == nil {
+		return
+	}
+	
+	message := ConversationMessage{
+		Role:      role,
+		Content:   content,
+		Timestamp: time.Now(),
+		Command:   command,
+		Output:    output,
+	}
+	
+	session.MessageHistory = append(session.MessageHistory, message)
+	session.LastActivity = time.Now()
+	
+	// Keep only last 20 messages to avoid memory issues
+	if len(session.MessageHistory) > 20 {
+		session.MessageHistory = session.MessageHistory[len(session.MessageHistory)-20:]
+	}
+	
+	log.Printf("💬 Added %s message to session %s (total: %d messages)", role, projectID, len(session.MessageHistory))
+}
+
+func (s *Server) getSessionContext(projectID string) string {
+	s.sessionsMutex.RLock()
+	defer s.sessionsMutex.RUnlock()
+	
+	session := s.sessions[projectID]
+	if session == nil || len(session.MessageHistory) == 0 {
+		return ""
+	}
+	
+	// Build context from recent messages
+	sessionContext := ""
+	recentMessages := session.MessageHistory
+	if len(recentMessages) > 5 {
+		recentMessages = recentMessages[len(recentMessages)-5:]
+	}
+	
+	for _, msg := range recentMessages {
+		if msg.Role == "user" {
+			sessionContext += fmt.Sprintf("Previous request: %s\n", msg.Content)
+		}
+		if msg.Role == "assistant" && msg.Output != "" {
+			sessionContext += fmt.Sprintf("Previous result: %s\n", msg.Output)
+		}
+	}
+	
+	return sessionContext
+}
+
+func (s *Server) detectLanguage(text string) string {
+	// Simple language detection based on character sets
+	hasJapanese := false
+	hasEnglish := false
+	
+	for _, r := range text {
+		if (r >= 0x3040 && r <= 0x309F) || // Hiragana
+		   (r >= 0x30A0 && r <= 0x30FF) || // Katakana
+		   (r >= 0x4E00 && r <= 0x9FAF) {  // CJK Unified Ideographs
+			hasJapanese = true
+		}
+		if (r >= 'A' && r <= 'Z') || (r >= 'a' && r <= 'z') {
+			hasEnglish = true
+		}
+	}
+	
+	if hasJapanese {
+		return "ja"
+	}
+	if hasEnglish {
+		return "en"
+	}
+	return "auto"
 }
 
 // Settings handler functions (placeholder implementations)
@@ -807,6 +1354,107 @@ func (s *Server) handleSettingsGet(conn *websocket.Conn, msg map[string]interfac
 	})
 }
 
+// Conversation management handlers
+func (s *Server) handleConversationHistory(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("💬 Handling conversation history request")
+	
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid conversation history message format")
+		return
+	}
+	
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Missing or invalid project ID")
+		return
+	}
+	
+	s.sessionsMutex.RLock()
+	session := s.sessions[projectID]
+	s.sessionsMutex.RUnlock()
+	
+	if session == nil {
+		s.sendMessage(conn, "conversation_history_response", map[string]interface{}{
+			"project_id": projectID,
+			"messages":   []ConversationMessage{},
+			"language":   "auto",
+			"status":     "success",
+		})
+		return
+	}
+	
+	s.sendMessage(conn, "conversation_history_response", map[string]interface{}{
+		"project_id":     projectID,
+		"session_id":     fmt.Sprintf("session_%s", projectID),
+		"messages":       session.MessageHistory,
+		"language":       session.Language,
+		"created_at":     session.CreatedAt,
+		"last_activity":  session.LastActivity,
+		"message_count":  len(session.MessageHistory),
+		"status":         "success",
+	})
+}
+
+func (s *Server) handleConversationClear(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("🧹 Handling conversation clear request")
+	
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid conversation clear message format")
+		return
+	}
+	
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Missing or invalid project ID")
+		return
+	}
+	
+	s.sessionsMutex.Lock()
+	delete(s.sessions, projectID)
+	s.sessionsMutex.Unlock()
+	
+	log.Printf("🧹 Cleared conversation session for project: %s", projectID)
+	
+	s.sendMessage(conn, "conversation_clear_response", map[string]interface{}{
+		"project_id": projectID,
+		"status":     "success",
+		"message":    "Conversation history cleared",
+	})
+}
+
+func (s *Server) handleConversationContinue(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("🔄 Handling conversation continue request")
+	
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid conversation continue message format")
+		return
+	}
+	
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Missing or invalid project ID")
+		return
+	}
+	
+	followUp, ok := data["follow_up"].(string)
+	if !ok || followUp == "" {
+		s.sendError(conn, "Missing follow-up message")
+		return
+	}
+	
+	// Use existing claude_execute flow but with enhanced context
+	s.handleDockerClaudeExecute(conn, map[string]interface{}{
+		"type": "claude_execute",
+		"data": map[string]interface{}{
+			"project_id": projectID,
+			"command":    followUp,
+		},
+	})
+}
+
 func getPortFromArgs() string {
 	// Command line flag
 	portFlag := flag.String("port", "", "Port to run server on (default: 8090)")
@@ -844,16 +1492,25 @@ func main() {
 	webInterface.StartWebServer()
 	log.Printf("🌐 Web management interface: http://%s:8080", server.getLocalIP())
 
-	// Set up HTTP routes
-	http.HandleFunc("/ws", server.handleWebSocket)
+	// Set up HTTP routes with CORS support
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		// Handle preflight requests
+		if r.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "*")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		server.handleWebSocket(w, r)
+	})
 	
 	// Serve QR code image
 	http.HandleFunc("/qr", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./qr-code.png")
 	})
 	
-	// Serve static files (including icon.png)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	// Note: static files are now served by the web interface on port 8080
 	
 	// Legacy web interface (fallback)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -900,11 +1557,53 @@ func main() {
 		w.Write([]byte(html))
 	})
 
+	// Determine the bind address based on VPN status and host configuration
+	var bindAddr string
+	if server.Host == "10.0.0.1" {
+		// VPN mode: bind to VPN interface specifically for macOS compatibility
+		bindAddr = "10.0.0.1:" + server.Port
+		log.Printf("🔒 VPN Mode: Binding specifically to VPN interface (10.0.0.1:%s)", server.Port)
+		log.Printf("🌐 VPN Access: ws://10.0.0.1:%s/ws", server.Port)
+		log.Printf("🏠 Local Fallback: ws://%s:%s/ws", server.getLocalIP(), server.Port)
+		log.Printf("💡 Note: macOS WireGuard requires specific VPN binding for self-connections")
+	} else {
+		// Local mode: bind to all interfaces for broad compatibility
+		bindAddr = "0.0.0.0:" + server.Port
+		log.Printf("🏠 Local Mode: Binding to all interfaces (0.0.0.0:%s)", server.Port)
+		log.Printf("🌐 Local Access: ws://%s:%s/ws", server.getLocalIP(), server.Port)
+	}
+	
 	// Start server
-	log.Printf("🌐 Web interface: http://%s:%s", server.Host, server.Port)
-	log.Printf("🎯 Ready for connections...")
+	log.Printf("🌐 Web interface: http://%s:8080", server.getLocalIP())
+	log.Printf("🎯 Ready for connections on %s...", bindAddr)
 
-	if err := http.ListenAndServe(":"+server.Port, nil); err != nil {
-		log.Fatal("Server failed to start:", err)
+	if err := http.ListenAndServe(bindAddr, nil); err != nil {
+		// If VPN binding fails, fallback to local mode with complete state update
+		if server.Host == "10.0.0.1" {
+			log.Printf("⚠️ VPN binding failed (%v), falling back to local mode", err)
+			
+			// Get fresh local IP and update server state completely
+			newLocalIP := server.getLocalIP()
+			server.Host = newLocalIP
+			bindAddr = "0.0.0.0:" + server.Port
+			log.Printf("🏠 Fallback: Binding to all interfaces (0.0.0.0:%s)", server.Port)
+			log.Printf("🌐 Local Access: ws://%s:%s/ws", newLocalIP, server.Port)
+			
+			// Regenerate QR code and connection URL for local mode
+			updatedURL := fmt.Sprintf("ws://%s:%s/ws?key=%s", server.Host, server.Port, server.SecretKey)
+			server.saveQRCodeImage(updatedURL)
+			log.Printf("🔄 Updated connection URL after VPN fallback: %s", updatedURL)
+			
+			// Update console display to reflect the change
+			fmt.Printf("\n🔄 Server fell back to Local Mode due to VPN binding failure\n")
+			fmt.Printf("🏠 New Connection URL: %s\n", updatedURL)
+			fmt.Printf("📱 Please use the updated QR code or connection URL\n\n")
+			
+			if err := http.ListenAndServe(bindAddr, nil); err != nil {
+				log.Fatal("Server failed to start even in local mode:", err)
+			}
+		} else {
+			log.Fatal("Server failed to start:", err)
+		}
 	}
 }
