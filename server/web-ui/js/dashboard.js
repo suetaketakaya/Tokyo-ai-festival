@@ -88,6 +88,31 @@ class RemoteClaudeDashboard {
         document.getElementById('close-logs-btn').addEventListener('click', () => {
             this.closeLogs();
         });
+
+        // Password modal controls
+        document.getElementById('password-modal-close').addEventListener('click', () => {
+            this.hidePasswordModal();
+        });
+
+        document.getElementById('password-cancel').addEventListener('click', () => {
+            this.hidePasswordModal();
+        });
+
+        document.getElementById('password-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handlePasswordSubmit();
+        });
+
+        document.getElementById('password-toggle').addEventListener('click', () => {
+            this.togglePasswordVisibility();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('password-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'password-modal') {
+                this.hidePasswordModal();
+            }
+        });
     }
 
     async loadServerStatus() {
@@ -282,9 +307,22 @@ class RemoteClaudeDashboard {
         }
     }
 
-    async switchConnectionMode(targetMode = null) {
+    async switchConnectionMode(targetMode = null, password = null) {
         // Determine target mode: if not specified, switch to opposite of current mode
         const newMode = targetMode || (this.currentMode === 'vpn' ? 'local' : 'vpn');
+        
+        // If switching to VPN mode and no password provided, show password modal
+        if (newMode === 'vpn' && !password) {
+            this.showPasswordModal('vpn');
+            return;
+        }
+        
+        // If switching to Local mode from VPN mode and no password provided, show password modal
+        // This is needed to stop the WireGuard VPN service
+        if (newMode === 'local' && this.currentMode === 'vpn' && !password) {
+            this.showPasswordModal('local');
+            return;
+        }
         
         const button = document.getElementById('switch-mode-btn');
         const originalText = button.querySelector('.button-text').textContent;
@@ -320,7 +358,8 @@ class RemoteClaudeDashboard {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    mode: newMode
+                    mode: newMode,
+                    password: password
                 })
             });
             
@@ -863,6 +902,109 @@ class RemoteClaudeDashboard {
         } catch (error) {
             console.error('Failed to refresh connection info:', error);
             this.showNotification('Failed to refresh connection information', 'error');
+        }
+    }
+
+    // Password modal methods
+    showPasswordModal(targetMode = 'vpn') {
+        const modal = document.getElementById('password-modal');
+        const passwordInput = document.getElementById('sudo-password');
+        const errorDiv = document.getElementById('password-error');
+        const submitBtn = document.getElementById('password-submit');
+        
+        // Store the target mode for later use
+        this.pendingModeSwitch = targetMode;
+        
+        // Reset form
+        passwordInput.value = '';
+        errorDiv.style.display = 'none';
+        
+        // Update modal content based on target mode
+        const modalTitle = document.querySelector('#password-modal .modal-header h2');
+        const modalBody = document.querySelector('#password-modal .modal-body p:first-of-type');
+        
+        if (targetMode === 'vpn') {
+            modalTitle.textContent = '🔐 Sudo Password Required';
+            modalBody.textContent = 'WireGuard VPN mode requires sudo privileges to configure the network interface.';
+            submitBtn.querySelector('.button-text').textContent = 'Enable VPN Mode';
+        } else {
+            modalTitle.textContent = '🔐 Sudo Password Required';
+            modalBody.textContent = 'Switching to Local Network mode requires sudo privileges to stop the WireGuard VPN service.';
+            submitBtn.querySelector('.button-text').textContent = 'Switch to Local Mode';
+        }
+        
+        // Show modal with animation
+        modal.style.display = 'flex';
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+        
+        // Focus on password input
+        setTimeout(() => {
+            passwordInput.focus();
+        }, 300);
+    }
+
+    hidePasswordModal() {
+        const modal = document.getElementById('password-modal');
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
+    async handlePasswordSubmit() {
+        const password = document.getElementById('sudo-password').value;
+        const errorDiv = document.getElementById('password-error');
+        const submitBtn = document.getElementById('password-submit');
+        
+        if (!password) {
+            this.showPasswordError('Please enter your password');
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.querySelector('.button-icon').textContent = '⏳';
+        submitBtn.querySelector('.button-text').textContent = 'Authenticating...';
+        
+        try {
+            // Hide modal
+            this.hidePasswordModal();
+            
+            // Execute mode switch with password (use stored pendingModeSwitch)
+            const targetMode = this.pendingModeSwitch || 'vpn';
+            await this.switchConnectionMode(targetMode, password);
+            
+        } catch (error) {
+            console.error('Password authentication failed:', error);
+            this.showPasswordError('Invalid password or authentication failed');
+            this.showPasswordModal(); // Show modal again
+        } finally {
+            // Reset submit button with appropriate text
+            submitBtn.disabled = false;
+            submitBtn.querySelector('.button-icon').textContent = '🔐';
+            const buttonText = this.pendingModeSwitch === 'local' ? 'Switch to Local Mode' : 'Enable VPN Mode';
+            submitBtn.querySelector('.button-text').textContent = buttonText;
+        }
+    }
+
+    showPasswordError(message) {
+        const errorDiv = document.getElementById('password-error');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+
+    togglePasswordVisibility() {
+        const passwordInput = document.getElementById('sudo-password');
+        const toggleIcon = document.getElementById('password-toggle').querySelector('.password-toggle-icon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.textContent = '🙈';
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.textContent = '👁️';
         }
     }
 }
