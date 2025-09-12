@@ -1,100 +1,257 @@
-# RemoteClaude v3.5
-**Enterprise Mobile-Driven Multi-Server Claude Development Platform**
+# RemoteClaude v3.7.1
+**🌐 Enterprise Mobile-Driven Multi-Server Claude Development Platform with External VPN & Apple App Store Ready**
 
-## Overview
-iPhoneアプリから複数のmacOS/Ubuntu サーバ上のClaude Code CLIをリモート操作し、リアルタイムでのプロジェクト開発・管理を実現する次世代モバイル開発プラットフォーム。v3.5では完全なマルチサーバ管理、拡張QuickCommands、リアルタイムターミナル、QRコードスキャン機能を搭載。
+## 📱 Overview | 概要
 
-## Architecture
+iPhoneアプリから世界中のmacOS/Ubuntu/WSL2サーバ上のClaude Code CLIをリモート操作し、リアルタイムでプロジェクト開発・管理を実現する次世代モバイル開発プラットフォーム。v3.7.1では**外部VPN接続**、**Apple App Store対応**、**WSL2完全サポート**、**自動インストーラ**を新搭載。
+
+### 🚀 Key Features | 主要機能
+
+- 📱 **Apple App Store対応**: 日本語ローカライゼーション完全対応
+- 🌐 **外部VPN接続**: WireGuard + IPv6 6to4トンネルで世界中からアクセス
+- 💻 **Multi-Platform**: macOS/Ubuntu/WSL2完全サポート
+- 🤖 **Claude AI統合**: リアルタイムAI開発支援
+- 🐳 **Docker完全統合**: コンテナベース開発環境
+- ⚡ **Web管理インターフェース**: ブラウザからサーバ管理
+- 🔐 **セキュリティ**: 暗号化通信とVPN統合
+
+## 🏗️ Architecture | システム構成
+
 ```
-iPhone App (React Native + Expo)
-      ↕ WebSocket Real-time Connection
-Multiple Servers (macOS/Ubuntu + Go WebSocket Server)
-      ↕ Command Execution
-Docker Containers (Ubuntu 22.04 + Claude CLI + Development Tools)
+📱 iPhone App (React Native + Expo)
+        ↕ Secure WebSocket Connection
+🌐 External VPN Server (WireGuard + IPv6)
+        ↕ Network Bridge
+💻 Multiple Servers (macOS/Ubuntu/WSL2)
+        ↕ Web Interface Management
+🐳 Docker Containers (Claude CLI + Development Tools)
+        ↕ Auto-Setup & Package Management
 ```
 
-## Project Structure
+## 📂 Project Structure | プロジェクト構成
+
 ```
-├── remoteclaude-server/         # Go server for macOS/Ubuntu
-├── RemoteClaudeApp/            # iPhone Expo app with multi-server support
-├── projects/                    # Docker project workspaces
-├── configs/                     # Configuration files
-├── docker/                      # Docker images and compose files
-├── dist/                        # Distribution builds
-├── build.sh                     # Build script
-└── README.md
+RemoteClaude/
+├── 📱 RemoteClaudeApp/           # iPhone Expo app
+│   ├── src/
+│   │   ├── screens/              # アプリ画面
+│   │   ├── components/           # UIコンポーネント
+│   │   └── services/             # WebSocket通信
+│   └── app.json                  # App Store設定
+├── 🖥️ server/                    # Go WebSocket server
+│   ├── main.go                   # メインサーバ
+│   ├── scripts/                  # 自動セットアップ
+│   ├── web-ui/                   # Web管理画面
+│   └── external-vpn/             # 外部VPN設定
+├── 🐳 docker/                    # Docker環境
+├── 📦 installers/                # 自動インストーラ
+├── 📋 configs/                   # 設定ファイル
+├── 🚀 dist/                      # ビルド成果物
+└── 📖 docs/                      # ドキュメント
 ```
 
-## 🚀 Quick Start Guide
+---
 
-### 💿 Easy Installation (macOS)
-**Download the pre-built DMG file:**
-1. Go to [Releases](https://github.com/suetaketakaya/Tokyo-ai-festival/releases)
-2. Download `RemoteClaude-Server-v3.5.0.dmg`
-3. Mount the DMG and drag **RemoteClaudeServer.app** to Applications
-4. Install dependencies: Docker Desktop + Claude CLI
-5. Launch the app from Applications folder
+## 🚀 Quick Start Guide | クイックスタートガイド
 
-### 🔧 Manual Installation Prerequisites
-- **macOS**: macOS 10.15+ or **Ubuntu**: 18.04+
-- **Docker**: Docker Desktop (macOS) or Docker CE (Ubuntu)
-- **Go**: 1.19+
-- **Node.js**: 18+
-- **iPhone**: iOS 13+ with Expo Go app
+### 📥 自動インストーラ (推奨)
 
-## Server Setup
-
-### macOS Server Setup
-
-#### 1. Install Prerequisites
+#### macOS用インストーラ
 ```bash
-# Install Homebrew (if not installed)
+# macOS用ワンクリックインストーラ
+curl -fsSL https://raw.githubusercontent.com/suetaketakaya/RemoteClaude/main/installers/install-macos.sh | bash
+
+# または手動ダウンロード
+wget https://github.com/suetaketakaya/RemoteClaude/releases/download/v3.7.1/remoteclaude-installer-macos.sh
+chmod +x remoteclaude-installer-macos.sh
+./remoteclaude-installer-macos.sh
+```
+
+#### Ubuntu/WSL2用インストーラ
+```bash
+# Ubuntu/WSL2用ワンクリックインストーラ
+curl -fsSL https://raw.githubusercontent.com/suetaketakaya/RemoteClaude/main/installers/install-ubuntu.sh | bash
+
+# または手動ダウンロード  
+wget https://github.com/suetaketakaya/RemoteClaude/releases/download/v3.7.1/remoteclaude-installer-ubuntu.sh
+chmod +x remoteclaude-installer-ubuntu.sh
+./remoteclaude-installer-ubuntu.sh
+```
+
+### 📋 インストーラが自動実行する内容
+
+#### ✅ システム要件チェック
+- OS バージョン確認
+- 必要な権限チェック  
+- ネットワーク接続確認
+
+#### ✅ 依存関係インストール
+- **Go 1.21+**: サーバビルド用
+- **Docker**: コンテナ実行環境
+- **Node.js 18+**: Web UI用
+- **WireGuard**: VPN機能用
+- **Claude CLI**: AI開発支援用
+
+#### ✅ 自動設定
+- サーバ設定ファイル生成
+- Docker環境構築
+- VPN設定（オプション）
+- 自動起動設定
+- Web管理画面セットアップ
+
+---
+
+## 💻 Manual Installation | 手動インストール手順
+
+### 🍎 macOS Server Setup | macOSサーバ設定
+
+#### 1. 前提条件インストール
+```bash
+# Homebrewインストール（未インストールの場合）
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Install required packages
-brew install go docker node npm
+# 必要パッケージインストール
+brew install go node npm docker qrencode wireguard-tools
 
-# Start Docker Desktop
+# Docker Desktop起動
 open /Applications/Docker.app
 ```
 
-#### 2. Install Claude CLI
+#### 2. Claude CLI インストール
 ```bash
-# Install Claude CLI
+# Claude CLI公式インストーラ
 curl -fsSL https://claude.ai/install.sh | sh
 
-# Verify installation
+# PATHに追加
+echo 'export PATH=$PATH:~/.local/bin' >> ~/.zshrc
+source ~/.zshrc
+
+# インストール確認
 claude --version
 ```
 
-#### 3. Build and Run Server
+#### 3. RemoteClaude サーバインストール
 ```bash
-# Clone and build
-git clone <repository-url>
-cd remote_manual/server
+# リポジトリクローン
+git clone https://github.com/suetaketakaya/Tokyo-ai-festival.git
+cd Tokyo-ai-festival/server
 
-# Build server binary
-./build.sh
+# 自動セットアップ実行
+./scripts/auto-setup.sh
 
-# Run server with default settings
-./remoteclaude-server
+# セットアップ内容:
+# ✅ Docker daemon 起動確認
+# ✅ WireGuard VPN 設定
+# ✅ サーバキー生成
+# ✅ Web UI 初期化
+# ✅ 外部VPN設定（オプション）
+```
 
-# Or run with custom port
+#### 4. サーバ起動
+```bash
+# 標準起動（ローカルネットワーク用）
 ./remoteclaude-server --port=8090
+
+# VPN接続用起動
+./remoteclaude-server --host=10.5.5.1 --port=8090 --external-vpn
+
+# Web管理画面アクセス
+open http://localhost:8080
 ```
 
-#### 4. Configure Firewall (macOS)
+### 🐧 Ubuntu/WSL2 Server Setup | Ubuntu/WSL2サーバ設定
+
+#### 1. システム更新と前提条件
 ```bash
-# Allow incoming connections (System Preferences > Security & Privacy > Firewall)
-# Or use command line:
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add ./remoteclaude-server
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+# システム更新
+sudo apt update && sudo apt upgrade -y
+
+# 必要パッケージインストール
+sudo apt install -y curl wget git build-essential software-properties-common
+
+# Go インストール
+wget https://golang.org/dl/go1.21.0.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
 ```
 
-#### 5. Auto-Start Service (Optional)
+#### 2. Docker インストール
 ```bash
-# Create launch daemon
+# Docker公式インストールスクリプト
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# ユーザをdockerグループに追加
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Docker起動と自動起動設定
+sudo systemctl enable docker
+sudo systemctl start docker
+```
+
+#### 3. Node.js とWireGuard
+```bash
+# Node.js インストール
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# WireGuard インストール
+sudo apt install -y wireguard qrencode
+
+# WireGuard ツール確認
+wg --version
+```
+
+#### 4. Claude CLI インストール
+```bash
+# Claude CLI インストール
+curl -fsSL https://claude.ai/install.sh | sh
+
+# PATH設定
+echo 'export PATH=$PATH:~/.local/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# 動作確認
+claude --version
+```
+
+#### 5. RemoteClaude ビルドと起動
+```bash
+# リポジトリクローン
+git clone https://github.com/suetaketakaya/Tokyo-ai-festival.git
+cd Tokyo-ai-festival/server
+
+# サーバビルド
+go build -o remoteclaude-server .
+
+# 実行権限付与
+chmod +x remoteclaude-server
+
+# サーバ起動
+./remoteclaude-server --port=8090
+
+# ファイアウォール設定
+sudo ufw allow 8090/tcp
+sudo ufw allow 8080/tcp  # Web UI用
+```
+
+#### 6. WSL2固有設定
+```bash
+# WSL2のIP取得（Windows側からアクセス用）
+hostname -I | awk '{print $1}'
+
+# Windows側でWSL2にアクセスする場合
+# PowerShellで以下実行:
+# netsh interface portproxy add v4tov4 listenport=8090 listenaddress=0.0.0.0 connectport=8090 connectaddress=[WSL2_IP]
+```
+
+### 🔧 サービス自動起動設定
+
+#### macOS用 (launchd)
+```bash
+# Launch Daemon作成
 sudo tee /Library/LaunchDaemons/com.remoteclaude.server.plist << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -104,7 +261,7 @@ sudo tee /Library/LaunchDaemons/com.remoteclaude.server.plist << EOF
     <string>com.remoteclaude.server</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/path/to/your/remoteclaude-server</string>
+        <string>$(pwd)/remoteclaude-server</string>
         <string>--port=8090</string>
     </array>
     <key>RunAtLoad</key>
@@ -112,1231 +269,983 @@ sudo tee /Library/LaunchDaemons/com.remoteclaude.server.plist << EOF
     <key>KeepAlive</key>
     <true/>
     <key>WorkingDirectory</key>
-    <string>/path/to/your/server/directory</string>
+    <string>$(pwd)</string>
 </dict>
 </plist>
 EOF
 
-# Load and start service
+# サービス有効化
 sudo launchctl load /Library/LaunchDaemons/com.remoteclaude.server.plist
-sudo launchctl start com.remoteclaude.server
 ```
 
-### Ubuntu Server Setup
-
-#### 1. Install Prerequisites
+#### Ubuntu用 (systemd)
 ```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
-
-# Install required packages
-sudo apt install -y curl wget git build-essential
-
-# Install Go
-wget https://golang.org/dl/go1.21.0.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz
-echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-source ~/.bashrc
-
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-sudo usermod -aG docker $USER
-newgrp docker
-
-# Install Node.js
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-
-#### 2. Install Claude CLI
-```bash
-# Install Claude CLI
-curl -fsSL https://claude.ai/install.sh | sh
-
-# Add to PATH if needed
-echo 'export PATH=$PATH:~/.local/bin' >> ~/.bashrc
-source ~/.bashrc
-
-# Verify installation
-claude --version
-```
-
-#### 3. Build and Run Server
-```bash
-# Clone and build
-git clone <repository-url>
-cd remote_manual/server
-
-# Build server binary
-chmod +x build.sh
-./build.sh
-
-# Run server
-./remoteclaude-server --port=8090
-```
-
-#### 4. Configure Firewall (Ubuntu)
-```bash
-# Configure UFW firewall
-sudo ufw enable
-sudo ufw allow 8090/tcp
-sudo ufw allow ssh
-sudo ufw status
-```
-
-#### 5. Auto-Start Service (systemd)
-```bash
-# Create systemd service
+# Systemdサービス作成
 sudo tee /etc/systemd/system/remoteclaude.service << EOF
 [Unit]
-Description=RemoteClaude Server
+Description=RemoteClaude Server v3.7.1
 After=network.target docker.service
 Requires=docker.service
 
 [Service]
 Type=simple
 User=$USER
-WorkingDirectory=/path/to/your/server/directory
-ExecStart=/path/to/your/remoteclaude-server --port=8090
+WorkingDirectory=$(pwd)
+ExecStart=$(pwd)/remoteclaude-server --port=8090
 Restart=always
 RestartSec=10
+Environment=HOME=$HOME
+Environment=PATH=$PATH
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-# Enable and start service
+# サービス有効化と起動
+sudo systemctl daemon-reload
 sudo systemctl enable remoteclaude.service
 sudo systemctl start remoteclaude.service
+
+# 状態確認
 sudo systemctl status remoteclaude.service
 ```
 
-## Mobile App Setup
+---
 
-### iPhone App Installation
+## 🌐 External VPN Setup | 外部VPN設定
+
+### 🏠 TP-Linkルーター設定例
+
+#### ルーター設定情報
+| 項目 | 設定値 |
+|------|--------|
+| **WireGuard トンネルIP** | `10.5.5.1/24` |
+| **リッスンポート** | `51820` |
+| **IPv4 アドレス** | `192.168.11.108` |
+| **6to4 トンネルアドレス** | `2002:c0a8:b6c::c0a8:b6c/48` |
+| **外部IP** | `153.246.248.142` |
+
+#### 1. IPv6 6to4 トンネル設定
 ```bash
-# Clone repository
-git clone <repository-url>
-cd remote_manual/RemoteClaudeApp
+# macOS版IPv6トンネルセットアップ
+cd server/external-vpn
+chmod +x setup-ipv6-tunnel-macos.sh
+sudo ./setup-ipv6-tunnel-macos.sh
 
-# Install dependencies
+# Ubuntu版IPv6トンネルセットアップ  
+sudo ./setup-ipv6-tunnel.sh
+```
+
+#### 2. 外部VPNサーバ起動
+```bash
+# macOS版外部VPNサーバ
+chmod +x start-external-server-macos.sh
+sudo ./start-external-server-macos.sh
+
+# Ubuntu版外部VPNサーバ
+sudo ./start-external-server.sh
+```
+
+#### 3. iPhone WireGuardクライアント設定
+```bash
+# QRコード生成確認
+ls ~/.remoteclaude/external-vpn/clients/client-iphone-qr.png
+
+# 設定ファイル確認
+cat ~/.remoteclaude/external-vpn/clients/client-iphone.conf
+```
+
+### 📱 iPhone WireGuard設定手順
+1. **App Store**から「WireGuard」アプリをインストール
+2. アプリを開き「**+**」ボタンをタップ
+3. 「**QRコードから作成**」を選択
+4. 生成されたQRコードをスキャン
+5. 接続名を「**RemoteClaude VPN**」に設定
+6. 「**保存**」をタップ
+7. VPN接続を**オン**に切り替え
+
+### 🔗 VPN経由接続URL
+```
+ws://10.5.5.1:8090/ws?key=<session-key>
+```
+
+---
+
+## 📱 iPhone App Setup | iPhoneアプリセットアップ
+
+### 🏪 App Store版 (推奨)
+1. **App Store**で「**ClaudeOps Remote**」を検索
+2. インストールして起動
+3. 「**サーバを追加**」をタップ
+4. QRコードスキャンまたは手動入力でサーバ追加
+
+### 🔧 開発版 (Expo)
+```bash
+# アプリディレクトリに移動
+cd RemoteClaudeApp
+
+# 依存関係インストール
 npm install
 
-# Install Expo CLI globally
+# Expo CLI インストール
 npm install -g @expo/cli
 
-# Start development server
+# 開発サーバ起動
 npx expo start
+
+# iPhone でExpo Goアプリをインストールして QRコードをスキャン
 ```
 
-### Expo Go Setup
-1. Install **Expo Go** from App Store
-2. Open Expo Go app
-3. Scan QR code from terminal
-4. App will load on your iPhone
+---
 
-## 📱 Usage Guide
+## 📱 Mobile App Usage Guide | モバイルアプリ操作ガイド
 
-### 1. Server Connection & Management
-1. **Start Server**: `./remoteclaude-server --port=8090`
-2. **Add Server**: 
-   - **QR Code Method**: Tap **"📱 Scan QR Code"** → Scan terminal QR
-   - **Manual Method**: Tap **"✏️ Add Manually"** → Enter WebSocket URL
-3. **Server Management**:
-   - **Connect**: Tap **"🔗 Connect"** to establish connection
-   - **Status Monitoring**: Real-time indicators (🟢 Connected, 🔴 Disconnected, 🟡 Connecting)
-   - **Edit Names**: Tap server name to customize
-   - **Remove**: Tap **"🗑️"** button to delete server
-   - **Multi-Server**: Manage unlimited servers simultaneously
+### 1. 🔗 サーバ接続管理
 
-### 2. Project Development
-1. **Access Projects**: Tap **"📋 View Projects"** from connected server
-2. **Create Project**: Tap **"➕ Create New Project"** → Enter project name
-3. **Project Operations**:
-   - **▶️ Start**: Start stopped Docker containers
-   - **⏹️ Stop**: Stop running containers  
-   - **🗑️ Delete**: Remove project completely
-4. **Development Access**: Tap project name to enter development environment
+#### サーバ追加方法
+1. **QRコードスキャン**
+   - 📱 「**QRコードスキャン**」をタップ
+   - カメラでサーバのQRコードを読み取り
+   - 自動的に接続情報が入力されます
 
-### 3. Development Environment Features
-#### **🚀 Enhanced QuickCommands**
-- **📂 Basic Commands**: `ls -la`, `pwd`, `git status`
-- **🐧 Linux System**: OS info, processes, disk usage, memory, system load
-- **🐍 Python Execution**: Version check, hello world, path info, pip packages
-- **🔍 File Operations**: Find Python/JS files, count lines
-- **🛠️ Dev Tools**: Check installed tools, environment variables
-- **🌐 Network**: IP check, date/time
-- **🤖 Claude AI**: Create README, analyze code, Python scripts
+2. **手動入力**
+   - ✏️ 「**手動追加**」をタップ  
+   - サーバ名を入力（例: "本社サーバ"）
+   - WebSocket URL を入力（例: `ws://192.168.1.100:8090/ws`）
+   - 「**保存**」をタップ
 
-#### **💻 Real-time Terminal**
-- **Live Command Execution**: Real-time output streaming
-- **Auto-capitalization Fix**: Proper command input handling
-- **Command History**: Scroll through previous commands and outputs
-- **Error Handling**: Clear distinction between output, errors, and system messages
+#### サーバ管理操作
+- 🔗 **接続**: サーバ名をタップして接続
+- 📝 **編集**: サーバ名を長押しして名前変更
+- 🗑️ **削除**: スワイプして削除ボタンをタップ
+- 🔄 **再接続**: 接続エラー時に「再試行」をタップ
 
-#### **⚡ Interactive Development**
-1. **Select Project**: Choose from project list
-2. **Execute Commands**: Use QuickCommands or type manually
-3. **Monitor Output**: Real-time terminal with color-coded responses
-4. **AI Assistance**: Use Claude commands for code generation and analysis
+#### 接続状態インジケータ
+- 🟢 **緑色**: 正常接続中
+- 🟡 **黄色**: 接続処理中
+- 🔴 **赤色**: 接続エラー
+- ⚪ **灰色**: 未接続
 
-## 💻 Direct Container Access & Editing
+### 2. 📋 プロジェクト管理
 
-### PC Terminal Access to Running Containers
+#### プロジェクト操作
+1. **プロジェクト一覧表示**
+   - 接続済みサーバから「**プロジェクト表示**」をタップ
+   - 既存プロジェクト一覧が表示されます
 
-#### **1. List Running Containers**
+2. **新規プロジェクト作成**
+   - ➕ 「**新規プロジェクト作成**」をタップ
+   - プロジェクト名を入力（例: "my-python-app"）
+   - 「**作成**」をタップ
+   - Docker環境が自動構築されます
+
+3. **プロジェクト制御**
+   - ▶️ **開始**: 停止中のコンテナを起動
+   - ⏹️ **停止**: 実行中のコンテナを停止  
+   - 🗑️ **削除**: プロジェクトを完全削除
+   - 📁 **アクセス**: プロジェクトの開発環境に入る
+
+### 3. 💻 開発環境操作
+
+#### ⚡ QuickCommands (クイックコマンド)
+開発でよく使うコマンドをワンタップで実行
+
+##### 📂 基本コマンド
+- `ls -la`: ファイル一覧表示
+- `pwd`: 現在のディレクトリ表示
+- `whoami`: 現在のユーザー名
+- `date`: 現在の日時
+
+##### 🐍 Python開発
+- `python3 --version`: Pythonバージョン確認
+- `pip list`: インストール済みパッケージ一覧
+- `python3 -c "print('Hello World')"`: Hello World実行
+
+##### 🔍 ファイル操作  
+- `find . -name "*.py"`: Pythonファイル検索
+- `find . -name "*.js"`: JavaScriptファイル検索
+- `wc -l $(find . -name "*.py")`: Pythonファイル行数計算
+
+##### 🤖 Claude AI機能
+- **README作成**: プロジェクトのREADME.mdを自動生成
+- **コード解析**: 既存コードの説明とドキュメント生成
+- **Pythonスクリプト作成**: 指定した機能のPythonコード生成
+
+#### 💬 リアルタイム端末
+1. **コマンド入力**
+   - 画面下部の入力欄にコマンドを入力
+   - 「**実行**」ボタンまたは改行で実行
+
+2. **出力表示**
+   - 🟢 **標準出力**: 通常の結果（緑色）
+   - 🔴 **エラー出力**: エラーメッセージ（赤色）  
+   - 🔵 **システムメッセージ**: 接続状況など（青色）
+
+3. **便利機能**
+   - ⌨️ **自動大文字化修正**: モバイル入力の自動修正を補正
+   - 📜 **コマンド履歴**: 過去のコマンドと結果を表示
+   - 📋 **長押しコピー**: 出力結果を長押しでコピー
+
+#### ⌨️ キーボードショートカット (v3.7.1 新機能)
+- **TAB キー**: コマンド補完・予測検索
+- **↑ 矢印キー**: コマンド履歴を前に戻る  
+- **↓ 矢印キー**: コマンド履歴を次に進む
+- **Ctrl+C**: 実行中のコマンドを中断
+
+### 4. 🔧 高度な開発操作
+
+#### Git操作例
 ```bash
-# Show all running RemoteClaude containers
+# リポジトリ初期化
+git init
+git config user.name "Your Name"  
+git config user.email "you@example.com"
+
+# ファイル追加とコミット
+git add .
+git commit -m "Initial commit"
+
+# リモートリポジトリ追加
+git remote add origin https://github.com/username/repo.git
+git push -u origin main
+```
+
+#### Python開発例
+```bash
+# 仮想環境作成
+python3 -m venv myenv
+source myenv/bin/activate
+
+# パッケージインストール
+pip install requests flask numpy
+
+# Pythonスクリプト実行
+python3 app.py
+
+# パッケージ一覧出力
+pip freeze > requirements.txt
+```
+
+#### Docker操作例
+```bash  
+# コンテナ内から他のコンテナ確認
+docker ps
+
+# ファイル転送（別端末から）
+docker cp myfile.py <container-id>:/workspace/
+
+# 新しいコンテナ起動
+docker run -it python:3.9 bash
+```
+
+---
+
+## 🌐 Web Management Interface | Web管理インターフェース
+
+### 📊 ダッシュボード機能
+
+#### アクセス方法
+```bash
+# ローカルアクセス
+http://localhost:8080
+
+# ネットワークアクセス  
+http://<server-ip>:8080
+
+# VPN経由アクセス
+http://10.5.5.1:8080
+```
+
+#### 利用可能な機能
+- 🚀 **サーバステータス**: リアルタイムサーバ監視
+- 🔐 **接続モード切り替え**: ローカル ↔ VPN モード切り替え
+- 📱 **QRコード管理**: 接続用QRコード生成・表示
+- 🔄 **サーバ制御**: 再起動・キー再生成・ログ表示
+- 📊 **WireGuard統合**: VPN状態確認とQRコード表示
+- 📈 **リソース監視**: CPU・メモリ・Docker使用状況
+
+#### API エンドポイント
+```bash
+# サーバ状態取得
+curl http://localhost:8080/api/status
+
+# 接続モード切り替え
+curl -X POST http://localhost:8080/api/switch-mode
+
+# QRコード再生成
+curl -X POST http://localhost:8080/api/regenerate-qr
+
+# QRコード画像取得
+http://localhost:8080/qr-code.png
+http://localhost:8080/wireguard-qr.png
+```
+
+---
+
+## 💻 Direct Container Access | 直接コンテナアクセス
+
+### 🐳 PC端末からのコンテナ操作
+
+#### 1. 実行中コンテナの確認
+```bash
+# RemoteClaude コンテナ一覧
 docker ps --filter "ancestor=remoteclaude-ubuntu-claude:latest"
 
-# Get container details
+# 全コンテナ詳細表示
 docker ps -a --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Ports}}"
-```
 
-#### **2. Access Container Shell**
-```bash
-# Method 1: Using container ID
-docker exec -it <container-id> /bin/bash
-
-# Method 2: Using container name (if named)
-docker exec -it <container-name> /bin/bash
-
-# Example with specific container
-docker exec -it a1b2c3d4e5f6 /bin/bash
-```
-
-#### **3. File Editing Options**
-
-##### **A. Using nano (Simple text editor)**
-```bash
-# Access container and edit files
-docker exec -it <container-id> /bin/bash
-cd /workspace
-nano src/main.py
-```
-
-##### **B. Using vim (Advanced editor)**
-```bash
-# Install vim if not available
-docker exec -it <container-id> apt-get update && apt-get install -y vim
-
-# Edit files with vim
-docker exec -it <container-id> vim /workspace/src/main.py
-```
-
-##### **C. VS Code with Dev Containers (Recommended)**
-```bash
-# Install VS Code Dev Containers extension
-# Open VS Code -> Command Palette (Cmd+Shift+P)
-# Select: "Dev Containers: Attach to Running Container"
-# Choose your RemoteClaude container
-```
-
-#### **4. File Transfer Between Host and Container**
-
-##### **Copy files FROM container TO host**
-```bash
-# Copy single file
-docker cp <container-id>:/workspace/src/main.py ./local-main.py
-
-# Copy entire directory
-docker cp <container-id>:/workspace/src ./local-src
-
-# Example
-docker cp a1b2c3d4e5f6:/workspace/project.py ./downloaded-project.py
-```
-
-##### **Copy files FROM host TO container**
-```bash
-# Copy single file
-docker cp ./local-file.py <container-id>:/workspace/
-
-# Copy directory
-docker cp ./local-src <container-id>:/workspace/
-
-# Example
-docker cp ./new-script.py a1b2c3d4e5f6:/workspace/scripts/
-```
-
-#### **5. Development Workflow Examples**
-
-##### **Real-time Code Editing**
-```bash
-# 1. Access container
-docker exec -it <container-id> /bin/bash
-
-# 2. Navigate to project
-cd /workspace
-
-# 3. Create/edit Python file
-nano hello.py
-# Add your code, save with Ctrl+O, exit with Ctrl+X
-
-# 4. Test immediately
-python hello.py
-
-# 5. Use Claude for code analysis
-claude analyze hello.py
-```
-
-##### **Git Operations Inside Container**
-```bash
-# Access container
-docker exec -it <container-id> /bin/bash
-
-# Initialize git (if not already done)
-cd /workspace
-git init
-git config user.name "Your Name"
-git config user.email "your.email@example.com"
-
-# Standard git workflow
-git add .
-git commit -m "Update from container"
-git push origin main
-```
-
-#### **6. Container Environment Information**
-```bash
-# Check container's working directory
-docker exec <container-id> pwd
-
-# List files in workspace
-docker exec <container-id> ls -la /workspace
-
-# Check installed tools
-docker exec <container-id> which python3
-docker exec <container-id> which claude
-docker exec <container-id> python3 --version
-
-# Check environment variables
-docker exec <container-id> env | grep -E "(PATH|PYTHON|CLAUDE)"
-```
-
-#### **7. Advanced Container Management**
-
-##### **Create Persistent Volume Mount**
-```bash
-# Stop existing container
-docker stop <container-id>
-
-# Create new container with host directory mounted
-docker run -it -d \
-  --name remoteclaude-dev \
-  -v $(pwd)/local-workspace:/workspace \
-  remoteclaude-ubuntu-claude:latest
-
-# Now files are synchronized between host and container
-```
-
-##### **Container Backup and Restore**
-```bash
-# Create container snapshot
-docker commit <container-id> remoteclaude-backup:$(date +%Y%m%d)
-
-# Export container filesystem
-docker export <container-id> > container-backup.tar
-
-# Import container (if needed)
-docker import container-backup.tar remoteclaude-restored:latest
-```
-
-#### **8. Troubleshooting Container Access**
-
-##### **Common Issues and Solutions**
-```bash
-# Issue: Container not responding
-docker ps -a  # Check if container is running
-docker start <container-id>  # Start stopped container
-
-# Issue: Permission denied
-docker exec -u root -it <container-id> /bin/bash  # Access as root
-chown -R $(whoami) /workspace  # Fix permissions
-
-# Issue: Tools not found
-docker exec <container-id> which claude
-docker exec <container-id> echo $PATH
-# Add to PATH if needed: export PATH=$PATH:/usr/local/bin
-
-# Issue: Files not persisting
-# Use volume mounts or copy files to host regularly
-```
-
-##### **Container Logs and Debugging**
-```bash
-# View container logs
-docker logs <container-id>
-
-# Follow container logs in real-time
-docker logs -f <container-id>
-
-# Check container resource usage
-docker stats <container-id>
-
-# Inspect container configuration
+# 特定コンテナ詳細
 docker inspect <container-id>
 ```
 
+#### 2. コンテナシェルアクセス
+```bash
+# コンテナIDでアクセス
+docker exec -it <container-id> /bin/bash
+
+# 例: コンテナ内での作業
+docker exec -it a1b2c3d4e5f6 /bin/bash
+cd /workspace
+ls -la
+```
+
+#### 3. ファイル編集オプション
+
+##### A. nano (シンプルエディタ)
+```bash
+# コンテナ内でnano使用
+docker exec -it <container-id> nano /workspace/app.py
+
+# 操作方法:
+# Ctrl+O: 保存
+# Ctrl+X: 終了
+# Ctrl+W: 検索
+```
+
+##### B. vim (高機能エディタ)
+```bash
+# vim インストール (必要に応じて)
+docker exec -it <container-id> apt-get update && apt-get install -y vim
+
+# vim でファイル編集
+docker exec -it <container-id> vim /workspace/main.py
+
+# 基本操作:
+# i: 挿入モード
+# Esc: ノーマルモード  
+# :w: 保存
+# :q: 終了
+# :wq: 保存して終了
+```
+
+##### C. VS Code Dev Containers (推奨)
+```bash
+# VS Code Extensions から「Dev Containers」をインストール
+# コマンドパレット (Cmd+Shift+P) を開く
+# 「Dev Containers: Attach to Running Container」を選択
+# RemoteClaude コンテナを選択
+# VS Code でコンテナ内を直接編集可能
+```
+
+#### 4. ファイル転送
+
+##### ホスト → コンテナ
+```bash
+# 単一ファイル転送
+docker cp ./local-file.py <container-id>:/workspace/
+
+# ディレクトリ転送  
+docker cp ./local-src/ <container-id>:/workspace/src/
+
+# 実例
+docker cp ./new-script.py a1b2c3d4e5f6:/workspace/scripts/
+```
+
+##### コンテナ → ホスト
+```bash
+# 単一ファイル取得
+docker cp <container-id>:/workspace/result.py ./downloaded-result.py
+
+# ディレクトリ取得
+docker cp <container-id>:/workspace/output/ ./local-output/
+
+# 実例
+docker cp a1b2c3d4e5f6:/workspace/project/ ./backup/
+```
+
+#### 5. 開発ワークフロー例
+
+##### リアルタイム開発
+```bash
+# 1. コンテナアクセス
+docker exec -it <container-id> /bin/bash
+
+# 2. プロジェクトディレクトリに移動
+cd /workspace
+
+# 3. 新規Pythonファイル作成
+nano hello.py
+# ファイル内容:
+print("Hello, RemoteClaude!")
+print(f"Python version: {sys.version}")
+
+# 4. 実行テスト
+python3 hello.py
+
+# 5. Claude AI でコード改善
+claude analyze hello.py
+claude improve hello.py
+```
+
+##### Git 操作
+```bash
+# コンテナ内Git設定
+docker exec -it <container-id> /bin/bash
+cd /workspace
+
+# Git初期設定
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+
+# 標準Gitワークフロー
+git init
+git add .
+git commit -m "Initial commit from container"
+git remote add origin https://github.com/username/repo.git
+git push -u origin main
+```
+
+### 6. 永続化とバックアップ
+
+#### ボリュームマウント設定
+```bash
+# 既存コンテナ停止
+docker stop <container-id>
+
+# ボリュームマウント付き新規コンテナ
+docker run -it -d \
+  --name remoteclaude-persistent \
+  -v $(pwd)/workspace:/workspace \
+  remoteclaude-ubuntu-claude:latest
+
+# これでホストとコンテナ間でファイル同期
+```
+
+#### コンテナバックアップ
+```bash
+# コンテナスナップショット作成
+docker commit <container-id> remoteclaude-backup:$(date +%Y%m%d-%H%M)
+
+# ファイルシステムエクスポート
+docker export <container-id> > container-backup-$(date +%Y%m%d).tar
+
+# バックアップファイルからインポート（復元時）
+docker import container-backup-YYYYMMDD.tar remoteclaude-restored:latest
+```
+
 ---
 
-## 🔧 Advanced Configuration
+## 🔧 Advanced Configuration | 高度な設定
 
-### Server Configuration Options
+### ⚙️ サーバ設定オプション
+
 ```bash
-# Basic usage
+# 基本起動
 ./remoteclaude-server
 
-# Custom port
+# カスタムポート
 ./remoteclaude-server --port=8090
 
-# Custom host binding
+# 特定IPバインド  
 ./remoteclaude-server --host=0.0.0.0 --port=8090
 
-# Debug mode
-./remoteclaude-server --debug --port=8090
+# デバッグモード
+./remoteclaude-server --debug --verbose --port=8090
+
+# 外部VPNモード
+./remoteclaude-server --external-vpn --allowed-networks="10.5.5.0/24" --port=8090
+
+# Web UI ポート指定
+./remoteclaude-server --port=8090 --web-port=8080
 ```
 
-### Environment Variables
-```bash
-# Set default port
-export REMOTECLAUDE_PORT=8090
+### 🌍 環境変数設定
 
-# Set host
+```bash
+# デフォルトポート設定
+export REMOTECLAUDE_PORT=8090
+export REMOTECLAUDE_WEB_PORT=8080
+
+# ホスト設定
 export REMOTECLAUDE_HOST=0.0.0.0
 
-# Enable debug logging
+# デバッグログ有効化
 export REMOTECLAUDE_DEBUG=true
+export REMOTECLAUDE_VERBOSE=true
 
-# Set project directory
-export REMOTECLAUDE_PROJECT_DIR=/path/to/projects
-```
+# プロジェクトディレクトリ  
+export REMOTECLAUDE_PROJECT_DIR=/custom/projects
 
-### Docker Configuration
-```bash
-# Custom Docker socket
+# Docker設定
 export DOCKER_HOST=unix:///var/run/docker.sock
 
-# Docker compose file location
-export REMOTECLAUDE_COMPOSE_FILE=/path/to/docker-compose.yml
-```
-
-## 🌐 Global Network Access & Remote Deployment
-
-### ⚠️ **SECURITY WARNING** ⚠️
-**Exposing RemoteClaude to the global internet introduces significant security risks. This section is for advanced users only.**
-
-#### **🚨 Critical Security Risks**
-
-##### **High-Risk Threats**
-- **🔓 Unauthorized Access**: Anyone with your IP:PORT can attempt connections
-- **🎯 Targeted Attacks**: Exposed services become attack vectors
-- **🕵️ Data Exposure**: Project files, environment variables, and system information at risk
-- **💻 Container Breakout**: Potential host system compromise through Docker escape
-- **🔍 Reconnaissance**: Attackers can probe your development environment
-- **📡 Traffic Interception**: Unencrypted WebSocket communications vulnerable to sniffing
-
-##### **Compliance & Legal Risks**
-- **📋 Data Protection**: May violate GDPR, CCPA, or corporate data policies
-- **🏢 Corporate Security**: Breach of company network security policies
-- **🔐 IP Exposure**: Intellectual property and source code at risk
-- **📊 Audit Trail**: Difficulty in tracking access and changes
-
----
-
-### 🔒 Secure Global Access Methods (Recommended)
-
-#### **Option 1: WireGuard VPN Tunnel (Most Secure & Free)**
-
-##### **🚀 Complete WireGuard Setup Guide**
-
-**Benefits:**
-- ✅ **Completely Free** (saves $6,000-$12,000/year vs commercial VPNs)
-- ✅ **Military-grade encryption** (ChaCha20/Poly1305)
-- ✅ **High performance** (faster than OpenVPN)
-- ✅ **Easy iPhone setup** (QR code configuration)
-- ✅ **Private network isolation** (10.0.0.0/24)
-
-##### **Step 1: Install WireGuard (macOS Server)**
-```bash
-# Install via Homebrew
-brew install wireguard-tools qrencode
-
-# Verify installation
-wg --version
-```
-
-##### **Step 2: Generate Encryption Keys**
-```bash
-# Create configuration directory
-mkdir -p ~/wireguard-config && cd ~/wireguard-config
-
-# Generate server keys
-wg genkey | tee server_private.key | wg pubkey > server_public.key
-
-# Generate client keys (for iPhone)
-wg genkey | tee client_private.key | wg pubkey > client_public.key
-
-# Display keys for configuration
-echo "Server Private: $(cat server_private.key)"
-echo "Server Public: $(cat server_public.key)"
-echo "Client Private: $(cat client_private.key)"
-echo "Client Public: $(cat client_public.key)"
-```
-
-##### **Step 3: Create Server Configuration**
-```bash
-# Create server config file
-cat > ~/wireguard-config/wg0.conf << EOF
-[Interface]
-PrivateKey = YOUR_SERVER_PRIVATE_KEY
-Address = 10.0.0.1/24
-ListenPort = 51820
-PostUp = echo "net.inet.ip.forwarding=1" | sudo sysctl -w -
-PostDown = echo "net.inet.ip.forwarding=0" | sudo sysctl -w -
-
-[Peer]
-PublicKey = YOUR_CLIENT_PUBLIC_KEY
-AllowedIPs = 10.0.0.2/32
-PersistentKeepalive = 25
-EOF
-
-# Replace YOUR_SERVER_PRIVATE_KEY and YOUR_CLIENT_PUBLIC_KEY with actual keys
-```
-
-##### **Step 4: Create iPhone Client Configuration**
-```bash
-# Get your public IP address
-PUBLIC_IP=$(curl -s ifconfig.me)
-echo "Your public IP: $PUBLIC_IP"
-
-# Create client configuration
-cat > ~/wireguard-config/client.conf << EOF
-[Interface]
-PrivateKey = YOUR_CLIENT_PRIVATE_KEY
-Address = 10.0.0.2/32
-DNS = 8.8.8.8, 8.8.4.4
-
-[Peer]
-PublicKey = YOUR_SERVER_PUBLIC_KEY
-Endpoint = $PUBLIC_IP:51820
-AllowedIPs = 10.0.0.0/24
-PersistentKeepalive = 25
-EOF
-
-# Replace YOUR_CLIENT_PRIVATE_KEY and YOUR_SERVER_PUBLIC_KEY with actual keys
-```
-
-##### **Step 5: Generate QR Code for iPhone**
-```bash
-# Generate QR code for easy iPhone setup
-cd ~/wireguard-config
-qrencode -t ansiutf8 -r client.conf
-
-# Save QR code as image (optional)
-qrencode -t png -o wireguard-qr.png -r client.conf
-```
-
-##### **Step 6: Router/Firewall Configuration**
-```bash
-# Configure router port forwarding (Web UI)
-# External Port: 51820 (UDP)
-# Internal IP: YOUR_LOCAL_IP (e.g., 192.168.1.100)
-# Internal Port: 51820 (UDP)
-
-# macOS Firewall (if enabled)
-# System Preferences > Security & Privacy > Firewall > Options
-# Add WireGuard and allow incoming connections
-
-# Alternative: Command line firewall
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /opt/homebrew/bin/wg
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblock /opt/homebrew/bin/wg
-```
-
-##### **Step 7: Start WireGuard Server**
-```bash
-# Start VPN server
-cd ~/wireguard-config
-sudo wg-quick up wg0
-
-# Verify server is running
-sudo wg show
-
-# Expected output:
-# interface: wg0
-#   public key: YOUR_SERVER_PUBLIC_KEY
-#   private key: (hidden)
-#   listening port: 51820
-```
-
-##### **Step 8: iPhone Setup**
-```bash
-# 1. Install WireGuard app from App Store (free)
-# 2. Open WireGuard app
-# 3. Tap "+" > "Create from QR Code"  
-# 4. Scan the QR code generated in Step 5
-# 5. Name: "RemoteClaude VPN"
-# 6. Save configuration
-# 7. Toggle connection ON
-```
-
-##### **Step 9: Verify VPN Connection**
-```bash
-# On macOS server, check connected clients
-sudo wg show
-
-# Expected output with connected iPhone:
-# peer: YOUR_CLIENT_PUBLIC_KEY
-#   endpoint: IPHONE_IP:PORT
-#   allowed ips: 10.0.0.2/32
-#   latest handshake: X seconds ago
-#   transfer: X.XX KiB received, X.XX KiB sent
-
-# On iPhone, verify VPN IP
-# Settings > VPN > WireGuard should show "Connected"
-# Visit whatismyipaddress.com - should show your home IP
-```
-
-##### **Step 10: Start RemoteClaude with VPN**
-
-**⚠️ IMPORTANT: IP Address Usage**
-
-When using WireGuard VPN, you **MUST** use the VPN internal IP address (`10.0.0.1`), **NOT** your local network IP (`192.168.x.x`). The iPhone will be isolated in the VPN tunnel and cannot access local network addresses.
-
-```bash
-# ✅ CORRECT: Start RemoteClaude server on VPN network
-cd /path/to/remote_manual
-./remoteclaude-server --host=10.0.0.1 --port=8090
-
-# iPhone RemoteClaude app connection:
-# Server URL: ws://10.0.0.1:8090/ws?key=SESSION_KEY
-# ✅ Secure, encrypted, private connection established!
-
-# ❌ WRONG: Using local IP with WireGuard VPN active
-./remoteclaude-server --host=192.168.1.100 --port=8090  # iPhone cannot reach this!
-```
-
-**📱 Connection Methods Comparison:**
-
-| Method | Server Command | iPhone URL | Security | Use Case |
-|--------|----------------|------------|----------|----------|
-| **WireGuard VPN** | `--host=10.0.0.1` | `ws://10.0.0.1:8090/ws` | 🔒 Encrypted | Remote/Secure |
-| **Local WiFi** | `--host=192.168.x.x` | `ws://192.168.x.x:8090/ws` | 🏠 Local only | Same network |
-
-**🔧 Quick Switch Commands:**
-```bash
-# Switch TO VPN mode
-sudo wg-quick up wg0
-./remoteclaude-server --host=10.0.0.1 --port=8090
-
-# Switch FROM VPN mode (back to local)
-sudo wg-quick down wg0  
-./remoteclaude-server --port=8090  # Auto-detects local IP
-```
-
-##### **Step 11: Auto-Start Configuration (Optional)**
-```bash
-# Create launch daemon for auto-start
-sudo tee /Library/LaunchDaemons/com.wireguard.wg0.plist << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>com.wireguard.wg0</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/opt/homebrew/bin/wg-quick</string>
-        <string>up</string>
-        <string>/Users/YOUR_USERNAME/wireguard-config/wg0</string>
-    </array>
-    <key>RunAtLoad</key>
-    <true/>
-    <key>KeepAlive</key>
-    <false/>
-    <key>WorkingDirectory</key>
-    <string>/Users/YOUR_USERNAME/wireguard-config</string>
-</dict>
-</plist>
-EOF
-
-# Load auto-start service
-sudo launchctl load /Library/LaunchDaemons/com.wireguard.wg0.plist
-
-# Start service
-sudo launchctl start com.wireguard.wg0
-```
-
-##### **🛠️ WireGuard Management Commands**
-```bash
-# Start VPN
-sudo wg-quick up wg0
-
-# Stop VPN  
-sudo wg-quick down wg0
-
-# Restart VPN
-sudo wg-quick down wg0 && sudo wg-quick up wg0
-
-# Check status
-sudo wg show
-
-# View configuration
-cat ~/wireguard-config/wg0.conf
-
-# Check if port is listening
-netstat -an | grep 51820
-
-# Monitor real-time connections
-watch -n 1 'sudo wg show'
-```
-
-##### **🔧 Troubleshooting WireGuard**
-```bash
-# Issue: Port already in use
-lsof -i :51820
-kill -9 <PID>
-
-# Issue: iPhone can't connect
-# Check router port forwarding: UDP 51820
-# Check public IP: curl ifconfig.me
-# Verify firewall allows UDP 51820
-
-# Issue: No handshake
-# Verify client.conf has correct Endpoint IP
-# Check keys match between server and client configs
-# Ensure PersistentKeepalive = 25 in client config
-
-# Issue: VPN connects but no internet
-# Check PostUp command in server config
-# Verify DNS settings in client config
-
-# View logs
-# macOS: Console.app > search "wireguard"
-# Command line: log show --predicate 'process == "wg-quick"' --last 1h
-```
-
-##### **📊 Cost Comparison**
-| Solution | Setup Time | Monthly Cost | Annual Cost | Security |
-|----------|------------|--------------|-------------|----------|
-| **WireGuard (Self-hosted)** | 30 min | $0 | **$0** | ⭐⭐⭐⭐⭐ |
-| NordVPN | 5 min | $5 | $60 | ⭐⭐⭐⭐ |
-| ExpressVPN | 5 min | $10 | $120 | ⭐⭐⭐⭐ |
-| Corporate VPN | Varies | $15+ | $180+ | ⭐⭐⭐ |
-
-**💰 Savings with WireGuard: $60-$180+ per year!**
-
-#### **Option 2: SSH Tunnel (Secure)**
-```bash
-# Create SSH tunnel from mobile device location
-ssh -L 8090:localhost:8090 user@your-server.com
-
-# Mobile app connects to: ws://localhost:8090/ws
-# Traffic encrypted through SSH tunnel
-```
-
-#### **Option 3: Reverse Proxy with SSL (Advanced)**
-```bash
-# Use nginx with SSL termination
-# Implement authentication middleware
-# See "Secure Reverse Proxy Setup" section below
-```
-
----
-
-### ⚡ Direct Internet Exposure (High Risk)
-
-#### **🔴 Use Only If You Accept ALL Risks Above**
-
-##### **Minimal Security Setup (Still Very Risky)**
-```bash
-# 1. Change default port to non-standard
-./remoteclaude-server --port=23847
-
-# 2. Use strong session key
+# セッションキー設定
 export REMOTECLAUDE_SESSION_KEY=$(openssl rand -hex 32)
-
-# 3. Bind to specific interface only
-./remoteclaude-server --host=0.0.0.0 --port=23847
-
-# 4. Configure strict firewall rules
-# macOS
-sudo pfctl -e
-sudo pfctl -f /etc/pf.conf
-
-# Ubuntu
-sudo ufw enable
-sudo ufw deny incoming
-sudo ufw allow out
-sudo ufw allow from <your-mobile-ip> to any port 23847
 ```
 
-##### **Router/Firewall Configuration**
+### 🔐 セキュリティ設定
+
 ```bash
-# Port forwarding (Router admin panel)
-External Port: 23847
-Internal IP: 192.168.1.100
-Internal Port: 23847
-Protocol: TCP
+# セッションキー生成
+openssl rand -hex 32
 
-# Firewall rules (allow only your mobile IP)
-Allow: <your-mobile-ip>:any -> <server-ip>:23847
-Deny: any:any -> <server-ip>:23847
-```
+# SSL証明書設定（将来の機能）
+export REMOTECLAUDE_SSL_CERT=/path/to/cert.pem
+export REMOTECLAUDE_SSL_KEY=/path/to/key.pem
 
-##### **Connection String for Mobile App**
-```
-ws://<your-public-ip>:23847/ws?key=<strong-session-key>
+# IP制限設定
+export REMOTECLAUDE_ALLOWED_IPS="192.168.1.0/24,10.5.5.0/24"
+
+# 認証設定
+export REMOTECLAUDE_AUTH_ENABLED=true
+export REMOTECLAUDE_AUTH_TOKEN="your-secure-token"
 ```
 
 ---
 
-### 🛡️ Secure Reverse Proxy Setup (Advanced Users)
+## 🛠️ Troubleshooting | トラブルシューティング
 
-#### **Nginx with SSL & Authentication**
-```nginx
-# /etc/nginx/sites-available/remoteclaude
-server {
-    listen 443 ssl http2;
-    server_name your-domain.com;
-    
-    ssl_certificate /path/to/ssl/cert.pem;
-    ssl_certificate_key /path/to/ssl/private.key;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    
-    # Rate limiting
-    limit_req_zone $binary_remote_addr zone=ws:10m rate=1r/s;
-    limit_req zone=ws burst=5;
-    
-    # IP whitelist (replace with your mobile IPs)
-    allow 203.0.113.0/24;  # Your mobile IP range
-    deny all;
-    
-    # Basic authentication
-    auth_basic "RemoteClaude Access";
-    auth_basic_user_file /etc/nginx/.htpasswd;
-    
-    location /ws {
-        proxy_pass http://127.0.0.1:8090;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # WebSocket timeout
-        proxy_read_timeout 3600s;
-        proxy_send_timeout 3600s;
-    }
-}
+### 🚨 一般的な問題と解決法
 
-# HTTP to HTTPS redirect
-server {
-    listen 80;
-    server_name your-domain.com;
-    return 301 https://$server_name$request_uri;
-}
-```
-
-#### **Setup Commands**
+#### サーバが起動しない
 ```bash
-# Install nginx and certbot
-sudo apt install nginx certbot python3-certbot-nginx
-
-# Create SSL certificate
-sudo certbot --nginx -d your-domain.com
-
-# Create htpasswd file
-sudo htpasswd -c /etc/nginx/.htpasswd remoteclaude-user
-
-# Enable site
-sudo ln -s /etc/nginx/sites-available/remoteclaude /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-
-# Mobile connection: wss://your-domain.com/ws?key=sessionkey
-```
-
----
-
-### 🔍 Security Monitoring & Logging
-
-#### **Connection Monitoring**
-```bash
-# Monitor WebSocket connections
-sudo netstat -tuln | grep 8090
-sudo ss -tuln | grep 8090
-
-# Log connection attempts
-sudo tail -f /var/log/nginx/access.log | grep ws
-
-# Monitor Docker container access
-docker logs -f <container-id>
-```
-
-#### **Intrusion Detection**
-```bash
-# Install fail2ban for automated blocking
-sudo apt install fail2ban
-
-# Create jail for RemoteClaude
-sudo tee /etc/fail2ban/jail.local << EOF
-[remoteclaude]
-enabled = true
-port = 23847
-filter = remoteclaude
-logpath = /var/log/remoteclaude.log
-maxretry = 3
-bantime = 3600
-EOF
-
-# Monitor for suspicious activity
-sudo tail -f /var/log/auth.log
-sudo tail -f /var/log/nginx/error.log
-```
-
-#### **Emergency Response Plan**
-```bash
-# Immediate threat response
-# 1. Block all traffic
-sudo ufw deny 23847
-
-# 2. Stop server immediately
-pkill remoteclaude-server
-
-# 3. Check for compromise
-docker ps -a
-docker logs <container-id>
-sudo netstat -tuln
-
-# 4. Rotate session keys
-export REMOTECLAUDE_SESSION_KEY=$(openssl rand -hex 32)
-
-# 5. Review access logs
-sudo grep -i "suspicious\|attack\|exploit" /var/log/*.log
-```
-
----
-
-### 📊 Risk Assessment Checklist
-
-#### **Before Global Exposure**
-- [ ] **Business Justification**: Documented reason for internet exposure
-- [ ] **Risk Acceptance**: Written approval from security team/management
-- [ ] **Data Classification**: Confirmed no sensitive/confidential data in containers
-- [ ] **Backup Strategy**: Full system backup and recovery plan in place
-- [ ] **Monitoring Setup**: Real-time alerts for suspicious activity
-- [ ] **Incident Response**: Clear escalation and response procedures
-- [ ] **Compliance Review**: Legal/compliance team approval if required
-- [ ] **Insurance Coverage**: Cyber insurance covers this use case
-
-#### **Regular Security Reviews**
-- [ ] **Weekly**: Review access logs and connection attempts
-- [ ] **Monthly**: Update SSL certificates and security patches
-- [ ] **Quarterly**: Penetration testing and vulnerability assessment
-- [ ] **Annually**: Full security audit and policy review
-
----
-
-### 🚫 **STRONGLY DISCOURAGED PRACTICES**
-
-#### **❌ Never Do This**
-```bash
-# DON'T: Expose without any authentication
-./remoteclaude-server --host=0.0.0.0 --port=8090
-
-# DON'T: Use default/weak session keys
-export REMOTECLAUDE_SESSION_KEY="123456"
-
-# DON'T: Disable all firewalls
-sudo ufw --force reset
-sudo ufw disable
-
-# DON'T: Run as root unnecessarily
-sudo ./remoteclaude-server
-
-# DON'T: Store secrets in containers
-docker run -e PASSWORD=secret123 ...
-```
-
-#### **🛑 Red Flags - Stop Immediately If You See**
-- Unexpected connection attempts from unknown IPs
-- Unusual Docker container activity or resource usage
-- Files modified without your knowledge
-- New containers or processes running
-- Unusual network traffic patterns
-- System performance degradation
-- Security alerts from monitoring tools
-
----
-
-### 📞 Emergency Contact Information
-**In case of security incident:**
-1. **Immediately disconnect** from internet
-2. **Document everything** - screenshots, logs, timeline
-3. **Contact your IT security team** or incident response provider
-4. **Preserve evidence** - don't modify logs or system state
-5. **Report to authorities** if required by regulation
-
----
-
-### 💡 Recommended Alternatives
-
-#### **For Development Teams**
-- **GitHub Codespaces**: Cloud-based development environments
-- **AWS Cloud9**: Managed IDE in the cloud
-- **Gitpod**: Automated development environments
-- **Corporate VPN**: Secure remote access to internal resources
-
-#### **For Individual Developers**
-- **Local Development**: Use containers locally only
-- **SSH Access**: Traditional secure remote access
-- **Screen Sharing**: TeamViewer, Chrome Remote Desktop
-- **VPS with VPN**: Private virtual server with VPN access
-
----
-
-## 🛠️ Troubleshooting
-
-### Common Issues
-
-#### Server Won't Start
-```bash
-# Check if port is already in use
+# 1. ポート使用状況確認
 lsof -i :8090
+netstat -an | grep :8090
 
-# Kill existing process
+# 2. 使用中プロセス終了
 kill -9 <PID>
 
-# Try different port
+# 3. 別ポートで起動
 ./remoteclaude-server --port=8091
+
+# 4. 権限問題の場合
+sudo ./remoteclaude-server --port=8090
 ```
 
-#### Mobile App Can't Connect
-1. **Check Network**: Ensure iPhone and server are on same network
-2. **Firewall**: Verify firewall allows the server port
-3. **URL Format**: Ensure WebSocket URL format: `ws://IP:PORT/ws?key=sessionkey`
-4. **Server Status**: Check server logs for connection attempts
-
-#### Docker Issues
+#### モバイルアプリが接続できない
 ```bash
-# Check Docker status
-docker --version
-docker info
-
-# Restart Docker service
-sudo systemctl restart docker  # Ubuntu
-# or restart Docker Desktop      # macOS
-
-# Check Docker permissions
-sudo usermod -aG docker $USER
-newgrp docker
-```
-
-#### Docker Project Creation Errors (v3.5.0 Fix Applied)
-
-**Error:** `Failed to create project: failed to initialize project: exit status 1`
-**Common Causes:**
-- Permission issues with chown operations in container
-- PATH environment not including Claude CLI location
-
-**v3.5.0 Automatic Fixes:**
-- **Fallback Initialization**: Server automatically retries with permission-safe directory creation
-- **PATH Environment**: Claude CLI path automatically configured in container execution
-- **Graceful Error Handling**: Container remains functional even if full initialization fails
-
-**Manual Troubleshooting:**
-```bash
-# Check existing containers
-docker ps -a
-
-# Test Claude CLI in existing container
-docker exec <container-id> claude --version
-
-# Manual project directory setup if needed
-docker exec <container-id> mkdir -p /workspace/{src,tests,docs}
-docker exec <container-id> git init /workspace
-
-# Verify PATH includes Claude CLI
-docker exec <container-id> echo $PATH
-docker exec <container-id> which claude
-```
-
-**Error:** `exit status 127` (Command not found)
-**Fixed in v3.5.0:** PATH environment automatically includes `/usr/local/bin` where Claude CLI is installed
-
-#### Permission Issues
-```bash
-# macOS: Grant full disk access to Terminal
-# System Preferences > Security & Privacy > Privacy > Full Disk Access
-
-# Ubuntu: Check user groups
-groups $USER
-sudo usermod -aG docker $USER
-```
-
-### Debug Mode
-```bash
-# Run server in debug mode
-./remoteclaude-server --debug --port=8090
-
-# Check server logs
-tail -f /var/log/remoteclaude.log
-
-# Monitor WebSocket connections
-netstat -an | grep :8090
-```
-
-### Network Diagnostics
-```bash
-# Test server connectivity
+# 1. ネットワーク接続確認
+ping <server-ip>
 telnet <server-ip> 8090
 
-# Check WebSocket endpoint
+# 2. ファイアウォール確認
+# macOS
+sudo pfctl -sr | grep 8090
+
+# Ubuntu  
+sudo ufw status
+sudo ufw allow 8090/tcp
+
+# 3. サーバログ確認
+./remoteclaude-server --debug --port=8090
+tail -f /var/log/remoteclaude.log
+```
+
+#### Docker関連エラー
+```bash
+# 1. Docker状態確認
+docker --version
+docker info
+systemctl status docker  # Ubuntu
+
+# 2. Docker再起動
+sudo systemctl restart docker  # Ubuntu
+# macOS: Docker Desktop を再起動
+
+# 3. 権限問題解決
+sudo usermod -aG docker $USER
+newgrp docker
+
+# 4. Docker デーモン確認
+sudo dockerd --debug  # 手動起動でデバッグ
+```
+
+#### VPN接続問題
+```bash
+# 1. WireGuard状態確認
+sudo wg show
+sudo wg-quick down wg0 && sudo wg-quick up wg0
+
+# 2. ポート確認
+netstat -an | grep 51820
+lsof -i UDP:51820
+
+# 3. 自動修復ツール実行
+cd server
+./repair-wireguard.sh
+```
+
+### 🔍 デバッグモード
+
+```bash
+# サーバデバッグ起動
+./remoteclaude-server --debug --verbose --port=8090
+
+# ログレベル設定
+export REMOTECLAUDE_LOG_LEVEL=DEBUG
+
+# WebSocket接続テスト
+wscat -c ws://localhost:8090/ws?key=test
+
+# HTTP接続テスト
 curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" \
-  -H "Host: <server-ip>:8090" -H "Origin: http://<server-ip>:8090" \
-  http://<server-ip>:8090/ws?key=test
+  http://localhost:8090/ws?key=test
 ```
 
-## 🔒 Security Considerations
+### 📊 パフォーマンス監視
 
-### Network Security
-- Use strong session keys
-- Consider VPN for remote connections
-- Regularly rotate session keys
-- Monitor connection logs
+```bash
+# リソース使用量監視
+docker stats
 
-### Container Security
-- Run containers with limited privileges
-- Use Docker security best practices
-- Regular security updates
-- Isolate project environments
+# ネットワーク接続監視
+netstat -an | grep :8090
+ss -tuln | grep :8090
 
-### Mobile Security
-- Secure session key storage
-- Use HTTPS/WSS in production
-- Implement connection timeouts
-- Regular app updates
+# システムリソース監視
+top
+htop
+iostat 1
 
-## 📊 API Documentation
-
-### WebSocket API Endpoints
+# ログ監視
+tail -f /var/log/remoteclaude.log
+journalctl -u remoteclaude.service -f  # systemd
 ```
-ws://server:port/ws?key=sessionkey
-```
-
-### Message Types
-```json
-// Connection established
-{
-  "type": "connection_established",
-  "data": {
-    "server_version": "3.0",
-    "capabilities": ["docker", "git", "claude"]
-  }
-}
-
-// Project list request
-{
-  "type": "get_projects",
-  "data": {}
-}
-
-// Command execution
-{
-  "type": "execute_command",
-  "data": {
-    "project_id": "container_id",
-    "command": "claude --help"
-  }
-}
-```
-
-## 🚀 Development Status - v3.5 Production Ready! 🎉
-
-### ✅ Core Features - Fully Implemented
-- [x] **Multi-Server Management**: Complete server connection lifecycle
-- [x] **QR Code Scanning**: Camera-based server discovery
-- [x] **Manual Server Entry**: Fallback WebSocket URL input
-- [x] **Real-Time Connection**: WebSocket-based live communication
-- [x] **Project Management**: Docker container creation/start/stop/delete
-- [x] **Enhanced QuickCommands**: 20+ pre-built commands
-- [x] **Live Terminal**: Real-time command execution and output
-- [x] **Auto-Capitalization Fix**: Proper mobile input handling
-- [x] **Server Persistence**: AsyncStorage-based data retention
-- [x] **Cross-Platform Servers**: macOS and Ubuntu support
-- [x] **Error Recovery**: Comprehensive error handling and retry logic
-
-### 🚀 Advanced Features - Production Grade
-- [x] **Linux System Commands**: OS info, processes, disk, memory monitoring
-- [x] **Python Execution Environment**: Version check, script execution, package management
-- [x] **File Operations**: Search, count, analysis tools
-- [x] **Development Tools Integration**: Git, Node.js, npm compatibility
-- [x] **Network Diagnostics**: IP checking, connectivity tests
-- [x] **Claude AI Integration**: Code generation, analysis, README creation
-- [x] **Real-Time UI Updates**: Status indicators, connection health
-- [x] **Comprehensive Logging**: Debug information and troubleshooting
-
-### 🔄 In Development (Future Phases)
-- [ ] SSL/TLS encryption for production deployment
-- [ ] User authentication and role-based access
-- [ ] Cloud deployment automation scripts
-- [ ] Multi-user collaboration features
-- [ ] Advanced project templates
-- [ ] Container resource monitoring
-
-## 🛡️ Enterprise-Grade Features
-
-### **📱 Mobile Experience**
-- **Intuitive UI/UX**: Clean, professional interface design
-- **Real-Time Feedback**: Live status updates and progress indicators
-- **Error Handling**: User-friendly error messages with retry options
-- **Offline Capability**: Local server configuration persistence
-- **Performance Optimized**: Efficient WebSocket connection reuse
-
-### **🖥️ Server Architecture**
-- **Multi-Server Support**: Unlimited concurrent server connections
-- **Real-Time Communication**: WebSocket-based bidirectional messaging
-- **Container Management**: Complete Docker lifecycle control
-- **Cross-Platform**: Native macOS and Ubuntu server support
-- **Resource Monitoring**: System health and performance tracking
-
-### **🔧 Development Environment**
-- **Complete Terminal**: Full Linux command support
-- **Python Runtime**: Built-in Python 3 execution environment
-- **Claude AI Integration**: AI-powered development assistance
-- **Quick Commands**: 20+ pre-configured development commands
-- **File Management**: Advanced file operations and search
-- **Git Integration**: Version control operations support
-
-## 📝 Version History
-- **v3.5**: Production-ready multi-server platform, enhanced QuickCommands, full terminal
-- **v3.0**: Enterprise multi-server management, enhanced security
-- **v2.0**: Docker integration, project management
-- **v1.0**: Basic WebSocket communication, QR scanning
-
-## 🤝 Contributing
-1. Fork the repository
-2. Create feature branch
-3. Test thoroughly on both platforms
-4. Submit pull request with detailed description
-
-## 📄 License
-MIT License - See LICENSE file for details
-
-## 🆘 Support
-For issues and questions:
-1. Check troubleshooting section above
-2. Review server logs in debug mode
-3. Test network connectivity
-4. Verify Docker and Claude CLI installations
-5. Create issue with detailed error logs
 
 ---
-**RemoteClaude v3.5** - The Ultimate Mobile-Driven Multi-Server Development Platform! 
 
-🚀 **Production Ready** | 📱 **Mobile First** | 🐧 **Cross Platform** | 🤖 **AI Powered** | ⚡ **Real Time**
+## 🏗️ System Architecture | システム構成詳細
 
-*Revolutionizing remote development with enterprise-grade multi-server architecture, enhanced QuickCommands, and seamless Claude AI integration!*
+### 🌐 Network Architecture | ネットワーク構成
+
+```
+Internet
+    ↓
+📡 Router (Port 51820 UDP / 8090 TCP)
+    ↓
+🏠 Local Network (192.168.1.0/24)
+    ↓
+💻 Server (macOS/Ubuntu/WSL2)
+    ├── 🐳 Docker Engine
+    │   └── 📦 Dev Containers
+    ├── 🌐 Web UI (Port 8080)
+    ├── 🔒 WireGuard VPN (Port 51820)
+    └── 📡 WebSocket Server (Port 8090)
+    ↓
+📱 iPhone App (Remote Access)
+```
+
+### 🔧 Component Architecture | コンポーネント構成
+
+#### Server Components | サーバコンポーネント
+```go
+// main.go - Core WebSocket Server
+├── WebSocket Handler      // リアルタイム通信
+├── Docker Manager        // コンテナ管理
+├── Project Manager       // プロジェクト操作
+├── Command Executor      // コマンド実行
+├── Web UI Handler        // 管理画面
+└── VPN Integration      // WireGuard統合
+
+// External VPN Server
+├── IPv6 6to4 Tunnel     // トンネル管理
+├── WireGuard Server     // VPN サーバ
+├── Network Bridge       // ブリッジ機能
+└── QR Generator         // QR コード生成
+```
+
+#### Mobile App Components | モバイルアプリ構成
+```typescript
+// React Native + Expo
+├── 📱 src/screens/
+│   ├── HomeScreen.tsx           // メイン画面
+│   ├── ServerListScreen.tsx     // サーバ一覧
+│   ├── ProjectListScreen.tsx    // プロジェクト一覧
+│   └── DevelopmentScreen.tsx    // 開発環境
+├── 🔗 src/services/
+│   ├── WebSocketService.ts      // WebSocket通信
+│   ├── StorageService.ts        // ローカル保存
+│   └── CameraService.ts         // QRコード読み取り
+├── 🎨 src/components/
+│   ├── ServerCard.tsx           // サーバカード
+│   ├── ProjectCard.tsx          // プロジェクトカード
+│   ├── Terminal.tsx             // 端末画面
+│   └── QuickCommands.tsx        // クイックコマンド
+└── ⚙️ src/utils/
+    ├── ValidationUtils.ts       // 入力検証
+    └── NetworkUtils.ts          // ネットワーク処理
+```
+
+### 🔄 Data Flow | データフロー
+
+```
+📱 iPhone Input
+    ↓ WebSocket
+🌐 Server Received
+    ↓ Command Parse
+🐳 Docker Container
+    ↓ Execute Command
+📤 Output Generated
+    ↓ Stream Response  
+📱 iPhone Display
+```
+
+### 🛡️ Security Architecture | セキュリティ構成
+
+```
+🔐 Security Layers:
+├── 📱 App Level
+│   ├── Session Key Management
+│   ├── Secure Storage (Keychain)
+│   └── Input Validation
+├── 🌐 Network Level  
+│   ├── WebSocket Secure (WSS)
+│   ├── WireGuard Encryption
+│   └── IPv6 6to4 Tunnel
+├── 🖥️ Server Level
+│   ├── Authentication
+│   ├── Authorization
+│   ├── Rate Limiting
+│   └── Audit Logging
+└── 🐳 Container Level
+    ├── Resource Limits
+    ├── Network Isolation
+    ├── User Privileges
+    └── File System Restrictions
+```
+
+---
+
+## 📊 Feature Matrix | 機能一覧
+
+### ✅ Core Features | 基本機能
+- [x] 📱 **Multi-Server Management**: 複数サーバ管理
+- [x] 🔗 **Real-time WebSocket**: リアルタイム通信
+- [x] 📷 **QR Code Scanning**: QRコード読み取り
+- [x] 🐳 **Docker Integration**: Docker完全統合
+- [x] 🤖 **Claude AI Integration**: Claude AI統合
+- [x] 💻 **Live Terminal**: ライブ端末機能
+- [x] ⚡ **Quick Commands**: クイックコマンド
+- [x] 🌐 **Web Management UI**: Web管理画面
+- [x] 🔐 **Session Management**: セッション管理
+- [x] 📱 **Mobile Optimized**: モバイル最適化
+
+### 🌟 Advanced Features | 高度な機能  
+- [x] 🌐 **External VPN Access**: 外部VPN接続
+- [x] 🔒 **WireGuard Integration**: WireGuard統合
+- [x] 🌈 **IPv6 6to4 Tunnel**: IPv6トンネル機能
+- [x] 🛠️ **Auto-Setup Scripts**: 自動セットアップ
+- [x] 📊 **Resource Monitoring**: リソース監視
+- [x] 🔄 **Auto-Restart**: 自動再起動機能
+- [x] 📝 **Comprehensive Logging**: 詳細ログ機能
+- [x] 🚀 **Performance Optimization**: パフォーマンス最適化
+- [x] 🔧 **Configuration Management**: 設定管理
+- [x] 🛡️ **Security Hardening**: セキュリティ強化
+
+### 🍎 Apple App Store Features | App Store対応機能
+- [x] 🇯🇵 **Japanese Localization**: 日本語ローカライゼーション
+- [x] ⌨️ **Keyboard Shortcuts**: キーボードショートカット (TAB, ↑/↓)
+- [x] 🤔 **Claude Thinking Display**: Claude思考プロセス表示
+- [x] 📷 **Camera Permissions**: カメラ権限 (日本語)
+- [x] 🎤 **Microphone Permissions**: マイク権限 (日本語)
+- [x] 📋 **Demo QR Codes**: デモ用QRコード
+- [x] 📱 **App Store Guidelines**: App Storeガイドライン準拠
+- [x] 🔒 **Privacy Compliance**: プライバシー準拠
+- [x] ⚡ **Performance Optimized**: パフォーマンス最適化
+- [x] 🛠️ **Robust Error Handling**: 堅牢なエラー処理
+
+### 💻 Platform Support | プラットフォーム対応
+- [x] 🍎 **macOS**: 完全サポート (Intel/Apple Silicon)
+- [x] 🐧 **Ubuntu**: 18.04+ サポート  
+- [x] 🪟 **WSL2**: Windows Subsystem for Linux完全サポート
+- [x] 🔧 **Auto-Installers**: 自動インストーラ (macOS/Ubuntu)
+- [x] 📦 **Package Managers**: パッケージマネージャ対応
+- [x] 🐳 **Docker**: Docker完全統合
+- [x] 🌐 **Cross-Platform**: クロスプラットフォーム動作
+- [x] ⚙️ **Service Integration**: サービス統合 (systemd/launchd)
+
+---
+
+## 📈 Version History | バージョン履歴
+
+### 🚀 v3.7.1 (2025-09-11) - External VPN & App Store Ready
+#### ✨ New Features | 新機能
+- 🌐 **External VPN Server**: TP-Linkルーター統合外部VPN
+- 🌈 **IPv6 6to4 Tunnel**: IPv6トンネリング機能
+- 🍎 **Apple App Store Ready**: App Store申請対応完了
+- 🇯🇵 **Japanese Localization**: 完全日本語ローカライゼーション
+- ⌨️ **Enhanced Keyboard Support**: TAB補完・矢印キー履歴
+- 🤔 **Claude Thinking Display**: Claude思考プロセス表示
+- 🔧 **macOS VPN Compatibility**: macOS向けVPN完全対応
+- 📦 **Auto-Installers**: Mac/Ubuntu自動インストーラ
+- 🪟 **WSL2 Full Support**: WSL2完全対応
+
+#### 🔧 Improvements | 改善
+- 📱 Camera/Microphone permissions in Japanese
+- 🛠️ Enhanced error handling and retry logic  
+- 🚀 Performance optimizations for mobile app
+- 🔒 Improved security with VPN integration
+- 📊 Better resource monitoring and logging
+- 🌐 Enhanced web management interface
+- 🔧 Automated repair tools for VPN issues
+
+### 🌐 v3.6.0 (Previous) - Web Management & Auto-Setup
+- Web管理インターフェース
+- 自動セットアップスクリプト  
+- WireGuard VPN統合
+- Docker daemon管理
+
+### 🚀 v3.5.0 (Previous) - Multi-Server Platform  
+- プロダクションレディマルチサーバプラットフォーム
+- 拡張QuickCommands
+- フル端末機能
+
+---
+
+## 🎯 Roadmap | 今後の予定
+
+### 📅 Next Release (v3.8.0) | 次期リリース
+- [ ] 🔐 **SSL/TLS Encryption**: HTTPS/WSS対応
+- [ ] 👥 **Multi-User Support**: マルチユーザ対応
+- [ ] 📊 **Advanced Monitoring**: 高度な監視機能
+- [ ] ☁️ **Cloud Deployment**: クラウドデプロイ自動化
+- [ ] 🤝 **Team Collaboration**: チーム開発機能
+
+### 🔮 Future Releases | 将来のリリース
+- [ ] 🌍 **Global Server Network**: グローバルサーバネットワーク
+- [ ] 🤖 **Advanced AI Integration**: 高度なAI統合
+- [ ] 📱 **Android Support**: Android アプリ対応
+- [ ] 🔒 **Enterprise Security**: エンタープライズセキュリティ
+- [ ] 📈 **Analytics Dashboard**: 分析ダッシュボード
+
+---
+
+## 🤝 Contributing | 貢献
+
+### 🛠️ Development Setup | 開発環境構築
+```bash
+# リポジトリフォーク
+git clone https://github.com/yourusername/RemoteClaude.git
+cd RemoteClaude
+
+# サーバ開発環境
+cd server
+go mod tidy
+go build .
+
+# モバイル開発環境  
+cd RemoteClaudeApp
+npm install
+npx expo start
+```
+
+### 📝 Contribution Guidelines | 貢献ガイドライン
+1. **Fork** リポジトリをフォーク
+2. **Branch** 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. **Code** コードを記述し、テスト確認
+4. **Commit** 変更をコミット (`git commit -m 'Add amazing feature'`)
+5. **Push** ブランチにプッシュ (`git push origin feature/amazing-feature`) 
+6. **Pull Request** プルリクエストを作成
+
+### 🧪 Testing | テスト
+```bash
+# サーバテスト
+cd server
+go test ./...
+
+# モバイルアプリテスト
+cd RemoteClaudeApp  
+npm test
+```
+
+---
+
+## 📞 Support | サポート
+
+### 🆘 Getting Help | ヘルプ
+
+#### 🔍 Troubleshooting Steps | トラブルシューティング手順
+1. **📋 Check FAQ**: よくある質問を確認
+2. **🛠️ Debug Mode**: デバッグモードでサーバ起動
+3. **📊 Check Logs**: ログファイルを確認
+4. **🌐 Network Test**: ネットワーク接続をテスト
+5. **🐳 Docker Status**: Docker状態を確認
+
+#### 📧 Contact Information | 連絡先
+- **🐛 Bug Reports**: GitHub Issues
+- **💡 Feature Requests**: GitHub Discussions
+- **📖 Documentation**: GitHub Wiki
+- **💬 Community**: Discord Server
+
+#### 📋 Issue Template | イシューテンプレート
+Bug報告時に含めてください:
+- 📱 OS Version (iOS/macOS/Ubuntu/WSL2)
+- 🏗️ RemoteClaude Version
+- 📋 Steps to reproduce
+- 🔍 Expected vs Actual behavior
+- 📊 Logs and screenshots
+
+---
+
+## 📄 License | ライセンス
+
+```
+MIT License
+
+Copyright (c) 2025 RemoteClaude Project
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+---
+
+## 🎉 Acknowledgments | 謝辞
+
+### 🙏 Special Thanks | 特別感謝
+- 🤖 **Anthropic**: Claude AI Platform
+- 🐳 **Docker**: Containerization Platform
+- ⚡ **Expo**: React Native Development Platform
+- 🔒 **WireGuard**: VPN Technology
+- 🍎 **Apple**: iOS Development Platform
+
+### 🔧 Technologies Used | 使用技術
+- **Backend**: Go, WebSocket, Docker
+- **Frontend**: React Native, TypeScript, Expo
+- **Mobile**: iOS, Android (planned)
+- **Infrastructure**: Docker, WireGuard, IPv6
+- **AI**: Claude API, OpenAI (planned)
+
+---
+
+**RemoteClaude v3.7.1** - 🌍 **The Ultimate Global Mobile Development Platform**
+
+🚀 **Production Ready** | 📱 **Mobile First** | 🌐 **VPN Enabled** | 🤖 **AI Powered** | 🍎 **App Store Ready** | 🔐 **Secure by Design**
+
+*世界中どこからでも iPhone だけで本格的な開発環境にアクセス。次世代のモバイルファースト開発プラットフォームで開発体験を革命化！*

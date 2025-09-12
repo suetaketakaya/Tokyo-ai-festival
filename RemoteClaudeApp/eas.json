@@ -18,6 +18,7 @@
       }
     },
     "production": {
+      "distribution": "store",
       "ios": {
         "resourceClass": "default",
         "image": "latest"

@@ -241,6 +241,56 @@
             </div>
         </div>
 
+        <!-- Container Management Section -->
+        <div class="container-management-section">
+            <h2>📦 Container Management</h2>
+            
+            <div class="container-info-panel">
+                <h3>🐳 Container Information</h3>
+                <div id="container-list">
+                    <div class="container-item">
+                        <span>Loading container information...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container-commands-section">
+                <h3>🔧 Container Access Commands</h3>
+                <div class="command-grid">
+                    <div class="command-item">
+                        <h5>List Containers</h5>
+                        <div class="code-block">
+                            <code>docker ps -a</code>
+                            <button class="copy-btn" onclick="copyToClipboard('docker ps -a')">📋</button>
+                        </div>
+                    </div>
+                    <div class="command-item">
+                        <h5>Access Container</h5>
+                        <div class="code-block">
+                            <code>docker exec -it [CONTAINER_NAME] /bin/bash</code>
+                            <button class="copy-btn" onclick="copyToClipboard('docker exec -it [CONTAINER_NAME] /bin/bash')">📋</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connection-urls-section">
+                    <h3>🔗 Connection URLs</h3>
+                    <div class="url-list">
+                        <div class="url-item">
+                            <strong>Wi-Fi Connection:</strong> 
+                            <span id="wifi-connection-url">Loading...</span>
+                            <button class="copy-btn" onclick="copyToClipboard(document.getElementById('wifi-connection-url').textContent)">📋</button>
+                        </div>
+                        <div class="url-item">
+                            <strong>VPN Connection:</strong> 
+                            <span id="vpn-connection-url">http://10.0.0.1:8090</span>
+                            <button class="copy-btn" onclick="copyToClipboard(document.getElementById('vpn-connection-url').textContent)">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="controls-section">
             <h2>🛠️ Server Controls</h2>
             <div class="control-buttons">

@@ -1557,18 +1557,12 @@ func main() {
 		w.Write([]byte(html))
 	})
 
-	// Determine the bind address based on VPN status and host configuration
-	var bindAddr string
+	// Bind to all interfaces to avoid FE/BE host mismatches across mode switches
+	bindAddr := "0.0.0.0:" + server.Port
 	if server.Host == "10.0.0.1" {
-		// VPN mode: bind to VPN interface specifically for macOS compatibility
-		bindAddr = "10.0.0.1:" + server.Port
-		log.Printf("🔒 VPN Mode: Binding specifically to VPN interface (10.0.0.1:%s)", server.Port)
-		log.Printf("🌐 VPN Access: ws://10.0.0.1:%s/ws", server.Port)
-		log.Printf("🏠 Local Fallback: ws://%s:%s/ws", server.getLocalIP(), server.Port)
-		log.Printf("💡 Note: macOS WireGuard requires specific VPN binding for self-connections")
+		log.Printf("🔒 VPN Mode: Accepting on all interfaces; use ws://10.0.0.1:%s/ws from clients", server.Port)
+		log.Printf("🏠 Local Fallback also available: ws://%s:%s/ws", server.getLocalIP(), server.Port)
 	} else {
-		// Local mode: bind to all interfaces for broad compatibility
-		bindAddr = "0.0.0.0:" + server.Port
 		log.Printf("🏠 Local Mode: Binding to all interfaces (0.0.0.0:%s)", server.Port)
 		log.Printf("🌐 Local Access: ws://%s:%s/ws", server.getLocalIP(), server.Port)
 	}
@@ -1578,32 +1572,6 @@ func main() {
 	log.Printf("🎯 Ready for connections on %s...", bindAddr)
 
 	if err := http.ListenAndServe(bindAddr, nil); err != nil {
-		// If VPN binding fails, fallback to local mode with complete state update
-		if server.Host == "10.0.0.1" {
-			log.Printf("⚠️ VPN binding failed (%v), falling back to local mode", err)
-			
-			// Get fresh local IP and update server state completely
-			newLocalIP := server.getLocalIP()
-			server.Host = newLocalIP
-			bindAddr = "0.0.0.0:" + server.Port
-			log.Printf("🏠 Fallback: Binding to all interfaces (0.0.0.0:%s)", server.Port)
-			log.Printf("🌐 Local Access: ws://%s:%s/ws", newLocalIP, server.Port)
-			
-			// Regenerate QR code and connection URL for local mode
-			updatedURL := fmt.Sprintf("ws://%s:%s/ws?key=%s", server.Host, server.Port, server.SecretKey)
-			server.saveQRCodeImage(updatedURL)
-			log.Printf("🔄 Updated connection URL after VPN fallback: %s", updatedURL)
-			
-			// Update console display to reflect the change
-			fmt.Printf("\n🔄 Server fell back to Local Mode due to VPN binding failure\n")
-			fmt.Printf("🏠 New Connection URL: %s\n", updatedURL)
-			fmt.Printf("📱 Please use the updated QR code or connection URL\n\n")
-			
-			if err := http.ListenAndServe(bindAddr, nil); err != nil {
-				log.Fatal("Server failed to start even in local mode:", err)
-			}
-		} else {
-			log.Fatal("Server failed to start:", err)
-		}
+		log.Fatal("Server failed to start:", err)
 	}
 }

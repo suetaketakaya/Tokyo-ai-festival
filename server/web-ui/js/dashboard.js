@@ -131,6 +131,12 @@ class RemoteClaudeDashboard {
         const connectionUrl = data.connection_url || `ws://${data.host}:${data.port}/ws?key=${data.sessionKey}`;
         document.getElementById('connection-url').textContent = connectionUrl;
         
+        // Update container management URLs
+        const wifiConnectionUrl = document.getElementById('wifi-connection-url');
+        if (wifiConnectionUrl && data.host && data.port) {
+            wifiConnectionUrl.textContent = `http://${data.host}:${data.port}`;
+        }
+        
         // Update current mode
         if (data.mode) {
             this.currentMode = data.mode;

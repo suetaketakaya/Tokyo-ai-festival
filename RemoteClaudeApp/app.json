@@ -2,7 +2,7 @@
   "expo": {
     "name": "ClaudeOps Remote",
     "slug": "remote-claude-app",
-    "version": "3.5.0",
+    "version": "3.5.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,14 +13,16 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.remoteclaude.app",
       "icon": "./assets/icon.png",
-      "deploymentTarget": "18.0",
+      "deploymentTarget": "13.0",
+      "buildNumber": "5",
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow ClaudeOps Remote to access your camera to scan QR codes.",
-        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
+        "NSCameraUsageDescription": "QRコードの読み取りのためにカメラへのアクセスを許可してください。",
+        "NSMicrophoneUsageDescription": "音声機能のためにマイクへのアクセスを許可してください。"
       }
     },
     "android": {
       "package": "com.remoteclaude.app",
+      "versionCode": 2,
       "permissions": [
         "CAMERA",
         "android.permission.CAMERA",
@@ -31,21 +33,21 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow RemoteClaude to access your camera to scan QR codes."
+          "cameraPermission": "QRコードの読み取りのためにカメラへのアクセスを許可してください。"
         }
       ],
       [
         "expo-barcode-scanner",
         {
-          "cameraPermission": "Allow RemoteClaude to access your camera to scan QR codes."
+          "cameraPermission": "QRコードの読み取りのためにカメラへのアクセスを許可してください。"
         }
       ]
     ],
+    "owner": "takaya1029",
     "extra": {
       "eas": {
-        "projectId": "401cce87-a023-4c11-b36d-f9bd2a3f5834"
+        "projectId": "ac204966-0aab-4509-8f0b-3c2a5878013c"
       }
-    },
-    "owner": "takechan"
+    }
   }
 }
