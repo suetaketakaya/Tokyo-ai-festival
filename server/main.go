@@ -1472,6 +1472,13 @@ func getPortFromArgs() string {
 	return DefaultPort
 }
 
+// sendPermissionRequest sends a permission request to the client
+func (s *Server) sendPermissionRequest(projectID string, permReq interface{}) error {
+	// TODO: Implement actual permission request sending
+	// For now, just return nil to allow compilation
+	return nil
+}
+
 func main() {
 	// Get port from command line or environment
 	port := getPortFromArgs()

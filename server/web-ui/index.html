@@ -343,6 +343,40 @@
         </div>
     </div>
 
+    <!-- Password Input Modal -->
+    <div id="password-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔐 Sudo Password Required</h2>
+                <span class="close" id="password-modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>WireGuard VPN mode requires sudo privileges to configure the network interface.</p>
+                <p>Please enter your system password:</p>
+                
+                <form id="password-form">
+                    <div class="password-input-group">
+                        <input type="password" id="sudo-password" placeholder="Enter sudo password" required>
+                        <div class="password-visibility-toggle" id="password-toggle">
+                            <span class="password-toggle-icon">👁️</span>
+                        </div>
+                    </div>
+                    <div class="password-actions">
+                        <button type="button" id="password-cancel" class="secondary-button">Cancel</button>
+                        <button type="submit" id="password-submit" class="primary-button">
+                            <span class="button-icon">🔐</span>
+                            <span class="button-text">Enable VPN Mode</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="password-error" class="error-message" style="display: none;">
+                    Invalid password or permission denied
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/dashboard.js"></script>
 </body>
 </html>

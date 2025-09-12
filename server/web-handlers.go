@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -46,7 +47,21 @@ type APIResponse struct {
 
 // ModeSwitchRequest represents a mode switching request
 type ModeSwitchRequest struct {
-	Mode string `json:"mode"`
+	Mode     string `json:"mode"`
+	Password string `json:"password,omitempty"` // sudo password for VPN mode
+}
+
+// SudoAuthRequest represents a sudo authentication request
+type SudoAuthRequest struct {
+	Command  string `json:"command"`
+	Password string `json:"password"`
+}
+
+// SudoAuthResponse represents a sudo authentication response
+type SudoAuthResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Output  string `json:"output,omitempty"`
 }
 
 // NewWebInterface creates a new web interface instance
@@ -143,7 +158,13 @@ func (wi *WebInterface) handleSwitchMode(w http.ResponseWriter, r *http.Request)
 	switch req.Mode {
 	case "vpn":
 		log.Println("🔐 Starting VPN mode activation...")
-		success, errorMsg = wi.enableVPNMode()
+		if req.Password != "" {
+			// Use password-based activation
+			success, errorMsg = wi.enableVPNModeWithPassword(req.Password)
+		} else {
+			// Try legacy method first, which will fail with helpful message
+			success, errorMsg = wi.enableVPNMode()
+		}
 		if success {
 			log.Printf("✅ VPN mode activated successfully")
 		} else {
@@ -151,7 +172,13 @@ func (wi *WebInterface) handleSwitchMode(w http.ResponseWriter, r *http.Request)
 		}
 	case "local":
 		log.Println("🏠 Starting Local mode activation...")
-		success, errorMsg = wi.enableLocalMode()
+		if req.Password != "" {
+			// Use password-based method
+			success, errorMsg = wi.enableLocalModeWithPassword(req.Password)
+		} else {
+			// Try legacy method first, which will fail with helpful message
+			success, errorMsg = wi.enableLocalMode()
+		}
 		if success {
 			log.Printf("✅ Local mode activated successfully")
 		} else {
@@ -473,7 +500,194 @@ func (wi *WebInterface) handleFavicon(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, iconPath)
 }
 
-// enableVPNMode enables WireGuard VPN mode
+// executeSudoCommand executes a command with sudo using provided password
+func (wi *WebInterface) executeSudoCommand(command []string, password string) (string, error) {
+	if len(command) == 0 {
+		return "", fmt.Errorf("empty command")
+	}
+
+	// Create the full sudo command
+	sudoCmd := append([]string{"sudo", "-S"}, command...)
+	
+	cmd := exec.Command(sudoCmd[0], sudoCmd[1:]...)
+	
+	// Create a buffer for stdin to pass the password
+	var stdin bytes.Buffer
+	stdin.WriteString(password + "\n")
+	cmd.Stdin = &stdin
+	
+	// Capture both stdout and stderr
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	
+	err := cmd.Run()
+	
+	// Combine stdout and stderr for output
+	output := stdout.String()
+	if stderr.String() != "" {
+		if output != "" {
+			output += "\n"
+		}
+		output += stderr.String()
+	}
+	
+	return output, err
+}
+
+// testSudoAccess tests if the provided password works for sudo
+func (wi *WebInterface) testSudoAccess(password string) bool {
+	output, err := wi.executeSudoCommand([]string{"echo", "test"}, password)
+	if err != nil {
+		log.Printf("🔐 Sudo test failed: %v, output: %s", err, output)
+		return false
+	}
+	return true
+}
+
+// handleSudoAuth handles sudo authentication requests
+func (wi *WebInterface) handleSudoAuth(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	
+	if r.Method != "POST" {
+		wi.sendErrorResponse(w, "Method not allowed")
+		return
+	}
+	
+	var req SudoAuthRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		wi.sendErrorResponse(w, "Invalid request body")
+		return
+	}
+	
+	// Test sudo access
+	if !wi.testSudoAccess(req.Password) {
+		response := SudoAuthResponse{
+			Success: false,
+			Message: "Invalid sudo password",
+		}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+	
+	// Execute the requested command
+	commandParts := strings.Fields(req.Command)
+	output, err := wi.executeSudoCommand(commandParts, req.Password)
+	
+	response := SudoAuthResponse{
+		Success: err == nil,
+		Output:  output,
+	}
+	
+	if err != nil {
+		response.Message = err.Error()
+	} else {
+		response.Message = "Command executed successfully"
+	}
+	
+	json.NewEncoder(w).Encode(response)
+}
+
+// enableVPNModeWithPassword enables WireGuard VPN mode using sudo password
+func (wi *WebInterface) enableVPNModeWithPassword(password string) (bool, string) {
+	log.Println("🔐 Enabling WireGuard VPN mode with sudo authentication...")
+	
+	// Check if WireGuard config exists
+	configPath := filepath.Join(os.Getenv("HOME"), ".remoteclaude", "wireguard", "wg0.conf")
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		return false, "WireGuard configuration file not found. Please run setup first."
+	}
+	
+	// Test sudo access first
+	if !wi.testSudoAccess(password) {
+		return false, "Invalid sudo password. Please check your password and try again."
+	}
+	
+	// First, ensure any existing WireGuard interface is down
+	log.Println("🔄 Stopping any existing WireGuard interface...")
+	wi.executeSudoCommand([]string{"wg-quick", "down", configPath}, password)
+	
+	// Wait a moment for interface to be fully down
+	time.Sleep(2 * time.Second)
+	
+	// Try to start WireGuard
+	log.Println("🚀 Starting WireGuard VPN interface...")
+	output, err := wi.executeSudoCommand([]string{"wg-quick", "up", configPath}, password)
+	
+	if err != nil {
+		log.Printf("❌ Failed to start WireGuard: %v, output: %s", err, output)
+		
+		// Check for common issues and provide helpful error messages
+		if strings.Contains(output, "already exists") {
+			return false, "WireGuard interface already exists. Try switching to Local mode first, then back to VPN."
+		} else if strings.Contains(output, "permission denied") {
+			return false, "Permission denied. Please ensure you have sudo access."
+		} else if strings.Contains(output, "Address already in use") {
+			return false, "VPN address conflict. Please check network configuration."
+		}
+		
+		return false, fmt.Sprintf("Failed to start WireGuard VPN: %s", output)
+	}
+	
+	// Wait for interface to be fully up
+	time.Sleep(3 * time.Second)
+	
+	// Verify VPN is working
+	if !wi.isWireGuardActive() {
+		return false, "WireGuard started but VPN interface is not responding"
+	}
+	
+	log.Println("✅ WireGuard VPN mode enabled successfully")
+	return true, "VPN mode activated successfully"
+}
+
+// enableLocalModeWithPassword enables local network mode using sudo password to stop VPN
+func (wi *WebInterface) enableLocalModeWithPassword(password string) (bool, string) {
+	log.Println("🔐 Enabling local network mode with sudo authentication...")
+	
+	// Check if WireGuard is currently running
+	if wi.isWireGuardActive() {
+		log.Println("🔄 WireGuard is active, attempting to stop with password...")
+		
+		// Test sudo access first
+		if !wi.testSudoAccess(password) {
+			return false, "Invalid sudo password. Please check your password and try again."
+		}
+		
+		// Stop WireGuard using sudo password
+		configPath := filepath.Join(os.Getenv("HOME"), ".remoteclaude", "wireguard", "wg0.conf")
+		output, err := wi.executeSudoCommand([]string{"wg-quick", "down", configPath}, password)
+		
+		if err != nil {
+			log.Printf("⚠️ WireGuard shutdown warning: %v, output: %s", err, output)
+			
+			// Check for common issues
+			if strings.Contains(output, "does not exist") || strings.Contains(output, "is not a WireGuard interface") {
+				log.Println("✅ No WireGuard interface to stop")
+			} else {
+				return false, fmt.Sprintf("Failed to stop WireGuard VPN: %s", output)
+			}
+		} else {
+			log.Printf("✅ WireGuard VPN stopped successfully: %s", output)
+		}
+		
+		// Wait a moment for interface to fully shut down
+		time.Sleep(2 * time.Second)
+	}
+	
+	// Get local IP for binding
+	wi.server.Host = wi.server.getLocalIP()
+	log.Printf("🏠 Switching to local IP: %s", wi.server.Host)
+	
+	// Generate new QR code and connection URL for local network
+	connectionURL := fmt.Sprintf("ws://%s:%s/ws?key=%s", wi.server.Host, wi.server.Port, wi.server.SecretKey)
+	wi.server.saveQRCodeImage(connectionURL)
+	log.Printf("🔄 QR code regenerated for local mode with URL: %s", connectionURL)
+	
+	return true, "Local network mode activated successfully"
+}
+
+// enableVPNMode enables WireGuard VPN mode (legacy version - now requests password)
 func (wi *WebInterface) enableVPNMode() (bool, string) {
 	log.Println("🔐 Enabling WireGuard VPN mode...")
 	
@@ -683,13 +897,15 @@ func (wi *WebInterface) isWireGuardActive() bool {
 
 // verifyVPNConnection verifies that VPN IP is accessible
 func (wi *WebInterface) verifyVPNConnection() bool {
-	// Check if wg0 interface exists and has the correct IP (macOS)
-	cmd := exec.Command("ifconfig", "utun3")  // WireGuard usually uses utun interfaces on macOS
+	// Check if wg0 interface exists and has the correct IP (Linux/WSL2)
+	cmd := exec.Command("ifconfig", "wg0")  // WireGuard uses wg0 interface on Linux
 	output, err := cmd.Output()
 	
 	if err != nil {
-		// Try alternative interface names
-		for _, iface := range []string{"utun0", "utun1", "utun2", "utun4", "utun5"} {
+		// Try alternative interface names for different platforms
+		interfaceNames := []string{"utun0", "utun1", "utun2", "utun3", "utun4", "utun5"} // macOS
+		
+		for _, iface := range interfaceNames {
 			cmd = exec.Command("ifconfig", iface)
 			output, err = cmd.Output()
 			if err == nil && strings.Contains(string(output), "10.0.0") {
@@ -701,13 +917,13 @@ func (wi *WebInterface) verifyVPNConnection() bool {
 		return false
 	}
 	
-	// Check if 10.0.0.1 is assigned to the interface
-	if !strings.Contains(string(output), "10.0.0") {
-		log.Printf("❌ VPN IP 10.0.0.x not found on interface")
+	// Check if 10.0.0.1 is assigned to the wg0 interface
+	if !strings.Contains(string(output), "10.0.0.1") {
+		log.Printf("❌ VPN IP 10.0.0.1 not found on wg0 interface")
 		return false
 	}
 	
-	log.Println("✅ VPN IP verified on interface")
+	log.Println("✅ VPN IP verified on wg0 interface")
 	return true
 }
 
@@ -748,6 +964,7 @@ func (wi *WebInterface) StartWebServer() {
 	// API endpoints
 	webMux.HandleFunc("/api/status", wi.handleStatus)
 	webMux.HandleFunc("/api/switch-mode", wi.handleSwitchMode)
+	webMux.HandleFunc("/api/sudo-auth", wi.handleSudoAuth)
 	webMux.HandleFunc("/api/regenerate-qr", wi.handleRegenerateQR)
 	webMux.HandleFunc("/api/restart", wi.handleRestart)
 	webMux.HandleFunc("/api/logs", wi.handleLogs)
