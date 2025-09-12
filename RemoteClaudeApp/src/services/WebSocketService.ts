@@ -29,10 +29,25 @@ class WebSocketService {
         this.callbacks = callbacks;
 
         console.log('🔌 Connecting to:', url);
+        
+        // Enhanced URL validation for iPad compatibility
+        try {
+          const urlObj = new URL(url);
+          if (urlObj.protocol !== 'ws:' && urlObj.protocol !== 'wss:') {
+            throw new Error(`Invalid protocol: ${urlObj.protocol}`);
+          }
+          console.log('✅ URL validation passed:', urlObj.href);
+        } catch (urlError) {
+          console.error('❌ Invalid WebSocket URL:', url, urlError);
+          this.isConnecting = false;
+          resolve(false);
+          return;
+        }
+
         this.ws = new WebSocket(url);
 
         this.ws.onopen = () => {
-          console.log('✅ WebSocket connected');
+          console.log('✅ WebSocket connected successfully');
           this.isConnecting = false;
           if (this.callbacks.onOpen) {
             this.callbacks.onOpen();
@@ -42,20 +57,35 @@ class WebSocketService {
 
         this.ws.onmessage = (event) => {
           try {
-            const message = JSON.parse(event.data);
-            console.log('📨 WebSocket received:', message.type);
+            console.log('📨 WebSocket RAW received:', event.data?.substring(0, 200) + '...');
+            
+            // Handle different data types
+            let message;
+            if (typeof event.data === 'string') {
+              message = JSON.parse(event.data);
+            } else {
+              console.error('❌ Non-string message received:', typeof event.data);
+              return;
+            }
+            
+            console.log('📨 WebSocket parsed message type:', message.type);
             if (this.callbacks.onMessage) {
+              console.log('✅ Calling onMessage callback');
               this.callbacks.onMessage(message);
             } else {
               console.error('❌ No message callback available!');
             }
           } catch (error) {
             console.error('❌ Failed to parse message:', error);
+            console.error('❌ Raw data type:', typeof event.data);
+            console.error('❌ Raw data preview:', event.data?.substring(0, 100));
           }
         };
 
         this.ws.onerror = (error) => {
-          console.error('❌ WebSocket error:', error);
+          console.error('❌ WebSocket error occurred:', error);
+          console.error('❌ WebSocket readyState:', this.ws?.readyState);
+          console.error('❌ Connection URL:', url);
           this.isConnecting = false;
           if (this.callbacks.onError) {
             this.callbacks.onError(error);
@@ -65,6 +95,11 @@ class WebSocketService {
 
         this.ws.onclose = (event) => {
           console.log('🔌 WebSocket closed:', event.code, event.reason);
+          console.log('🔌 Close event details:', {
+            code: event.code,
+            reason: event.reason,
+            wasClean: event.wasClean
+          });
           this.isConnecting = false;
           this.ws = null;
           if (this.callbacks.onClose) {
@@ -75,20 +110,26 @@ class WebSocketService {
           }
         };
 
-        // Connection timeout
+        // Extended timeout for iPad compatibility
         setTimeout(() => {
           if (this.isConnecting) {
-            console.log('⏰ Connection timeout');
+            console.log('⏰ Connection timeout after 15 seconds');
+            console.log('⏰ WebSocket state:', this.ws?.readyState);
             this.isConnecting = false;
             if (this.ws) {
-              this.ws.close();
+              this.ws.close(1006, 'Connection timeout');
+              this.ws = null;
             }
             resolve(false);
           }
-        }, 10000);
+        }, 15000);
 
       } catch (error) {
-        console.error('❌ Connection error:', error);
+        console.error('❌ Connection setup error:', error);
+        console.error('❌ Error details:', {
+          message: error.message,
+          stack: error.stack
+        });
         this.isConnecting = false;
         resolve(false);
       }

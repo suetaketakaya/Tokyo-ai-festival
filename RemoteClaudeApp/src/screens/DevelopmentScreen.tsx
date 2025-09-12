@@ -9,6 +9,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -39,7 +41,14 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [isThinking, setIsThinking] = useState(false);
+  const [thinkingText, setThinkingText] = useState('');
+  const [tabSuggestions, setTabSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
+  const inputRef = useRef<TextInput>(null);
 
   const { projectId, projectName, connectionUrl, sessionKey } = route.params;
 
@@ -72,10 +81,12 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
   }, []);
 
   const connectToServer = async () => {
+    addSystemMessage('🔌 Attempting to connect to server...');
+    
     const success = await WebSocketService.connect(connectionUrl, {
       onOpen: () => {
         setIsConnected(true);
-        addSystemMessage('Connected to RemoteClaude server');
+        addSystemMessage('✅ Successfully connected to RemoteClaude server');
       },
       onMessage: (message) => {
         handleServerMessage(message);
@@ -83,16 +94,38 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
       onError: (error) => {
         console.error('WebSocket error:', error);
         setIsConnected(false);
-        addSystemMessage('Connection error occurred', 'error');
+        addSystemMessage('❌ WebSocket connection error occurred', 'error');
+        addSystemMessage('🔍 Check server URL and network connectivity', 'error');
       },
-      onClose: () => {
+      onClose: (event) => {
         setIsConnected(false);
-        addSystemMessage('Disconnected from server', 'error');
+        const reason = event?.reason || 'Unknown reason';
+        const code = event?.code || 'Unknown code';
+        addSystemMessage(`🔌 Disconnected from server (${code}: ${reason})`, 'error');
+        
+        // Auto-reconnect for certain close codes
+        if (event?.code !== 1000 && event?.code !== 1001) {
+          setTimeout(() => {
+            addSystemMessage('🔄 Attempting to reconnect...');
+            connectToServer();
+          }, 3000);
+        }
       },
     });
 
     if (!success) {
-      Alert.alert('Connection Failed', 'Could not connect to the RemoteClaude server.');
+      addSystemMessage('❌ Failed to establish WebSocket connection', 'error');
+      addSystemMessage(`🌐 Server URL: ${connectionUrl}`, 'error');
+      addSystemMessage('💡 Please check that the server is running and accessible', 'error');
+      
+      Alert.alert(
+        'Connection Failed', 
+        `Could not connect to the RemoteClaude server.\n\nURL: ${connectionUrl}\n\nPlease verify:\n• Server is running\n• Network connectivity\n• Firewall settings\n• URL is correct`,
+        [
+          { text: 'Retry', onPress: connectToServer },
+          { text: 'Cancel', style: 'cancel' }
+        ]
+      );
     }
   };
 
@@ -104,9 +137,18 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
     const messageType = message.type ? message.type.toString().trim() : '';
     
     switch (messageType) {
+      case 'claude_thinking':
+        setIsThinking(true);
+        if (message.data && message.data.thinking) {
+          setThinkingText(message.data.thinking);
+          addSystemMessage('🤔 Claude is thinking...', 'system');
+        }
+        break;
+        
       case 'claude_output':
         console.log('🔥 DEVELOPMENT_FIXED_v1: Successfully handling claude_output message');
         setIsExecuting(false);
+        setIsThinking(false);
         if (message.data && message.data.output) {
           console.log('🔥 DEVELOPMENT_FIXED_v1: Adding terminal output:', message.data.output.substring(0, 100));
           addTerminalOutput(message.data.output, 'output');
@@ -188,6 +230,13 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
       return;
     }
 
+    // Add command to history
+    const trimmedCommand = command.trim();
+    if (trimmedCommand && commandHistory[commandHistory.length - 1] !== trimmedCommand) {
+      setCommandHistory(prev => [...prev, trimmedCommand]);
+    }
+    setHistoryIndex(-1);
+
     // Add command to terminal
     addTerminalLine(`$ ${command}`, 'command');
 
@@ -208,6 +257,7 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
       setIsExecuting(true);
       addSystemMessage('Executing command...');
       setCommand('');
+      setShowSuggestions(false);
     } else {
       addSystemMessage('Failed to send command', 'error');
     }
@@ -221,6 +271,78 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
   const clearTerminal = () => {
     setTerminalLines([]);
     addSystemMessage('Terminal cleared');
+  };
+
+  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+    const { key } = e.nativeEvent;
+    
+    if (key === 'Tab') {
+      e.preventDefault();
+      handleTabCompletion();
+    } else if (key === 'ArrowUp') {
+      e.preventDefault();
+      handleArrowUp();
+    } else if (key === 'ArrowDown') {
+      e.preventDefault();
+      handleArrowDown();
+    } else if (key === 'Escape') {
+      e.preventDefault();
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleTabCompletion = () => {
+    const currentCommand = command.toLowerCase().trim();
+    const commonCommands = [
+      'ls', 'ls -la', 'pwd', 'cd', 'mkdir', 'rm', 'cp', 'mv',
+      'cat', 'vim', 'nano', 'grep', 'find', 'ps', 'top', 'df',
+      'git status', 'git add', 'git commit', 'git push', 'git pull',
+      'python3', 'npm', 'node', 'docker', 'curl', 'wget'
+    ];
+    
+    const suggestions = commonCommands.filter(cmd => 
+      cmd.startsWith(currentCommand) && cmd !== currentCommand
+    );
+    
+    if (suggestions.length === 1) {
+      setCommand(suggestions[0] + ' ');
+      setShowSuggestions(false);
+    } else if (suggestions.length > 1) {
+      setTabSuggestions(suggestions);
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleArrowUp = () => {
+    if (commandHistory.length > 0) {
+      const newIndex = historyIndex === -1 ? commandHistory.length - 1 
+                      : Math.max(0, historyIndex - 1);
+      setHistoryIndex(newIndex);
+      setCommand(commandHistory[newIndex]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleArrowDown = () => {
+    if (commandHistory.length > 0 && historyIndex >= 0) {
+      const newIndex = historyIndex + 1;
+      if (newIndex >= commandHistory.length) {
+        setHistoryIndex(-1);
+        setCommand('');
+      } else {
+        setHistoryIndex(newIndex);
+        setCommand(commandHistory[newIndex]);
+      }
+      setShowSuggestions(false);
+    }
+  };
+
+  const selectSuggestion = (suggestion: string) => {
+    setCommand(suggestion + ' ');
+    setShowSuggestions(false);
+    inputRef.current?.focus();
   };
 
   const getLineStyle = (type: TerminalLine['type']) => {
@@ -277,6 +399,14 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
         )}
         {isExecuting && (
           <Text style={styles.executingLine}>⏳ Executing command...</Text>
+        )}
+        {isThinking && (
+          <View style={styles.thinkingContainer}>
+            <Text style={styles.thinkingLine}>🤔 Claude is thinking...</Text>
+            {thinkingText && (
+              <Text style={styles.thinkingDetail}>{thinkingText}</Text>
+            )}
+          </View>
         )}
       </ScrollView>
 
@@ -441,13 +571,33 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
         </ScrollView>
       </View>
 
+      {/* Tab Suggestions */}
+      {showSuggestions && tabSuggestions.length > 0 && (
+        <View style={styles.suggestionsContainer}>
+          <Text style={styles.suggestionsTitle}>💡 Tab Suggestions:</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {tabSuggestions.map((suggestion, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.suggestionButton}
+                onPress={() => selectSuggestion(suggestion)}
+              >
+                <Text style={styles.suggestionText}>{suggestion}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
       {/* Command Input */}
       <View style={styles.inputContainer}>
         <TextInput
+          ref={inputRef}
           style={styles.commandInput}
           value={command}
           onChangeText={setCommand}
-          placeholder="Enter Claude command or shell command..."
+          onKeyPress={handleKeyPress}
+          placeholder="Enter Claude command or shell command... (↑ for history, Tab for completion)"
           placeholderTextColor="#999"
           multiline={false}
           returnKeyType="send"
@@ -631,5 +781,52 @@ const styles = StyleSheet.create({
   },
   sendButtonText: {
     fontSize: 20,
+  },
+  // New styles for keyboard shortcuts and thinking display
+  thinkingContainer: {
+    backgroundColor: '#2d2d2d',
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#007AFF',
+  },
+  thinkingLine: {
+    color: '#007AFF',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 13,
+    marginBottom: 5,
+    fontStyle: 'italic',
+  },
+  thinkingDetail: {
+    color: '#ccc',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  suggestionsContainer: {
+    backgroundColor: '#2d2d2d',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#404040',
+  },
+  suggestionsTitle: {
+    color: '#007AFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  suggestionButton: {
+    backgroundColor: '#404040',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginRight: 8,
+  },
+  suggestionText: {
+    color: '#fff',
+    fontSize: 11,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
 });

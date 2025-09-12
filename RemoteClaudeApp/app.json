@@ -2,7 +2,7 @@
   "expo": {
     "name": "ClaudeOps Remote",
     "slug": "remote-claude-app",
-    "version": "3.5.1",
+    "version": "3.7.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,7 @@
       "bundleIdentifier": "com.remoteclaude.app",
       "icon": "./assets/icon.png",
       "deploymentTarget": "13.0",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "infoPlist": {
         "NSCameraUsageDescription": "QRコードの読み取りのためにカメラへのアクセスを許可してください。",
         "NSMicrophoneUsageDescription": "音声機能のためにマイクへのアクセスを許可してください。"
