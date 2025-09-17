@@ -945,6 +945,190 @@ func (wi *WebInterface) sendErrorResponse(w http.ResponseWriter, errorMsg string
 	json.NewEncoder(w).Encode(response)
 }
 
+// Web-Mobile Synchronization Handlers
+
+// handleSyncProjects returns current Docker projects for web dashboard
+func (wi *WebInterface) handleSyncProjects(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	projects, err := wi.server.dockerManager.ListProjects()
+	if err != nil {
+		wi.sendErrorResponse(w, fmt.Sprintf("Failed to list projects: %v", err))
+		return
+	}
+
+	// Convert projects to web-friendly format
+	var webProjects []map[string]interface{}
+	for _, project := range projects {
+		webProjects = append(webProjects, map[string]interface{}{
+			"id":            project.ID,
+			"name":          project.Name,
+			"type":          project.Type,
+			"status":        project.Status,
+			"container_id":  project.ContainerID[:12],
+			"created_at":    project.CreatedAt.Format("2006-01-02 15:04:05"),
+			"last_access":   project.LastAccess.Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	response := APIResponse{
+		Success: true,
+		Data:    map[string]interface{}{
+			"projects": webProjects,
+			"total":    len(webProjects),
+		},
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
+
+// handleSyncClients returns connected WebSocket clients information
+func (wi *WebInterface) handleSyncClients(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// TODO: Implement actual client tracking in WebSocket handler
+	// For now, return mock data
+	clients := []ClientInfo{
+		{
+			Name:   "iPhone App",
+			IP:     "192.168.0.142",
+			Status: "connected",
+		},
+	}
+
+	response := APIResponse{
+		Success: true,
+		Data:    map[string]interface{}{
+			"clients": clients,
+			"total":   len(clients),
+		},
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
+
+// handleSyncSessions returns active conversation sessions
+func (wi *WebInterface) handleSyncSessions(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	wi.server.sessionsMutex.RLock()
+	defer wi.server.sessionsMutex.RUnlock()
+
+	var sessions []map[string]interface{}
+	for projectID, session := range wi.server.sessions {
+		sessions = append(sessions, map[string]interface{}{
+			"project_id":     projectID,
+			"language":       session.Language,
+			"message_count":  len(session.MessageHistory),
+			"created_at":     session.CreatedAt.Format("2006-01-02 15:04:05"),
+			"last_activity":  session.LastActivity.Format("2006-01-02 15:04:05"),
+		})
+	}
+
+	response := APIResponse{
+		Success: true,
+		Data:    map[string]interface{}{
+			"sessions": sessions,
+			"total":    len(sessions),
+		},
+	}
+
+	json.NewEncoder(w).Encode(response)
+}
+
+// handleStatusStream provides Server-Sent Events for real-time status updates
+func (wi *WebInterface) handleStatusStream(w http.ResponseWriter, r *http.Request) {
+	// Set headers for Server-Sent Events
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	// Generate unique client ID
+	clientID := fmt.Sprintf("web_%d", time.Now().UnixNano())
+
+	// Register client with server for notifications
+	clientChan := wi.server.registerWebClient(clientID)
+	defer wi.server.unregisterWebClient(clientID)
+
+	// Send initial status
+	initialStatus := map[string]interface{}{
+		"type":      "initial_status",
+		"timestamp": time.Now().Unix(),
+		"host":      wi.server.Host,
+		"mode":      func() string {
+			if wi.isWireGuardActive() && wi.server.Host == "10.0.0.1" {
+				return "vpn"
+			}
+			return "local"
+		}(),
+		"active_projects": func() int {
+			projects, _ := wi.server.dockerManager.ListProjects()
+			activeCount := 0
+			for _, p := range projects {
+				if p.Status == "running" {
+					activeCount++
+				}
+			}
+			return activeCount
+		}(),
+	}
+
+	// Send initial status
+	data, _ := json.Marshal(initialStatus)
+	fmt.Fprintf(w, "data: %s\n\n", string(data))
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
+
+	// Periodic status updates
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	// Listen for real-time notifications and periodic updates
+	for {
+		select {
+		case notification := <-clientChan:
+			data, _ := json.Marshal(notification)
+			fmt.Fprintf(w, "data: %s\n\n", string(data))
+			if f, ok := w.(http.Flusher); ok {
+				f.Flush()
+			}
+		case <-ticker.C:
+			// Send periodic status updates
+			status := map[string]interface{}{
+				"type":      "periodic_status",
+				"timestamp": time.Now().Unix(),
+				"host":      wi.server.Host,
+				"mode":      func() string {
+					if wi.isWireGuardActive() && wi.server.Host == "10.0.0.1" {
+						return "vpn"
+					}
+					return "local"
+				}(),
+				"active_projects": func() int {
+					projects, _ := wi.server.dockerManager.ListProjects()
+					activeCount := 0
+					for _, p := range projects {
+						if p.Status == "running" {
+							activeCount++
+						}
+					}
+					return activeCount
+				}(),
+			}
+
+			data, _ := json.Marshal(status)
+			fmt.Fprintf(w, "data: %s\n\n", string(data))
+			if f, ok := w.(http.Flusher); ok {
+				f.Flush()
+			}
+		case <-r.Context().Done():
+			return
+		}
+	}
+}
+
 // StartWebServer starts the web interface server
 func (wi *WebInterface) StartWebServer() {
 	webMux := http.NewServeMux()
@@ -970,6 +1154,12 @@ func (wi *WebInterface) StartWebServer() {
 	webMux.HandleFunc("/api/logs", wi.handleLogs)
 	webMux.HandleFunc("/api/wireguard-qr", wi.handleWireGuardQR)
 	webMux.HandleFunc("/api/vpn-connection-qr", wi.handleVPNConnectionQR)
+
+	// Web-Mobile Synchronization APIs
+	webMux.HandleFunc("/api/sync/projects", wi.handleSyncProjects)
+	webMux.HandleFunc("/api/sync/clients", wi.handleSyncClients)
+	webMux.HandleFunc("/api/sync/sessions", wi.handleSyncSessions)
+	webMux.HandleFunc("/api/sync/status-stream", wi.handleStatusStream)
 	webMux.HandleFunc("/qr-code.png", wi.handleQRCodeImage)
 	webMux.HandleFunc("/wireguard-qr.png", wi.handleWireGuardQRImage)
 	webMux.HandleFunc("/vpn-connection-qr.png", wi.handleVPNConnectionQRImage)

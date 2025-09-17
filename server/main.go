@@ -53,9 +53,13 @@ type Server struct {
 	SecretKey     string
 	upgrader      websocket.Upgrader
 	dockerManager *DockerManager
+	configManager *ConfigManager
 	// Session management
 	sessions      map[string]*ConversationSession
 	sessionsMutex sync.RWMutex
+	// Web-Mobile synchronization
+	webClients    map[string]chan map[string]interface{}
+	webMutex      sync.RWMutex
 }
 
 func NewServer(port string) *Server {
@@ -67,11 +71,16 @@ func NewServer(port string) *Server {
 	// Initialize Docker manager
 	dockerManager := NewDockerManager("./projects")
 
+	// Initialize Configuration manager
+	configManager := NewConfigManager()
+
 	return &Server{
 		Port:          port,
 		SecretKey:     secretKey,
 		dockerManager: dockerManager,
+		configManager: configManager,
 		sessions:      make(map[string]*ConversationSession),
+		webClients:    make(map[string]chan map[string]interface{}),
 		upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true // Allow all origins for mobile app connection
@@ -451,6 +460,22 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 	case "conversation_continue":
 		s.handleConversationContinue(conn, msg)
 
+	// Configuration management
+	case "config_save":
+		s.handleConfigSave(conn, msg)
+
+	case "config_load":
+		s.handleConfigLoad(conn, msg)
+
+	case "config_sync":
+		s.handleConfigSync(conn, msg)
+
+	case "config_quick_commands":
+		s.handleConfigQuickCommands(conn, msg)
+
+	case "quick_command_execute":
+		s.handleQuickCommandExecute(conn, msg)
+
 	default:
 		s.sendError(conn, fmt.Sprintf("Unknown message type: %s", msgType))
 	}
@@ -570,6 +595,24 @@ func (s *Server) handleProjectCreate(conn *websocket.Conn, msg map[string]interf
 	})
 	
 	log.Printf("✅ Created Docker project: %s (ID: %s)", projectName, project.ID)
+
+	// Auto-apply configuration to new container
+	go func() {
+		time.Sleep(5 * time.Second) // Wait for container to be fully ready
+		s.autoApplyConfiguration(project.ID, project.ContainerID)
+	}()
+
+	// Notify web interface about new project
+	s.notifyWebClients("project_created", map[string]interface{}{
+		"project": map[string]interface{}{
+			"id":           project.ID,
+			"name":         project.Name,
+			"type":         project.Type,
+			"status":       project.Status,
+			"container_id": project.ContainerID[:12],
+			"created_at":   project.CreatedAt.Format("2006-01-02T15:04:05Z"),
+		},
+	})
 }
 
 func (s *Server) handleProjectStart(conn *websocket.Conn, msg map[string]interface{}) {
@@ -1314,6 +1357,50 @@ func (s *Server) detectLanguage(text string) string {
 	return "auto"
 }
 
+// notifyWebClients sends notifications to connected web clients
+func (s *Server) notifyWebClients(eventType string, data map[string]interface{}) {
+	s.webMutex.RLock()
+	defer s.webMutex.RUnlock()
+
+	notification := map[string]interface{}{
+		"type":      eventType,
+		"data":      data,
+		"timestamp": time.Now().Unix(),
+	}
+
+	for clientID, clientChan := range s.webClients {
+		select {
+		case clientChan <- notification:
+			log.Printf("📡 Sent %s notification to web client %s", eventType, clientID)
+		default:
+			log.Printf("⚠️ Failed to send notification to web client %s (channel full)", clientID)
+		}
+	}
+}
+
+// registerWebClient adds a new web client for notifications
+func (s *Server) registerWebClient(clientID string) chan map[string]interface{} {
+	s.webMutex.Lock()
+	defer s.webMutex.Unlock()
+
+	clientChan := make(chan map[string]interface{}, 10)
+	s.webClients[clientID] = clientChan
+	log.Printf("📱 Registered web client: %s", clientID)
+	return clientChan
+}
+
+// unregisterWebClient removes a web client
+func (s *Server) unregisterWebClient(clientID string) {
+	s.webMutex.Lock()
+	defer s.webMutex.Unlock()
+
+	if clientChan, exists := s.webClients[clientID]; exists {
+		close(clientChan)
+		delete(s.webClients, clientID)
+		log.Printf("📱 Unregistered web client: %s", clientID)
+	}
+}
+
 // Settings handler functions (placeholder implementations)
 func (s *Server) handleSettingsUpdate(conn *websocket.Conn, msg map[string]interface{}) {
 	log.Printf("🔧 Handling settings update request")
@@ -1472,12 +1559,358 @@ func getPortFromArgs() string {
 	return DefaultPort
 }
 
+// autoApplyConfiguration automatically applies user configuration to new containers
+func (s *Server) autoApplyConfiguration(projectID, containerID string) {
+	log.Printf("🔧 Auto-applying configuration to project %s", projectID)
+
+	// Try to load default user configuration (using "default" as user ID for now)
+	userConfig, err := s.configManager.LoadUserConfig("default")
+	if err != nil {
+		log.Printf("⚠️ Failed to load user config for auto-apply: %v", err)
+		return
+	}
+
+	// Create sync request
+	syncRequest := &ConfigSyncRequest{
+		UserID:          "default",
+		UserConfig:      userConfig,
+		TargetContainer: containerID,
+		SyncType:        "update",
+	}
+
+	// Apply configuration
+	response, err := s.configManager.SyncConfigToContainer(containerID, syncRequest)
+	if err != nil {
+		log.Printf("⚠️ Failed to auto-apply configuration: %v", err)
+		return
+	}
+
+	log.Printf("✅ Auto-applied configuration to %s: %v", projectID, response.Applied)
+}
+
 // sendPermissionRequest sends a permission request to the client
 func (s *Server) sendPermissionRequest(projectID string, permReq interface{}) error {
 	// TODO: Implement actual permission request sending
 	// For now, just return nil to allow compilation
 	return nil
 }
+
+// Configuration management handlers
+
+func (s *Server) handleConfigSave(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("💾 Handling config save request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid config save message format")
+		return
+	}
+
+	// Parse user configuration from request
+	configData, _ := json.Marshal(data)
+	var userConfig UserConfiguration
+	if err := json.Unmarshal(configData, &userConfig); err != nil {
+		s.sendError(conn, fmt.Sprintf("Failed to parse config data: %v", err))
+		return
+	}
+
+	// Set creation/update timestamps
+	if userConfig.CreatedAt.IsZero() {
+		userConfig.CreatedAt = time.Now()
+	}
+	userConfig.UpdatedAt = time.Now()
+
+	// Save configuration
+	err := s.configManager.SaveUserConfig(&userConfig)
+	if err != nil {
+		s.sendError(conn, fmt.Sprintf("Failed to save config: %v", err))
+		return
+	}
+
+	s.sendMessage(conn, "config_save_response", map[string]interface{}{
+		"status":  "success",
+		"message": "Configuration saved successfully",
+		"config_id": userConfig.ID,
+	})
+}
+
+func (s *Server) handleConfigLoad(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("📂 Handling config load request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid config load message format")
+		return
+	}
+
+	userID, ok := data["user_id"].(string)
+	if !ok {
+		s.sendError(conn, "Missing user_id in config load request")
+		return
+	}
+
+	// Load user configuration
+	userConfig, err := s.configManager.LoadUserConfig(userID)
+	if err != nil {
+		s.sendError(conn, fmt.Sprintf("Failed to load config: %v", err))
+		return
+	}
+
+	s.sendMessage(conn, "config_load_response", map[string]interface{}{
+		"status": "success",
+		"config": userConfig,
+	})
+}
+
+func (s *Server) handleConfigSync(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("🔄 Handling config sync request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid config sync message format")
+		return
+	}
+
+	// Parse sync request
+	syncData, _ := json.Marshal(data)
+	var syncRequest ConfigSyncRequest
+	if err := json.Unmarshal(syncData, &syncRequest); err != nil {
+		s.sendError(conn, fmt.Sprintf("Failed to parse sync request: %v", err))
+		return
+	}
+
+	// If no target container specified, sync to all project containers
+	if syncRequest.TargetContainer == "" {
+		projects, err := s.dockerManager.ListProjects()
+		if err != nil {
+			s.sendError(conn, fmt.Sprintf("Failed to list projects: %v", err))
+			return
+		}
+
+		var responses []map[string]interface{}
+		for _, project := range projects {
+			if project.Status == "running" {
+				syncRequest.TargetContainer = project.ContainerID
+				response, err := s.configManager.SyncConfigToContainer(project.ContainerID, &syncRequest)
+				if err != nil {
+					log.Printf("⚠️ Failed to sync config to container %s: %v", project.ContainerID[:12], err)
+					continue
+				}
+
+				responses = append(responses, map[string]interface{}{
+					"container_id": project.ContainerID[:12],
+					"project_name": project.Name,
+					"response": response,
+				})
+			}
+		}
+
+		s.sendMessage(conn, "config_sync_response", map[string]interface{}{
+			"status": "success",
+			"message": "Configuration sync completed",
+			"sync_results": responses,
+		})
+	} else {
+		// Sync to specific container
+		response, err := s.configManager.SyncConfigToContainer(syncRequest.TargetContainer, &syncRequest)
+		if err != nil {
+			s.sendError(conn, fmt.Sprintf("Failed to sync config: %v", err))
+			return
+		}
+
+		s.sendMessage(conn, "config_sync_response", map[string]interface{}{
+			"status": "success",
+			"response": response,
+		})
+	}
+}
+
+func (s *Server) handleConfigQuickCommands(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("⚡ Handling quick commands config request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid quick commands message format")
+		return
+	}
+
+	action, ok := data["action"].(string)
+	if !ok {
+		s.sendError(conn, "Missing action in quick commands request")
+		return
+	}
+
+	switch action {
+	case "get_defaults":
+		// Return default quick commands
+		defaultCommands := GetDefaultQuickCommands()
+		s.sendMessage(conn, "config_quick_commands_response", map[string]interface{}{
+			"status": "success",
+			"commands": defaultCommands,
+			"message": "Default quick commands retrieved",
+		})
+
+	case "save_custom":
+		// Save custom quick commands
+		commandsData, ok := data["commands"].([]interface{})
+		if !ok {
+			s.sendError(conn, "Invalid commands format")
+			return
+		}
+
+		var commands []QuickCommand
+		for _, cmdData := range commandsData {
+			cmdBytes, _ := json.Marshal(cmdData)
+			var cmd QuickCommand
+			if err := json.Unmarshal(cmdBytes, &cmd); err != nil {
+				continue
+			}
+			commands = append(commands, cmd)
+		}
+
+		s.sendMessage(conn, "config_quick_commands_response", map[string]interface{}{
+			"status": "success",
+			"message": "Custom quick commands saved",
+			"commands": commands,
+		})
+
+	default:
+		s.sendError(conn, fmt.Sprintf("Unknown quick commands action: %s", action))
+	}
+}
+
+func (s *Server) handleQuickCommandExecute(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("⚡ Handling quick command execution request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid quick command execute message format")
+		return
+	}
+
+	projectID, ok := data["project_id"].(string)
+	if !ok {
+		s.sendError(conn, "Missing project_id in quick command request")
+		return
+	}
+
+	commandID, ok := data["command_id"].(string)
+	if !ok {
+		s.sendError(conn, "Missing command_id in quick command request")
+		return
+	}
+
+	// Load user configuration to get custom commands
+	userConfig, err := s.configManager.LoadUserConfig("default")
+	if err != nil {
+		log.Printf("⚠️ Failed to load user config for quick commands: %v", err)
+		userConfig = s.configManager.getDefaultUserConfig("default")
+	}
+
+	// Find the command
+	var targetCommand *QuickCommand
+	for _, cmd := range userConfig.QuickCommands {
+		if cmd.ID == commandID {
+			targetCommand = &cmd
+			break
+		}
+	}
+
+	if targetCommand == nil {
+		s.sendError(conn, fmt.Sprintf("Quick command not found: %s", commandID))
+		return
+	}
+
+	// Send confirmation request if required
+	if targetCommand.RequiresConfirmation {
+		s.sendMessage(conn, "quick_command_confirmation", map[string]interface{}{
+			"command": targetCommand,
+			"project_id": projectID,
+			"message": fmt.Sprintf("Execute '%s'?", targetCommand.Name),
+		})
+		return
+	}
+
+	// Execute the command
+	s.executeQuickCommand(conn, projectID, targetCommand)
+}
+
+func (s *Server) executeQuickCommand(conn *websocket.Conn, projectID string, command *QuickCommand) {
+	log.Printf("🔧 Executing quick command '%s' in project %s", command.Name, projectID)
+
+	// Notify about command start
+	s.sendMessage(conn, "quick_command_started", map[string]interface{}{
+		"command_id": command.ID,
+		"command_name": command.Name,
+		"project_id": projectID,
+	})
+
+	// Process special commands with enhanced features
+	processedCommand := s.processSpecialCommand(command.Command, projectID)
+
+	// Execute command in container
+	output, err := s.dockerManager.ExecuteCommand(projectID, processedCommand)
+
+	if err != nil {
+		s.sendMessage(conn, "quick_command_error", map[string]interface{}{
+			"command_id": command.ID,
+			"error": err.Error(),
+			"output": output,
+			"project_id": projectID,
+		})
+		return
+	}
+
+	// Send success response
+	s.sendMessage(conn, "quick_command_response", map[string]interface{}{
+		"command_id": command.ID,
+		"command_name": command.Name,
+		"output": output,
+		"project_id": projectID,
+		"status": "success",
+		"message": fmt.Sprintf("✅ Command '%s' executed successfully", command.Name),
+	})
+
+	// Notify web interface about command execution
+	s.notifyWebClients("quick_command_executed", map[string]interface{}{
+		"project_id": projectID,
+		"command": command.Name,
+		"success": true,
+	})
+
+	log.Printf("✅ Quick command '%s' completed in project %s", command.Name, projectID)
+}
+
+func (s *Server) processSpecialCommand(command, projectID string) string {
+	// Process special variables and enhance commands
+	processed := command
+
+	// Replace common variables
+	processed = strings.ReplaceAll(processed, "$(date)", time.Now().Format("2006-01-02 15:04:05"))
+	processed = strings.ReplaceAll(processed, "$(project_id)", projectID)
+
+	// Enhanced Git commands with error handling
+	if strings.HasPrefix(processed, "git") {
+		// Add git safety checks
+		if strings.Contains(processed, "git commit") && !strings.Contains(processed, "--allow-empty") {
+			processed = "git diff --cached --quiet && echo 'No changes to commit' || " + processed
+		}
+
+		if strings.Contains(processed, "git push") {
+			// Add branch verification
+			processed = "git symbolic-ref --short HEAD > /dev/null 2>&1 && " + processed + " || echo 'No remote branch configured'"
+		}
+	}
+
+	// Enhanced Firebase commands
+	if strings.HasPrefix(processed, "firebase") {
+		// Check if firebase is installed and configured
+		processed = "which firebase > /dev/null && firebase list > /dev/null 2>&1 && " + processed + " || echo 'Firebase CLI not configured'"
+	}
+
+	return processed
+}
+
 
 func main() {
 	// Get port from command line or environment

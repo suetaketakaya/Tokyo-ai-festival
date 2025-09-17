@@ -22,4 +22,14 @@ export type RootStackParamList = {
     };
   };
   Settings: undefined;
+  Configuration: {
+    connectionUrl: string;
+    sessionKey: string;
+  };
+  QuickCommands: {
+    projectId: string;
+    projectName: string;
+    connectionUrl: string;
+    sessionKey: string;
+  };
 };

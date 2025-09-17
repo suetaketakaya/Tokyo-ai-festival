@@ -184,6 +184,11 @@ func (dm *DockerManager) ExecuteCommand(projectID, command string) (string, erro
 		return "", err
 	}
 
+	// Check if container is running and start if necessary
+	if err := dm.ensureContainerRunning(containerID, projectID); err != nil {
+		return "", fmt.Errorf("failed to ensure container is running: %v", err)
+	}
+
 	// Execute command in container with proper PATH environment
 	args := []string{"exec", "-i", "-e", "PATH=/usr/local/bin:/usr/bin:/bin:/sbin", containerID, "/bin/bash", "-c", command}
 	cmd := exec.Command("docker", args...)
@@ -198,6 +203,34 @@ func (dm *DockerManager) ExecuteCommand(projectID, command string) (string, erro
 
 	log.Printf("✅ Command executed successfully in %s", projectID)
 	return result, nil
+}
+
+// ensureContainerRunning checks if container is running and starts it if not
+func (dm *DockerManager) ensureContainerRunning(containerID, projectID string) error {
+	// Check container status
+	cmd := exec.Command("docker", "inspect", "--format", "{{.State.Status}}", containerID)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to check container status: %v", err)
+	}
+
+	status := strings.TrimSpace(string(output))
+	log.Printf("🔍 Container %s status: %s", containerID[:12], status)
+
+	// If not running, start it
+	if status != "running" {
+		log.Printf("🚀 Starting stopped container %s for project %s", containerID[:12], projectID)
+		startCmd := exec.Command("docker", "start", containerID)
+		if err := startCmd.Run(); err != nil {
+			return fmt.Errorf("failed to start container: %v", err)
+		}
+
+		// Wait a bit for container to be fully ready
+		time.Sleep(2 * time.Second)
+		log.Printf("✅ Container %s started successfully", containerID[:12])
+	}
+
+	return nil
 }
 
 // ListProjects returns a list of all Docker-based projects
@@ -422,6 +455,12 @@ func (dm *DockerManager) StreamCommand(ctx context.Context, projectID, command s
 		containerID, err := dm.getContainerID(projectID)
 		if err != nil {
 			errorChan <- err
+			return
+		}
+
+		// Check if container is running and start if necessary
+		if err := dm.ensureContainerRunning(containerID, projectID); err != nil {
+			errorChan <- fmt.Errorf("failed to ensure container is running: %v", err)
 			return
 		}
 

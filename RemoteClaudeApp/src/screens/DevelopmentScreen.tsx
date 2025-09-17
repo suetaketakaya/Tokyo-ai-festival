@@ -412,7 +412,20 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
 
       {/* Quick Commands */}
       <View style={styles.quickCommands}>
-        <Text style={styles.quickCommandsTitle}>🚀 Quick Commands</Text>
+        <View style={styles.quickCommandsHeader}>
+          <Text style={styles.quickCommandsTitle}>🚀 Quick Commands</Text>
+          <TouchableOpacity
+            style={styles.moreCommandsButton}
+            onPress={() => navigation.navigate('QuickCommands', {
+              projectId,
+              projectName,
+              connectionUrl,
+              sessionKey,
+            })}
+          >
+            <Text style={styles.moreCommandsText}>⚡ View All</Text>
+          </TouchableOpacity>
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <TouchableOpacity
             style={styles.quickCommandButton}
@@ -434,68 +447,15 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('Create a simple README file')}
+            onPress={() => navigation.navigate('Configuration', {
+              connectionUrl,
+              sessionKey,
+            })}
           >
-            <Text style={styles.quickCommandText}>📄 Claude: README</Text>
+            <Text style={styles.quickCommandText}>⚙️ Settings</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('Show project structure and explain the codebase')}
-          >
-            <Text style={styles.quickCommandText}>🏗️ Claude: Analyze</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('claude --help')}
-          >
-            <Text style={styles.quickCommandText}>❓ Claude Help</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('echo "Hello from RemoteClaude!"')}
-          >
-            <Text style={styles.quickCommandText}>👋 Test Echo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('Write a simple hello world Python script')}
-          >
-            <Text style={styles.quickCommandText}>🐍 Claude: Python</Text>
-          </TouchableOpacity>
-          
-          {/* Linux Commands */}
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('cat /etc/os-release')}
-          >
-            <Text style={styles.quickCommandText}>🐧 OS Info</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('ps aux')}
-          >
-            <Text style={styles.quickCommandText}>⚙️ Processes</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('df -h')}
-          >
-            <Text style={styles.quickCommandText}>💾 Disk Usage</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('free -h')}
-          >
-            <Text style={styles.quickCommandText}>🧠 Memory</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('top -n 1')}
-          >
-            <Text style={styles.quickCommandText}>📊 System Load</Text>
-          </TouchableOpacity>
-          
-          {/* Python Commands */}
+
+          {/* Simplified command set */}
           <TouchableOpacity
             style={styles.quickCommandButton}
             onPress={() => executeQuickCommand('python3 --version')}
@@ -733,11 +693,27 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#404040',
   },
+  quickCommandsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   quickCommandsTitle: {
     color: '#ccc',
     fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 8,
+  },
+  moreCommandsButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  moreCommandsText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   quickCommandButton: {
     backgroundColor: '#404040',
