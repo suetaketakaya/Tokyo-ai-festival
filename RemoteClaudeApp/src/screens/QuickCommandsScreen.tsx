@@ -74,30 +74,43 @@ export default function QuickCommandsScreen({ navigation, route }: Props) {
 
     switch (message.type) {
       case 'config_quick_commands_response':
-        if (message.status === 'success' && message.commands) {
-          setCommands(message.commands);
+        const responseData = message.data || message;
+        const status = responseData.status;
+        const commands = responseData.commands;
+
+        console.log('⚡ QuickCommands response data:', responseData);
+        console.log('⚡ Commands received:', commands);
+
+        if (status === 'success' && commands) {
+          setCommands(commands);
+          console.log('✅ QuickCommands loaded successfully:', commands.length, 'commands');
+        } else {
+          console.log('❌ Failed to load QuickCommands:', status);
         }
         setIsLoading(false);
         break;
 
       case 'quick_command_confirmation':
-        setConfirmCommand(message.command);
+        const confirmData = message.data || message;
+        setConfirmCommand(confirmData.command);
         setShowConfirmModal(true);
         break;
 
       case 'quick_command_started':
-        setExecutingCommand(message.command_id);
+        const startData = message.data || message;
+        setExecutingCommand(startData.command_id);
         break;
 
       case 'quick_command_response':
         setExecutingCommand(null);
-        if (message.status === 'success') {
+        const responseResult = message.data || message;
+        if (responseResult.status === 'success') {
           Alert.alert(
             '✅ 実行完了',
-            `コマンド「${message.command_name}」が正常に実行されました！`,
+            `コマンド「${responseResult.command_name}」が正常に実行されました！`,
             [
               { text: 'OK' },
-              { text: '出力を表示', onPress: () => Alert.alert('実行結果', message.output || '出力なし') }
+              { text: '出力を表示', onPress: () => Alert.alert('実行結果', responseResult.output || '出力なし') }
             ]
           );
         }
@@ -105,12 +118,13 @@ export default function QuickCommandsScreen({ navigation, route }: Props) {
 
       case 'quick_command_error':
         setExecutingCommand(null);
+        const errorResult = message.data || message;
         Alert.alert(
           '❌ 実行エラー',
-          `コマンドの実行に失敗しました：\n${message.error}`,
+          `コマンドの実行に失敗しました：\n${errorResult.error}`,
           [
             { text: 'OK' },
-            { text: '詳細を表示', onPress: () => Alert.alert('エラー詳細', message.output || 'エラー出力なし') }
+            { text: '詳細を表示', onPress: () => Alert.alert('エラー詳細', errorResult.output || 'エラー出力なし') }
           ]
         );
         break;

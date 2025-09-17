@@ -550,6 +550,48 @@ func GetDefaultQuickCommands() []QuickCommand {
 			Command:     "pip install -r requirements.txt",
 			Category:    "package_management",
 		},
+		{
+			ID:          "list_files",
+			Name:        "List Files",
+			Description: "List current directory contents",
+			Command:     "ls -la",
+			Category:    "system",
+		},
+		{
+			ID:          "current_directory",
+			Name:        "Current Directory",
+			Description: "Show current working directory",
+			Command:     "pwd",
+			Category:    "system",
+		},
+		{
+			ID:          "disk_usage",
+			Name:        "Disk Usage",
+			Description: "Show disk space usage",
+			Command:     "df -h",
+			Category:    "system",
+		},
+		{
+			ID:          "memory_usage",
+			Name:        "Memory Usage",
+			Description: "Show memory usage",
+			Command:     "free -h",
+			Category:    "system",
+		},
+		{
+			ID:          "process_list",
+			Name:        "Process List",
+			Description: "Show running processes",
+			Command:     "ps aux",
+			Category:    "system",
+		},
+		{
+			ID:          "docker_ps",
+			Name:        "Docker Containers",
+			Description: "List Docker containers",
+			Command:     "docker ps -a",
+			Category:    "system",
+		},
 	}
 }
 
