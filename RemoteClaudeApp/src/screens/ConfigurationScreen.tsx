@@ -119,11 +119,20 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
       // Set up message handler
       WebSocketService.updateCallbacks({
         onMessage: (message) => {
-          if (message.type === 'config_load_response') {
-            if (message.config) {
-              setConfig(message.config);
+          try {
+            console.log('📥 Config load message received:', message.type, message.status);
+
+            if (message.type === 'config_load_response') {
+              if (message.config) {
+                setConfig(message.config);
+                console.log('✅ Configuration loaded successfully');
+              }
+              setIsLoading(false);
             }
+          } catch (error) {
+            console.error('❌ Error in config load message handler:', error);
             setIsLoading(false);
+            Alert.alert('読み込みエラー', '設定の読み込み中にエラーが発生しました');
           }
         },
       });
@@ -168,19 +177,27 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
       // Set up message handler
       WebSocketService.updateCallbacks({
         onMessage: (message) => {
-          if (message.type === 'config_save_response') {
-            setIsSaving(false);
-            if (message.status === 'success') {
-              Alert.alert('保存完了', '設定が正常に保存されました！', [
-                { text: 'OK', onPress: () => navigation.goBack() },
-                { text: '同期実行', onPress: syncConfiguration }
-              ]);
-            } else {
-              Alert.alert('保存エラー', message.error || '設定の保存に失敗しました', [
-                { text: 'OK' },
-                { text: 'リトライ', onPress: saveConfiguration }
-              ]);
+          try {
+            console.log('💾 Config save message received:', message.type, message.status);
+
+            if (message.type === 'config_save_response') {
+              setIsSaving(false);
+              if (message.status === 'success') {
+                Alert.alert('保存完了', '設定が正常に保存されました！', [
+                  { text: 'OK', onPress: () => navigation.goBack() },
+                  { text: '同期実行', onPress: syncConfiguration }
+                ]);
+              } else {
+                Alert.alert('保存エラー', message.error || '設定の保存に失敗しました', [
+                  { text: 'OK' },
+                  { text: 'リトライ', onPress: saveConfiguration }
+                ]);
+              }
             }
+          } catch (error) {
+            console.error('❌ Error in config save message handler:', error);
+            setIsSaving(false);
+            Alert.alert('処理エラー', 'メッセージ処理中にエラーが発生しました');
           }
         },
       });
@@ -241,30 +258,37 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
       // Set up message handler first
       WebSocketService.updateCallbacks({
         onMessage: (message) => {
-          console.log('🔄 Sync message received:', message.type);
-          if (message.type === 'config_sync_response') {
-            setIsSyncing(false);
-            if (message.status === 'success') {
-              const containerCount = message.sync_results?.length || 0;
-              Alert.alert(
-                '✅ 同期完了',
-                `設定を ${containerCount} 個のコンテナに正常に同期しました！`,
-                [
+          try {
+            console.log('🔄 Sync message received:', message.type, message.status);
+
+            if (message.type === 'config_sync_response') {
+              setIsSyncing(false);
+              if (message.status === 'success') {
+                const containerCount = message.sync_results?.length || 0;
+                Alert.alert(
+                  '✅ 同期完了',
+                  `設定を ${containerCount} 個のコンテナに正常に同期しました！`,
+                  [
+                    { text: 'OK' },
+                    { text: '詳細を表示', onPress: () => {
+                      const details = message.sync_results?.map(r =>
+                        `${r.project_name}: ${r.response?.status || 'unknown'}`
+                      ).join('\n') || '詳細情報なし';
+                      Alert.alert('同期詳細', details);
+                    }}
+                  ]
+                );
+              } else {
+                Alert.alert('同期エラー', message.error || '設定の同期に失敗しました', [
                   { text: 'OK' },
-                  { text: '詳細を表示', onPress: () => {
-                    const details = message.sync_results?.map(r =>
-                      `${r.project_name}: ${r.response?.status || 'unknown'}`
-                    ).join('\n') || '詳細情報なし';
-                    Alert.alert('同期詳細', details);
-                  }}
-                ]
-              );
-            } else {
-              Alert.alert('同期エラー', message.error || '設定の同期に失敗しました', [
-                { text: 'OK' },
-                { text: 'リトライ', onPress: syncConfiguration }
-              ]);
+                  { text: 'リトライ', onPress: syncConfiguration }
+                ]);
+              }
             }
+          } catch (error) {
+            console.error('❌ Error in config sync message handler:', error);
+            setIsSyncing(false);
+            Alert.alert('処理エラー', '同期メッセージ処理中にエラーが発生しました');
           }
         },
       });
