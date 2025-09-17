@@ -52,6 +52,13 @@ export default function QuickCommandsScreen({ navigation, route }: Props) {
 
     loadQuickCommands();
     setupMessageHandlers();
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      WebSocketService.updateCallbacks({
+        onMessage: () => {}, // Clear callbacks
+      });
+    };
   }, []);
 
   const setupMessageHandlers = () => {

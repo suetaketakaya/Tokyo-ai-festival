@@ -77,6 +77,7 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
 
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -84,6 +85,13 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
     });
 
     loadConfiguration();
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      WebSocketService.updateCallbacks({
+        onMessage: () => {}, // Clear callbacks
+      });
+    };
   }, []);
 
   const loadConfiguration = async () => {
@@ -175,17 +183,56 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
     } catch (error) {
       console.error('Failed to save configuration:', error);
       setIsSaving(false);
-      Alert.alert('Error', 'Failed to save configuration');
+      Alert.alert('保存エラー', '設定の保存リクエストに失敗しました', [
+        { text: 'OK' },
+        { text: 'リトライ', onPress: saveConfiguration }
+      ]);
     }
   };
 
   const syncConfiguration = async () => {
     if (!WebSocketService.isConnected()) {
-      Alert.alert('Error', 'Not connected to server');
+      Alert.alert('接続エラー', 'サーバーに接続されていません。', [
+        { text: 'サーバーリストへ', onPress: () => navigation.goBack() },
+        { text: 'リトライ', onPress: syncConfiguration }
+      ]);
       return;
     }
 
+    setIsSyncing(true);
+
     try {
+      // Set up message handler first
+      WebSocketService.updateCallbacks({
+        onMessage: (message) => {
+          console.log('🔄 Sync message received:', message.type);
+          if (message.type === 'config_sync_response') {
+            setIsSyncing(false);
+            if (message.status === 'success') {
+              const containerCount = message.sync_results?.length || 0;
+              Alert.alert(
+                '✅ 同期完了',
+                `設定を ${containerCount} 個のコンテナに正常に同期しました！`,
+                [
+                  { text: 'OK' },
+                  { text: '詳細を表示', onPress: () => {
+                    const details = message.sync_results?.map(r =>
+                      `${r.project_name}: ${r.response?.status || 'unknown'}`
+                    ).join('\n') || '詳細情報なし';
+                    Alert.alert('同期詳細', details);
+                  }}
+                ]
+              );
+            } else {
+              Alert.alert('同期エラー', message.error || '設定の同期に失敗しました', [
+                { text: 'OK' },
+                { text: 'リトライ', onPress: syncConfiguration }
+              ]);
+            }
+          }
+        },
+      });
+
       // Send config sync request
       WebSocketService.send({
         type: 'config_sync',
@@ -196,26 +243,14 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
         },
       });
 
-      // Set up message handler
-      WebSocketService.updateCallbacks({
-        onMessage: (message) => {
-          if (message.type === 'config_sync_response') {
-            if (message.status === 'success') {
-              Alert.alert(
-                'Success',
-                `Configuration synced to ${message.sync_results?.length || 0} containers`
-              );
-            } else {
-              Alert.alert('Error', message.error || 'Failed to sync configuration');
-            }
-          }
-        },
-      });
-
-      Alert.alert('Info', 'Syncing configuration to all containers...');
+      console.log('🔄 Sync request sent');
     } catch (error) {
       console.error('Failed to sync configuration:', error);
-      Alert.alert('Error', 'Failed to sync configuration');
+      setIsSyncing(false);
+      Alert.alert('同期エラー', '設定の同期リクエストに失敗しました', [
+        { text: 'OK' },
+        { text: 'リトライ', onPress: syncConfiguration }
+      ]);
     }
   };
 
@@ -389,10 +424,13 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.button, styles.syncButton]}
+              style={[styles.button, styles.syncButton, isSyncing && styles.buttonDisabled]}
               onPress={syncConfiguration}
+              disabled={isSyncing}
             >
-              <Text style={styles.buttonText}>🔄 Sync to All Containers</Text>
+              <Text style={styles.buttonText}>
+                {isSyncing ? '🔄 同期中...' : '🔄 全コンテナに同期'}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
