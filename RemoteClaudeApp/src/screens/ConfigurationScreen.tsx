@@ -123,8 +123,13 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
             console.log('📥 Config load message received:', message.type, message.status);
 
             if (message.type === 'config_load_response') {
-              if (message.config) {
-                setConfig(message.config);
+              const responseData = message.data || message;
+              const config = responseData.config;
+
+              console.log('📥 Load response data:', responseData);
+
+              if (config) {
+                setConfig(config);
                 console.log('✅ Configuration loaded successfully');
               }
               setIsLoading(false);
@@ -182,13 +187,19 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
 
             if (message.type === 'config_save_response') {
               setIsSaving(false);
-              if (message.status === 'success') {
+              const responseData = message.data || message;
+              const status = responseData.status;
+              const errorMessage = responseData.error || responseData.message;
+
+              console.log('💾 Response data:', responseData);
+
+              if (status === 'success') {
                 Alert.alert('保存完了', '設定が正常に保存されました！', [
                   { text: 'OK', onPress: () => navigation.goBack() },
                   { text: '同期実行', onPress: syncConfiguration }
                 ]);
               } else {
-                Alert.alert('保存エラー', message.error || '設定の保存に失敗しました', [
+                Alert.alert('保存エラー', errorMessage || '設定の保存に失敗しました', [
                   { text: 'OK' },
                   { text: 'リトライ', onPress: saveConfiguration }
                 ]);
@@ -263,15 +274,22 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
 
             if (message.type === 'config_sync_response') {
               setIsSyncing(false);
-              if (message.status === 'success') {
-                const containerCount = message.sync_results?.length || 0;
+              const responseData = message.data || message;
+              const status = responseData.status;
+              const syncResults = responseData.sync_results;
+              const errorMessage = responseData.error || responseData.message;
+
+              console.log('🔄 Sync response data:', responseData);
+
+              if (status === 'success') {
+                const containerCount = syncResults?.length || 0;
                 Alert.alert(
                   '✅ 同期完了',
                   `設定を ${containerCount} 個のコンテナに正常に同期しました！`,
                   [
                     { text: 'OK' },
                     { text: '詳細を表示', onPress: () => {
-                      const details = message.sync_results?.map(r =>
+                      const details = syncResults?.map(r =>
                         `${r.project_name}: ${r.response?.status || 'unknown'}`
                       ).join('\n') || '詳細情報なし';
                       Alert.alert('同期詳細', details);
@@ -279,7 +297,7 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
                   ]
                 );
               } else {
-                Alert.alert('同期エラー', message.error || '設定の同期に失敗しました', [
+                Alert.alert('同期エラー', errorMessage || '設定の同期に失敗しました', [
                   { text: 'OK' },
                   { text: 'リトライ', onPress: syncConfiguration }
                 ]);
