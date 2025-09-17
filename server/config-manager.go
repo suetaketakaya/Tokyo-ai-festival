@@ -136,6 +136,8 @@ type ConfigSyncRequest struct {
 	ContainerConfig *ContainerConfiguration `json:"container_config,omitempty"`
 	TargetContainer string                  `json:"target_container,omitempty"`
 	SyncType        string                  `json:"sync_type"` // "check", "update", "force"
+	AdminPrivileges bool                    `json:"admin_privileges,omitempty"`
+	AdminPassword   string                  `json:"admin_password,omitempty"`
 }
 
 // ConfigSyncResponse represents the server's response to a sync request
@@ -279,7 +281,15 @@ func (cm *ConfigManager) SyncConfigToContainer(containerID string, syncRequest *
 
 	// Apply Git configuration
 	if userConfig != nil && userConfig.Git.Username != "" {
-		if err := cm.applyGitConfig(containerID, &userConfig.Git); err != nil {
+		var err error
+		if syncRequest.AdminPrivileges && syncRequest.AdminPassword != "" {
+			log.Printf("🔐 Using admin privileges for Git configuration")
+			err = cm.applyGitConfigWithAdmin(containerID, &userConfig.Git, syncRequest.AdminPassword)
+		} else {
+			err = cm.applyGitConfig(containerID, &userConfig.Git)
+		}
+
+		if err != nil {
 			log.Printf("⚠️ Failed to apply git config: %v", err)
 		} else {
 			response.Applied = append(response.Applied, "git_config")
@@ -306,6 +316,45 @@ func (cm *ConfigManager) SyncConfigToContainer(containerID string, syncRequest *
 
 	response.Message = fmt.Sprintf("Applied %d configuration items to container", len(response.Applied))
 	return response, nil
+}
+
+// applyGitConfigWithAdmin applies Git configuration to container with admin privileges
+func (cm *ConfigManager) applyGitConfigWithAdmin(containerID string, gitConfig *GitConfig, adminPassword string) error {
+	log.Printf("🔐 Applying Git configuration with admin privileges to container %s", containerID[:12])
+
+	// Use sudo with password for Docker operations
+	sudoCommands := []string{
+		fmt.Sprintf(`echo '%s' | sudo -S chown claude:claude /home/claude`, adminPassword),
+		fmt.Sprintf(`echo '%s' | sudo -S mkdir -p /home/claude`, adminPassword),
+		fmt.Sprintf(`echo '%s' | sudo -S touch /home/claude/.gitconfig`, adminPassword),
+		fmt.Sprintf(`echo '%s' | sudo -S chown claude:claude /home/claude/.gitconfig`, adminPassword),
+		fmt.Sprintf(`echo '%s' | sudo -S chmod 644 /home/claude/.gitconfig`, adminPassword),
+	}
+
+	// Run sudo setup commands
+	for _, cmd := range sudoCommands {
+		execCmd := fmt.Sprintf("docker exec %s /bin/bash -c '%s'", containerID, cmd)
+		if err := runCommand(execCmd); err != nil {
+			log.Printf("⚠️ Admin setup command failed (continuing): %v", err)
+		}
+	}
+
+	// Now try git config with proper permissions
+	gitCommands := []string{
+		fmt.Sprintf(`git config --global user.name "%s"`, gitConfig.Username),
+		fmt.Sprintf(`git config --global user.email "%s"`, gitConfig.Email),
+	}
+
+	for _, cmd := range gitCommands {
+		execCmd := fmt.Sprintf("docker exec -u claude %s /bin/bash -c '%s'", containerID, cmd)
+		if err := runCommand(execCmd); err != nil {
+			log.Printf("⚠️ Git config with admin privileges failed, using fallback: %v", err)
+			return cm.applyGitConfig(containerID, gitConfig) // Fallback to environment variables
+		}
+	}
+
+	log.Printf("✅ Applied Git configuration with admin privileges to container %s", containerID[:12])
+	return nil
 }
 
 // applyGitConfig applies Git configuration to container

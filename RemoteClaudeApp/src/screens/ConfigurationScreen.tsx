@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -78,6 +79,9 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [pendingSyncAction, setPendingSyncAction] = useState<() => void>(() => {});
 
   useEffect(() => {
     navigation.setOptions({
@@ -190,7 +194,39 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
     }
   };
 
-  const syncConfiguration = async () => {
+  const requestPermissionAndSync = () => {
+    Alert.alert(
+      '🔐 管理者権限が必要',
+      'Docker設定の変更には管理者権限が必要です。権限昇格を承認しますか？',
+      [
+        { text: 'キャンセル', style: 'cancel' },
+        {
+          text: '🔓 権限を要求',
+          onPress: () => {
+            setShowPermissionModal(true);
+            setPendingSyncAction(() => syncConfiguration);
+          }
+        }
+      ]
+    );
+  };
+
+  const executeWithPermission = async () => {
+    if (!adminPassword.trim()) {
+      Alert.alert('入力エラー', '管理者パスワードを入力してください。');
+      return;
+    }
+
+    setShowPermissionModal(false);
+    setAdminPassword('');
+
+    // Execute the pending action with admin privileges
+    if (pendingSyncAction) {
+      pendingSyncAction();
+    }
+  };
+
+  const syncConfiguration = async (useAdminPrivileges = false) => {
     if (!WebSocketService.isConnected()) {
       Alert.alert('接続エラー', 'サーバーに接続されていません。', [
         { text: 'サーバーリストへ', onPress: () => navigation.goBack() },
@@ -240,6 +276,8 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
           user_id: 'default',
           user_config: config,
           sync_type: 'update',
+          admin_privileges: useAdminPrivileges,
+          admin_password: useAdminPrivileges ? adminPassword : undefined,
         },
       });
 
@@ -425,16 +463,65 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
 
             <TouchableOpacity
               style={[styles.button, styles.syncButton, isSyncing && styles.buttonDisabled]}
-              onPress={syncConfiguration}
+              onPress={requestPermissionAndSync}
               disabled={isSyncing}
             >
               <Text style={styles.buttonText}>
-                {isSyncing ? '🔄 同期中...' : '🔄 全コンテナに同期'}
+                {isSyncing ? '🔄 同期中...' : '🔐 管理者権限で同期'}
               </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Permission Request Modal */}
+      <Modal
+        visible={showPermissionModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowPermissionModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.permissionModalContent}>
+            <Text style={styles.permissionModalTitle}>🔐 管理者認証</Text>
+            <Text style={styles.permissionModalMessage}>
+              Docker設定を変更するため、管理者パスワードを入力してください。
+            </Text>
+
+            <TextInput
+              style={styles.passwordInput}
+              value={adminPassword}
+              onChangeText={setAdminPassword}
+              placeholder="管理者パスワード"
+              secureTextEntry={true}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+
+            <View style={styles.permissionModalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => {
+                  setShowPermissionModal(false);
+                  setAdminPassword('');
+                }}
+              >
+                <Text style={styles.cancelButtonText}>キャンセル</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.executeButton]}
+                onPress={executeWithPermission}
+              >
+                <Text style={styles.executeButtonText}>🔓 実行</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.permissionNotice}>
+              ⚠️ この操作はDockerコンテナの設定を変更します。
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -543,5 +630,81 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  permissionModalContent: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
+    margin: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 8,
+    minWidth: 300,
+  },
+  permissionModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  permissionModalMessage: {
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  passwordInput: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#f9fafb',
+    marginBottom: 20,
+  },
+  permissionModalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 6,
+  },
+  cancelButton: {
+    backgroundColor: '#f3f4f6',
+  },
+  executeButton: {
+    backgroundColor: '#dc2626',
+  },
+  cancelButtonText: {
+    color: '#374151',
+    fontWeight: 'bold',
+  },
+  executeButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  permissionNotice: {
+    fontSize: 12,
+    color: '#f59e0b',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
