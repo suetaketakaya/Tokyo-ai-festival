@@ -332,12 +332,12 @@ export default function ProjectListScreen({ navigation, route }: Props) {
         <View style={styles.header}>
           <View style={styles.titleRow}>
             <Text style={styles.title}>RemoteClaude Projects</Text>
-            <TouchableOpacity 
+            {/* <TouchableOpacity 
               style={styles.settingsButton}
               onPress={() => navigation.navigate('Settings')}
             >
               <Text style={styles.settingsButtonText}>⚙️</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <Text style={styles.connectionInfo}>
             🟢 Connected • Session: {sessionKey.substring(0, 8)}...

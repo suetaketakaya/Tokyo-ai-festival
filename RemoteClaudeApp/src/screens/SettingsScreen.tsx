@@ -136,7 +136,7 @@ export default function SettingsScreen({ navigation }: Props) {
         </View>
 
         {/* Claude Configuration */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>🤖 Claude Configuration</Text>
           
           <View style={styles.inputGroup}>
@@ -170,7 +170,7 @@ export default function SettingsScreen({ navigation }: Props) {
           <TouchableOpacity style={styles.testButton} onPress={testClaudeConnection}>
             <Text style={styles.testButtonText}>🔗 Test Connection</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {/* Git Configuration */}
         <View style={styles.section}>

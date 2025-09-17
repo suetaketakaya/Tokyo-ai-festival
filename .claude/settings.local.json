@@ -13,7 +13,15 @@
       "Bash(docker build:*)",
       "Read(/Users/suetaketakaya/1.prog/**)",
       "Bash(sudo mkdir:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(git stash:*)",
+      "Bash(git push:*)",
+      "Bash(open:*)",
+      "Bash(docker version:*)",
+      "Bash(docker start:*)",
+      "Bash(npm install)",
+      "Bash(npx expo install:*)",
+      "Bash(./remoteclaude-server-test --help)"
     ],
     "deny": [],
     "ask": []
