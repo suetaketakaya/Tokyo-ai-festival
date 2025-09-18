@@ -1800,23 +1800,42 @@ func (s *Server) handleQuickCommandExecute(conn *websocket.Conn, msg map[string]
 		return
 	}
 
-	// Load user configuration to get custom commands
+	log.Printf("🔍 Looking for command ID: %s", commandID)
+
+	// Try to load user configuration, fallback to defaults if it fails
+	var allCommands []QuickCommand
 	userConfig, err := s.configManager.LoadUserConfig("default")
 	if err != nil {
 		log.Printf("⚠️ Failed to load user config for quick commands: %v", err)
-		userConfig = s.configManager.getDefaultUserConfig("default")
+		log.Printf("📋 Using default commands")
+		allCommands = GetDefaultQuickCommands()
+	} else {
+		log.Printf("✅ Loaded user config with %d quick commands", len(userConfig.QuickCommands))
+		allCommands = userConfig.QuickCommands
+
+		// If user config exists but has no quick commands, use defaults
+		if len(allCommands) == 0 {
+			log.Printf("📋 User config has no quick commands, using defaults")
+			allCommands = GetDefaultQuickCommands()
+		}
 	}
 
 	// Find the command
 	var targetCommand *QuickCommand
-	for _, cmd := range userConfig.QuickCommands {
+	for i, cmd := range allCommands {
+		log.Printf("🔍 Checking command %d: ID=%s, Name=%s", i, cmd.ID, cmd.Name)
 		if cmd.ID == commandID {
 			targetCommand = &cmd
+			log.Printf("✅ Found target command: %s", cmd.Name)
 			break
 		}
 	}
 
 	if targetCommand == nil {
+		log.Printf("❌ Command not found. Available commands:")
+		for i, cmd := range allCommands {
+			log.Printf("   %d. ID=%s, Name=%s", i+1, cmd.ID, cmd.Name)
+		}
 		s.sendError(conn, fmt.Sprintf("Quick command not found: %s", commandID))
 		return
 	}
