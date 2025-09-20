@@ -45,10 +45,6 @@ class WebSocketService {
       console.log('✅ Already connected');
       if (screenId) {
         this.registerScreenCallbacks(screenId, callbacks);
-        // Call onOpen for the new screen since connection is already established
-        if (callbacks.onOpen) {
-          setTimeout(() => callbacks.onOpen!(), 0);
-        }
       }
       return true;
     }

@@ -44,6 +44,11 @@ export default function ProjectListScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     checkConnection();
+
+    return () => {
+      // Cleanup callbacks when component unmounts
+      WebSocketService.unregisterScreenCallbacks('projectlist');
+    };
   }, []);
 
   const checkConnection = async () => {
@@ -55,8 +60,8 @@ export default function ProjectListScreen({ navigation, route }: Props) {
       setIsConnected(true);
       setIsLoading(false);
       
-      // Update WebSocket callbacks to handle messages in this screen
-      WebSocketService.updateCallbacks({
+      // Register callbacks for this screen
+      WebSocketService.registerScreenCallbacks('projectlist', {
         onMessage: (message) => {
           handleServerMessage(message);
         },
@@ -64,7 +69,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
           console.log('🔌 Disconnected from server in ProjectList');
           setIsConnected(false);
         },
-      });
+      }, 2); // High priority for project list
       
       // Request project list
       requestProjectList();
@@ -95,7 +100,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
           console.log('🔌 Disconnected from server');
           setIsConnected(false);
         },
-      });
+      }, 'projectlist'); // Register with screen ID
 
       if (!success) {
         Alert.alert('Connection Failed', 'Could not connect to the RemoteClaude server.');
@@ -135,11 +140,15 @@ export default function ProjectListScreen({ navigation, route }: Props) {
         break;
         
       case 'project_create_response':
+        console.log('🎉 ProjectListScreen: Received project_create_response:', message.data);
         setIsLoading(false);
         if (message.data?.project) {
           Alert.alert('Success!', message.data?.message || 'Project created successfully!');
-          // Refresh project list
-          requestProjectList();
+          // Refresh project list after a short delay to ensure server is ready
+          setTimeout(() => {
+            console.log('🔄 ProjectListScreen: Refreshing project list after creation');
+            requestProjectList();
+          }, 1000);
         }
         break;
 
@@ -193,8 +202,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
     navigation.navigate('Development', {
       projectId: project.id,
       projectName: project.name,
-      connectionUrl: connectionUrl,
-      sessionKey: sessionKey,
+      serverUrl: connectionUrl || '',
     });
   };
 
@@ -340,7 +348,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
             </TouchableOpacity> */}
           </View>
           <Text style={styles.connectionInfo}>
-            🟢 Connected • Session: {sessionKey.substring(0, 8)}...
+            🟢 Connected • Session: {sessionKey?.substring(0, 8) || 'Unknown'}...
           </Text>
         </View>
 

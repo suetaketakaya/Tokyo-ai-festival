@@ -21,7 +21,12 @@
       "Bash(docker start:*)",
       "Bash(npm install)",
       "Bash(npx expo install:*)",
-      "Bash(./remoteclaude-server-test --help)"
+      "Bash(./remoteclaude-server-test --help)",
+      "Bash(./remoteclaude-server --port=8090)",
+      "Bash(npm install:*)",
+      "Bash(docker exec:*)",
+      "Bash(lsof:*)",
+      "Bash(./remoteclaude-server --port=8091)"
     ],
     "deny": [],
     "ask": []

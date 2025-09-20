@@ -2,589 +2,769 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
-  ScrollView,
+  FlatList,
   Alert,
+  StyleSheet,
   SafeAreaView,
-  ActivityIndicator,
   Modal,
+  TextInput,
+  ActivityIndicator,
+  Platform,
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../types/Navigation';
 import WebSocketService from '../services/WebSocketService';
 
-type QuickCommandsScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'QuickCommands'
->;
-
-type QuickCommandsScreenRouteProp = RouteProp<RootStackParamList, 'QuickCommands'>;
-
-interface Props {
-  navigation: QuickCommandsScreenNavigationProp;
-  route: QuickCommandsScreenRouteProp;
-}
-
-interface QuickCommand {
+interface Command {
   id: string;
   name: string;
-  description: string;
   command: string;
+  description: string;
   category: string;
-  requires_confirmation?: boolean;
+  icon: string;
+  color: string;
+  isFavorite?: boolean;
+  lastUsed?: Date;
+  usageCount?: number;
 }
 
-export default function QuickCommandsScreen({ navigation, route }: Props) {
-  const [commands, setCommands] = useState<QuickCommand[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [executingCommand, setExecutingCommand] = useState<string | null>(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [confirmCommand, setConfirmCommand] = useState<QuickCommand | null>(null);
+interface Props {
+  route: {
+    params: {
+      serverUrl: string;
+      projectId: string;
+    };
+  };
+  navigation: any;
+}
 
-  const { projectId, projectName, connectionUrl, sessionKey } = route.params;
+const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
+  const { serverUrl, projectId } = route.params;
+  const [commands, setCommands] = useState<Command[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedCommand, setSelectedCommand] = useState<Command | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'category' | 'recent' | 'frequent'>('category');
+  const [quickExecuteMode, setQuickExecuteMode] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
-      title: `⚡ Quick Commands - ${projectName}`,
+      title: `Quick Commands - ${projectId}`,
+      headerRight: () => (
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: quickExecuteMode ? '#4CAF50' : '#666' }]}
+            onPress={() => setQuickExecuteMode(!quickExecuteMode)}
+          >
+            <Text style={styles.headerButtonText}>⚡</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: isConnected ? '#4CAF50' : '#f44336' }]}
+            onPress={() => {
+              const debugInfo = WebSocketService.getDebugInfo();
+              Alert.alert('Debug Info', JSON.stringify(debugInfo, null, 2));
+            }}
+          >
+            <Text style={styles.headerButtonText}>
+              {isConnected ? '🟢' : '🔴'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ),
     });
+  }, [navigation, projectId, isConnected, quickExecuteMode]);
 
-    loadQuickCommands();
-    setupMessageHandlers();
+  useEffect(() => {
+    initializeCommands();
+    connectToServer();
 
-    // Cleanup function to prevent memory leaks
     return () => {
-      WebSocketService.updateCallbacks({
-        onMessage: () => {}, // Clear callbacks
-      });
+      WebSocketService.unregisterScreenCallbacks('quickcommands');
     };
   }, []);
 
-  const setupMessageHandlers = () => {
-    WebSocketService.updateCallbacks({
-      onMessage: (message) => {
-        handleServerMessage(message);
+  const connectToServer = async () => {
+    // serverUrl already includes /ws and key parameter
+    const connectionUrl = serverUrl;
+
+    const success = await WebSocketService.connect(connectionUrl, {
+      onOpen: () => {
+        setIsConnected(true);
       },
-    });
+      onMessage: handleServerMessage,
+      onError: (error) => {
+        console.error('WebSocket error:', error);
+        setIsConnected(false);
+      },
+      onClose: (event) => {
+        setIsConnected(false);
+      },
+    }, 'quickcommands');
+
+    if (!success) {
+      Alert.alert('Connection Failed', 'Could not connect to the server.');
+    }
   };
 
   const handleServerMessage = (message: any) => {
-    console.log('📨 Quick Commands received message:', message.type);
+    const messageType = message.type ? message.type.toString().trim() : '';
 
-    switch (message.type) {
-      case 'config_quick_commands_response':
-        const responseData = message.data || message;
-        const status = responseData.status;
-        const commands = responseData.commands;
-
-        console.log('⚡ QuickCommands response data:', responseData);
-        console.log('⚡ Commands received:', commands);
-
-        if (status === 'success' && commands) {
-          setCommands(commands);
-          console.log('✅ QuickCommands loaded successfully:', commands.length, 'commands');
-        } else {
-          console.log('❌ Failed to load QuickCommands:', status);
-        }
-        setIsLoading(false);
+    switch (messageType) {
+      case 'claude_output':
+        setIsExecuting(false);
+        Alert.alert('Command Completed', 'Command executed successfully!');
         break;
 
-      case 'quick_command_confirmation':
-        const confirmData = message.data || message;
-        setConfirmCommand(confirmData.command);
-        setShowConfirmModal(true);
+      case 'claude_error':
+        setIsExecuting(false);
+        Alert.alert('Command Failed', message.data?.error || 'Unknown error occurred');
         break;
 
-      case 'quick_command_started':
-        const startData = message.data || message;
-        setExecutingCommand(startData.command_id);
+      case 'pong':
         break;
 
-      case 'quick_command_response':
-        setExecutingCommand(null);
-        const responseResult = message.data || message;
-        if (responseResult.status === 'success') {
-          Alert.alert(
-            '✅ 実行完了',
-            `コマンド「${responseResult.command_name}」が正常に実行されました！`,
-            [
-              { text: 'OK' },
-              { text: '出力を表示', onPress: () => Alert.alert('実行結果', responseResult.output || '出力なし') }
-            ]
-          );
-        }
-        break;
-
-      case 'quick_command_error':
-        setExecutingCommand(null);
-        const errorResult = message.data || message;
-        Alert.alert(
-          '❌ 実行エラー',
-          `コマンドの実行に失敗しました：\n${errorResult.error}`,
-          [
-            { text: 'OK' },
-            { text: '詳細を表示', onPress: () => Alert.alert('エラー詳細', errorResult.output || 'エラー出力なし') }
-          ]
-        );
+      default:
         break;
     }
   };
 
-  const loadQuickCommands = async () => {
-    if (!WebSocketService.isConnected()) {
-      Alert.alert('接続エラー', 'サーバーに接続されていません。', [
-        { text: '戻る', onPress: () => navigation.goBack() },
-        { text: 'リトライ', onPress: loadQuickCommands }
-      ]);
+  const initializeCommands = () => {
+    const defaultCommands: Command[] = [
+      // File Operations
+      {
+        id: '1',
+        name: 'List Files',
+        command: 'ls -la',
+        description: 'List all files and directories with details',
+        category: 'File Operations',
+        color: '#4CAF50',
+        usageCount: 0,
+      },
+      {
+        id: '2',
+        name: 'Current Directory',
+        command: 'pwd',
+        description: 'Show current working directory',
+        category: 'File Operations',
+        color: '#2196F3',
+        usageCount: 0,
+      },
+      {
+        id: '3',
+        name: 'File Search',
+        command: 'find . -name "*.py" -type f',
+        description: 'Find Python files in current directory',
+        category: 'File Operations',
+                color: '#FF9800',
+        usageCount: 0,
+      },
+
+      // Git Commands
+      {
+        id: '4',
+        name: 'Git Status',
+        command: 'git status',
+        description: 'Show git repository status',
+        category: 'Git',
+                color: '#FF9800',
+        usageCount: 0,
+      },
+      {
+        id: '5',
+        name: 'Git Log',
+        command: 'git log --oneline -10',
+        description: 'Show recent git commits',
+        category: 'Git',
+                color: '#9C27B0',
+        usageCount: 0,
+      },
+      {
+        id: '6',
+        name: 'Git Branch',
+        command: 'git branch -a',
+        description: 'List all git branches',
+        category: 'Git',
+                color: '#795548',
+        usageCount: 0,
+      },
+
+      // System Info
+      {
+        id: '7',
+        name: 'Disk Usage',
+        command: 'df -h',
+        description: 'Show disk space usage',
+        category: 'System',
+                color: '#F44336',
+        usageCount: 0,
+      },
+      {
+        id: '8',
+        name: 'Memory Usage',
+        command: 'free -h',
+        description: 'Show memory usage',
+        category: 'System',
+                color: '#E91E63',
+        usageCount: 0,
+      },
+      {
+        id: '9',
+        name: 'Process List',
+        command: 'ps aux | head -20',
+        description: 'Show running processes',
+        category: 'System',
+                color: '#607D8B',
+        usageCount: 0,
+      },
+
+      // Development
+      {
+        id: '10',
+        name: 'Python Version',
+        command: 'python --version',
+        description: 'Check Python version',
+        category: 'Development',
+                color: '#3F51B5',
+        usageCount: 0,
+      },
+      {
+        id: '11',
+        name: 'Node Version',
+        command: 'node --version',
+        description: 'Check Node.js version',
+        category: 'Development',
+                color: '#4CAF50',
+        usageCount: 0,
+      },
+      {
+        id: '12',
+        name: 'NPM List',
+        command: 'npm list --depth=0',
+        description: 'List installed npm packages',
+        category: 'Development',
+                color: '#FF5722',
+        usageCount: 0,
+      },
+
+      // Docker
+      {
+        id: '13',
+        name: 'Docker Containers',
+        command: 'docker ps',
+        description: 'List running Docker containers',
+        category: 'Docker',
+                color: '#2196F3',
+        usageCount: 0,
+      },
+      {
+        id: '14',
+        name: 'Docker Images',
+        command: 'docker images',
+        description: 'List Docker images',
+        category: 'Docker',
+                color: '#9C27B0',
+        usageCount: 0,
+      },
+
+      // Network
+      {
+        id: '15',
+        name: 'Network Info',
+        command: 'ip addr show',
+        description: 'Show network interface information',
+        category: 'Network',
+                color: '#00BCD4',
+        usageCount: 0,
+      },
+      {
+        id: '16',
+        name: 'Port Check',
+        command: 'netstat -tulpn | grep LISTEN',
+        description: 'Show listening ports',
+        category: 'Network',
+                color: '#FFC107',
+        usageCount: 0,
+      },
+    ];
+
+    setCommands(defaultCommands);
+  };
+
+  const executeCommand = (command: Command) => {
+    if (!isConnected) {
+      Alert.alert('Error', 'Not connected to server');
       return;
     }
 
-    try {
-      WebSocketService.send({
-        type: 'config_quick_commands',
-        data: {
-          action: 'get_defaults',
-        },
-      });
-    } catch (error) {
-      console.error('Failed to load quick commands:', error);
-      setIsLoading(false);
+    if (quickExecuteMode) {
+      // Execute immediately in quick mode
+      performExecution(command);
+    } else {
+      // Show confirmation modal
+      setSelectedCommand(command);
+      setShowConfirmModal(true);
     }
   };
 
-  const executeQuickCommand = async (command: QuickCommand) => {
-    if (!WebSocketService.isConnected()) {
-      Alert.alert('接続エラー', 'サーバーに接続されていません。', [
-        { text: '戻る', onPress: () => navigation.goBack() }
-      ]);
-      return;
-    }
+  const performExecution = (command: Command) => {
+    setIsExecuting(true);
 
-    try {
-      WebSocketService.send({
-        type: 'quick_command_execute',
-        data: {
-          project_id: projectId,
-          command_id: command.id,
-        },
-      });
-    } catch (error) {
-      console.error('Failed to execute quick command:', error);
-      Alert.alert('Error', 'Failed to execute command');
-    }
-  };
+    // Update usage statistics
+    setCommands(prev => prev.map(cmd =>
+      cmd.id === command.id
+        ? {
+            ...cmd,
+            usageCount: (cmd.usageCount || 0) + 1,
+            lastUsed: new Date()
+          }
+        : cmd
+    ));
 
-  const confirmAndExecute = () => {
-    if (confirmCommand) {
-      setShowConfirmModal(false);
-      executeQuickCommand(confirmCommand);
-      setConfirmCommand(null);
-    }
-  };
+    const success = WebSocketService.send({
+      type: 'claude_execute',
+      data: {
+        project_id: projectId,
+        command: command.command,
+        context: {
+          current_dir: '/workspace',
+          git_branch: 'main'
+        }
+      }
+    });
 
-  const getCommandIcon = (category: string) => {
-    switch (category) {
-      case 'git':
-        return '📝';
-      case 'deployment':
-        return '🚀';
-      case 'package_management':
-        return '📦';
-      case 'system':
-        return '⚙️';
-      default:
-        return '⚡';
+    if (!success) {
+      setIsExecuting(false);
+      Alert.alert('Error', 'Failed to send command');
     }
   };
 
-  const getCommandButtonStyle = (category: string, isExecuting: boolean) => {
-    let baseStyle = [styles.commandButton];
-
-    if (isExecuting) {
-      baseStyle.push(styles.executingButton);
-      return baseStyle;
-    }
-
-    switch (category) {
-      case 'git':
-        baseStyle.push(styles.gitButton);
-        break;
-      case 'deployment':
-        baseStyle.push(styles.deploymentButton);
-        break;
-      case 'package_management':
-        baseStyle.push(styles.packageButton);
-        break;
-      default:
-        baseStyle.push(styles.defaultButton);
-    }
-
-    return baseStyle;
+  const toggleFavorite = (commandId: string) => {
+    setCommands(prev => prev.map(cmd =>
+      cmd.id === commandId ? { ...cmd, isFavorite: !cmd.isFavorite } : cmd
+    ));
   };
 
-  const groupedCommands = commands.reduce((groups, command) => {
-    const category = command.category || 'other';
-    if (!groups[category]) {
-      groups[category] = [];
-    }
-    groups[category].push(command);
-    return groups;
-  }, {} as Record<string, QuickCommand[]>);
-
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3b82f6" />
-          <Text style={styles.loadingText}>Loading Quick Commands...</Text>
-        </View>
-      </SafeAreaView>
+  const getSortedCommands = () => {
+    let filteredCommands = commands.filter(cmd =>
+      cmd.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cmd.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cmd.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }
+
+    switch (sortBy) {
+      case 'name':
+        return filteredCommands.sort((a, b) => a.name.localeCompare(b.name));
+      case 'category':
+        return filteredCommands.sort((a, b) => {
+          if (a.isFavorite && !b.isFavorite) return -1;
+          if (!a.isFavorite && b.isFavorite) return 1;
+          return a.category.localeCompare(b.category);
+        });
+      case 'recent':
+        return filteredCommands.sort((a, b) => {
+          if (a.isFavorite && !b.isFavorite) return -1;
+          if (!a.isFavorite && b.isFavorite) return 1;
+          const aTime = a.lastUsed ? a.lastUsed.getTime() : 0;
+          const bTime = b.lastUsed ? b.lastUsed.getTime() : 0;
+          return bTime - aTime;
+        });
+      case 'frequent':
+        return filteredCommands.sort((a, b) => {
+          if (a.isFavorite && !b.isFavorite) return -1;
+          if (!a.isFavorite && b.isFavorite) return 1;
+          return (b.usageCount || 0) - (a.usageCount || 0);
+        });
+      default:
+        return filteredCommands;
+    }
+  };
+
+  const renderCommandCard = ({ item }: { item: Command }) => (
+    <TouchableOpacity
+      style={[styles.commandCard, { borderLeftColor: item.color }]}
+      onPress={() => executeCommand(item)}
+      onLongPress={() => toggleFavorite(item.id)}
+      disabled={isExecuting}
+    >
+      <View style={styles.cardHeader}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.commandName}>{item.name}</Text>
+          {item.isFavorite && (
+            <Text style={styles.favoriteIcon}>⭐</Text>
+          )}
+        </View>
+        <View style={styles.usageInfo}>
+          {item.usageCount ? (
+            <Text style={styles.usageCount}>×{item.usageCount}</Text>
+          ) : null}
+        </View>
+      </View>
+
+      <Text style={styles.commandDescription}>{item.description}</Text>
+      <Text style={styles.commandText}>{item.command}</Text>
+
+      <View style={styles.cardFooter}>
+        <Text style={[styles.categoryTag, { backgroundColor: item.color }]}>
+          {item.category}
+        </Text>
+        {item.lastUsed && (
+          <Text style={styles.lastUsed}>
+            {item.lastUsed.toLocaleDateString()}
+          </Text>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderSortButtons = () => (
+    <View style={styles.sortContainer}>
+      {[
+        { key: 'category', label: 'Category' },
+        { key: 'name', label: 'Name' },
+        { key: 'recent', label: 'Recent' },
+        { key: 'frequent', label: 'Popular' },
+      ].map((option) => (
+        <TouchableOpacity
+          key={option.key}
+          style={[
+            styles.sortButton,
+            sortBy === option.key && styles.sortButtonActive
+          ]}
+          onPress={() => setSortBy(option.key as any)}
+        >
+          <Text style={[
+            styles.sortText,
+            sortBy === option.key && styles.sortTextActive
+          ]}>
+            {option.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>⚡ Quick Commands</Text>
-          <Text style={styles.headerSubtitle}>
-            Execute common tasks with one tap
-          </Text>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search commands..."
+          placeholderTextColor="#888"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
+
+      {renderSortButtons()}
+
+      {quickExecuteMode && (
+        <View style={styles.quickModeNotice}>
+          <Text style={styles.quickModeText}>⚡ Quick Execute Mode: Commands run immediately</Text>
         </View>
+      )}
 
-        {Object.keys(groupedCommands).length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>📋 コマンドが見つかりません</Text>
-            <Text style={styles.emptyText}>
-              サーバーからクイックコマンドを取得できませんでした。
-              ネットワーク接続を確認するか、設定画面からコマンドを設定してください。
-            </Text>
-            <TouchableOpacity
-              style={styles.reloadButton}
-              onPress={loadQuickCommands}
-            >
-              <Text style={styles.reloadButtonText}>🔄 再読み込み</Text>
-            </TouchableOpacity>
-          </View>
-        ) : Object.entries(groupedCommands).map(([category, categoryCommands]) => (
-          <View key={category} style={styles.categorySection}>
-            <Text style={styles.categoryTitle}>
-              {getCommandIcon(category)} {category.replace('_', ' ').toUpperCase()}
-            </Text>
+      <FlatList
+        data={getSortedCommands()}
+        renderItem={renderCommandCard}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.row}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+      />
 
-            {categoryCommands.map((command) => {
-              const isExecuting = executingCommand === command.id;
-
-              return (
-                <TouchableOpacity
-                  key={command.id}
-                  style={getCommandButtonStyle(command.category, isExecuting)}
-                  onPress={() => executeQuickCommand(command)}
-                  disabled={isExecuting || executingCommand !== null}
-                >
-                  <View style={styles.commandContent}>
-                    <View style={styles.commandHeader}>
-                      <Text style={styles.commandName}>
-                        {isExecuting ? '⏳' : getCommandIcon(command.category)} {command.name}
-                      </Text>
-                      {command.requires_confirmation && (
-                        <Text style={styles.confirmationBadge}>⚠️</Text>
-                      )}
-                    </View>
-                    <Text style={styles.commandDescription}>
-                      {command.description}
-                    </Text>
-                    <Text style={styles.commandCode}>
-                      {isExecuting ? 'Executing...' : command.command}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        ))}
-
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.configButton}
-            onPress={() => navigation.navigate('Configuration', {
-              connectionUrl,
-              sessionKey,
-            })}
-          >
-            <Text style={styles.configButtonText}>⚙️ Configure Commands</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      {/* Confirmation Modal */}
       <Modal
         visible={showConfirmModal}
-        transparent={true}
         animationType="slide"
-        onRequestClose={() => setShowConfirmModal(false)}
+        presentationStyle="pageSheet"
+        transparent={false}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>⚠️ Confirm Action</Text>
-            <Text style={styles.modalMessage}>
-              Are you sure you want to execute:
-            </Text>
-            <Text style={styles.modalCommand}>
-              {confirmCommand?.name}
-            </Text>
-            <Text style={styles.modalDescription}>
-              {confirmCommand?.description}
-            </Text>
-
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowConfirmModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.confirmButton]}
-                onPress={confirmAndExecute}
-              >
-                <Text style={styles.confirmButtonText}>Execute</Text>
-              </TouchableOpacity>
-            </View>
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Execute Command</Text>
           </View>
-        </View>
+
+          {selectedCommand && (
+            <View style={styles.modalContent}>
+              <View style={styles.commandPreview}>
+                <Text style={styles.previewName}>{selectedCommand.name}</Text>
+                <Text style={styles.previewDescription}>{selectedCommand.description}</Text>
+                <View style={styles.commandCodeContainer}>
+                  <Text style={styles.commandCode}>{selectedCommand.command}</Text>
+                </View>
+              </View>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => {
+                    setShowConfirmModal(false);
+                    setSelectedCommand(null);
+                  }}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.executeButtonModal]}
+                  onPress={() => {
+                    setShowConfirmModal(false);
+                    if (selectedCommand) {
+                      performExecution(selectedCommand);
+                    }
+                    setSelectedCommand(null);
+                  }}
+                  disabled={isExecuting}
+                >
+                  {isExecuting ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Text style={styles.executeButtonText}>Execute</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#1a1a1a',
   },
-  loadingContainer: {
+  headerButtons: {
+    flexDirection: 'row',
+    marginRight: 10,
+  },
+  headerButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  headerButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  searchContainer: {
+    padding: 15,
+  },
+  searchInput: {
+    backgroundColor: '#2a2a2a',
+    color: '#fff',
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  sortContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 15,
+    paddingBottom: 10,
+    justifyContent: 'space-between',
+  },
+  sortButton: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    marginHorizontal: 2,
     alignItems: 'center',
   },
-  loadingText: {
-    fontSize: 16,
-    color: '#64748b',
-    marginTop: 16,
+  sortButtonActive: {
+    backgroundColor: '#4CAF50',
   },
-  scrollView: {
-    flex: 1,
-    padding: 16,
+  sortText: {
+    color: '#888',
+    fontSize: 11,
+    fontWeight: '500',
   },
-  header: {
-    marginBottom: 24,
+  sortTextActive: {
+    color: '#fff',
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1e293b',
+  quickModeNotice: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    marginHorizontal: 15,
+    marginBottom: 10,
+    borderRadius: 6,
+  },
+  quickModeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
     textAlign: 'center',
   },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#64748b',
-    textAlign: 'center',
-    marginTop: 4,
+  listContainer: {
+    padding: 15,
   },
-  categorySection: {
-    marginBottom: 24,
+  row: {
+    justifyContent: 'space-between',
   },
-  categoryTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#374151',
-    marginBottom: 12,
-  },
-  commandButton: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+  commandCard: {
+    width: '48%',
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    borderLeftWidth: 3,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
-  defaultButton: {
-    backgroundColor: '#ffffff',
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 6,
   },
-  gitButton: {
-    backgroundColor: '#f0f9ff',
-    borderLeftWidth: 4,
-    borderLeftColor: '#3b82f6',
-  },
-  deploymentButton: {
-    backgroundColor: '#f0fdf4',
-    borderLeftWidth: 4,
-    borderLeftColor: '#10b981',
-  },
-  packageButton: {
-    backgroundColor: '#fefce8',
-    borderLeftWidth: 4,
-    borderLeftColor: '#f59e0b',
-  },
-  executingButton: {
-    backgroundColor: '#fef3c7',
-    borderLeftWidth: 4,
-    borderLeftColor: '#f59e0b',
-  },
-  commandContent: {
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
   },
-  commandHeader: {
+  favoriteIcon: {
+    fontSize: 10,
+    marginLeft: 3,
+  },
+  usageInfo: {
+    alignItems: 'flex-end',
+  },
+  usageCount: {
+    color: '#4CAF50',
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
+  commandName: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 3,
+  },
+  commandDescription: {
+    color: '#ccc',
+    fontSize: 10,
+    marginBottom: 6,
+    lineHeight: 12,
+  },
+  commandText: {
+    color: '#4CAF50',
+    fontSize: 9,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    backgroundColor: '#1a1a1a',
+    padding: 4,
+    borderRadius: 3,
+    marginBottom: 6,
+  },
+  cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
   },
-  commandName: {
-    fontSize: 16,
+  categoryTag: {
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 8,
+    fontSize: 8,
+    color: '#fff',
     fontWeight: 'bold',
-    color: '#1e293b',
-    flex: 1,
+    overflow: 'hidden',
   },
-  confirmationBadge: {
-    fontSize: 12,
-    color: '#f59e0b',
-  },
-  commandDescription: {
-    fontSize: 14,
-    color: '#64748b',
-    marginBottom: 8,
-  },
-  commandCode: {
-    fontSize: 12,
-    color: '#6b7280',
-    fontFamily: 'monospace',
-    backgroundColor: '#f3f4f6',
-    padding: 8,
-    borderRadius: 6,
-  },
-  footer: {
-    marginTop: 24,
-    marginBottom: 32,
-  },
-  configButton: {
-    backgroundColor: '#3b82f6',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  configButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  lastUsed: {
+    color: '#888',
+    fontSize: 8,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: '#1a1a1a',
   },
-  modalContent: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 24,
-    margin: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  modalHeader: {
+    padding: 20,
+    backgroundColor: '#2a2a2a',
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+    alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  modalMessage: {
-    fontSize: 16,
-    color: '#64748b',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  modalCommand: {
+    color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    textAlign: 'center',
+    fontWeight: '600',
+  },
+  modalContent: {
+    flex: 1,
+    padding: 20,
+  },
+  commandPreview: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  previewName: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '600',
     marginBottom: 8,
   },
-  modalDescription: {
+  previewDescription: {
+    color: '#ccc',
     fontSize: 14,
-    color: '#64748b',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 15,
+    lineHeight: 20,
   },
-  modalButtons: {
+  commandCodeContainer: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 8,
+    padding: 15,
+    width: '100%',
+  },
+  commandCode: {
+    color: '#4CAF50',
+    fontSize: 14,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    textAlign: 'center',
+  },
+  modalActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   modalButton: {
     flex: 1,
-    padding: 12,
+    paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
-    marginHorizontal: 8,
+    marginHorizontal: 5,
   },
   cancelButton: {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#666',
   },
-  confirmButton: {
-    backgroundColor: '#ef4444',
+  executeButtonModal: {
+    backgroundColor: '#4CAF50',
   },
   cancelButtonText: {
-    color: '#374151',
-    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
-  confirmButtonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },
-  emptyContainer: {
-    padding: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 200,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#374151',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#6b7280',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 24,
-  },
-  reloadButton: {
-    backgroundColor: '#3b82f6',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  reloadButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
+  executeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
+
+export default QuickCommandsScreen;

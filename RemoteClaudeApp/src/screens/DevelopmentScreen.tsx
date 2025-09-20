@@ -2,32 +2,23 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   ScrollView,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
+  StyleSheet,
+  SafeAreaView,
+  ActivityIndicator,
+  Modal,
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
+  Platform,
+  Image,
+  Dimensions,
+  Linking,
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../types/Navigation';
+// import { WebView } from 'react-native-webview';
 import WebSocketService from '../services/WebSocketService';
-
-type DevelopmentScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Development'
->;
-
-type DevelopmentScreenRouteProp = RouteProp<RootStackParamList, 'Development'>;
-
-interface Props {
-  navigation: DevelopmentScreenNavigationProp;
-  route: DevelopmentScreenRouteProp;
-}
 
 interface TerminalLine {
   id: string;
@@ -36,155 +27,229 @@ interface TerminalLine {
   timestamp: Date;
 }
 
-export default function DevelopmentScreen({ navigation, route }: Props) {
+interface ErrorEntry {
+  id: string;
+  message: string;
+  timestamp: Date;
+  command?: string;
+}
+
+interface PreviewItem {
+  id: string;
+  name: string;
+  type: 'matplotlib' | 'webapp' | 'jupyter';
+  path?: string;
+  port?: number;
+  lastModified: Date;
+}
+
+interface Props {
+  route: {
+    params: {
+      serverUrl: string;
+      projectId: string;
+    };
+  };
+  navigation: any;
+}
+
+const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
+  const { serverUrl, projectId } = route.params;
   const [command, setCommand] = useState('');
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [commandHistory, setCommandHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingText, setThinkingText] = useState('');
-  const [tabSuggestions, setTabSuggestions] = useState<string[]>([]);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const scrollViewRef = useRef<ScrollView>(null);
-  const inputRef = useRef<TextInput>(null);
+  const [executionProgress, setExecutionProgress] = useState(0);
+  const [errorHistory, setErrorHistory] = useState<ErrorEntry[]>([]);
+  const [showErrorPanel, setShowErrorPanel] = useState(false);
 
-  const { projectId, projectName, connectionUrl, sessionKey } = route.params;
+  // Tab and Preview States
+  const [activeTab, setActiveTab] = useState<'terminal' | 'preview'>('terminal');
+  const [previewItems, setPreviewItems] = useState<PreviewItem[]>([]);
+  const [selectedPreviewItem, setSelectedPreviewItem] = useState<PreviewItem | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const textInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    // Set navigation title
     navigation.setOptions({
-      title: `🛠️ ${projectName} (NEW_CODE_VERSION)`,
+      title: `Development - ${projectId}`,
+      headerRight: () => (
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => navigation.navigate('DetailedSettings')}
+          >
+            <Text style={styles.headerButtonText}>⚙️</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: isConnected ? '#4CAF50' : '#f44336' }]}
+            onPress={() => {
+              const debugInfo = WebSocketService.getDebugInfo();
+              Alert.alert('Debug Info', JSON.stringify(debugInfo, null, 2));
+            }}
+          >
+            <Text style={styles.headerButtonText}>
+              {isConnected ? '🟢' : '🔴'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ),
     });
+  }, [navigation, projectId, isConnected]);
 
-    // Always set up message callbacks for this screen
-    console.log('🔥 DEVELOPMENT_INIT: Setting up WebSocket callbacks');
-    if (WebSocketService.isConnected()) {
-      console.log('🔥 DEVELOPMENT_INIT: WebSocket already connected, updating callbacks');
-      setIsConnected(true);
-      
-      // Re-establish callbacks for this screen
-      WebSocketService.updateCallbacks({
-        onMessage: handleServerMessage,
-      });
-      
-      addSystemMessage('🔥 DEVELOPMENT_INIT: WebSocket callbacks updated for development screen');
-    } else {
-      console.log('🔥 DEVELOPMENT_INIT: WebSocket not connected, establishing connection');
-      connectToServer();
-    }
+  useEffect(() => {
+    connectToServer();
 
     return () => {
-      // Don't disconnect here as we might navigate back
+      WebSocketService.unregisterScreenCallbacks('development');
     };
   }, []);
 
+  useEffect(() => {
+    console.log('🔥 DEVELOPMENT: State changed - isConnected:', isConnected, 'isExecuting:', isExecuting);
+  }, [isConnected, isExecuting]);
+
   const connectToServer = async () => {
-    addSystemMessage('🔌 Attempting to connect to server...');
-    
+    // serverUrl already includes /ws and key parameter
+    const connectionUrl = serverUrl;
+    console.log('🔌 DEVELOPMENT: Connecting to:', connectionUrl);
+    addSystemMessage(`Connecting to ${connectionUrl}...`);
+
     const success = await WebSocketService.connect(connectionUrl, {
       onOpen: () => {
+        console.log('✅ DEVELOPMENT: onOpen callback called');
         setIsConnected(true);
-        addSystemMessage('✅ Successfully connected to RemoteClaude server');
+        addSystemMessage('サーバーに正常に接続しました！');
       },
-      onMessage: (message) => {
-        handleServerMessage(message);
-      },
+      onMessage: handleServerMessage,
       onError: (error) => {
-        console.error('WebSocket error:', error);
+        console.error('❌ DEVELOPMENT: WebSocket error:', error);
         setIsConnected(false);
-        addSystemMessage('❌ WebSocket connection error occurred', 'error');
-        addSystemMessage('🔍 Check server URL and network connectivity', 'error');
+        addSystemMessage('接続エラーが発生しました', 'error');
       },
       onClose: (event) => {
+        console.log('🔌 DEVELOPMENT: onClose callback called');
         setIsConnected(false);
-        const reason = event?.reason || 'Unknown reason';
-        const code = event?.code || 'Unknown code';
-        addSystemMessage(`🔌 Disconnected from server (${code}: ${reason})`, 'error');
-        
-        // Auto-reconnect for certain close codes
-        if (event?.code !== 1000 && event?.code !== 1001) {
-          setTimeout(() => {
-            addSystemMessage('🔄 Attempting to reconnect...');
-            connectToServer();
-          }, 3000);
-        }
+        addSystemMessage(`接続が閉じられました: ${event.reason || '不明な理由'}`, 'error');
       },
-    });
+    }, 'development');
 
+    console.log('🔌 DEVELOPMENT: Connection result:', success);
     if (!success) {
-      addSystemMessage('❌ Failed to establish WebSocket connection', 'error');
-      addSystemMessage(`🌐 Server URL: ${connectionUrl}`, 'error');
-      addSystemMessage('💡 Please check that the server is running and accessible', 'error');
-      
-      Alert.alert(
-        'Connection Failed', 
-        `Could not connect to the RemoteClaude server.\n\nURL: ${connectionUrl}\n\nPlease verify:\n• Server is running\n• Network connectivity\n• Firewall settings\n• URL is correct`,
-        [
-          { text: 'Retry', onPress: connectToServer },
-          { text: 'Cancel', style: 'cancel' }
-        ]
-      );
+      Alert.alert('Connection Failed', 'Could not connect to the server. Please check your connection.');
     }
   };
 
   const handleServerMessage = (message: any) => {
-    console.log('🔥 DEVELOPMENT_FIXED_v1: Processing message:', message.type);
-    console.log('🔥 DEVELOPMENT_FIXED_v1: Message data:', message.data);
-    
-    // Normalize message type to handle potential whitespace/newline issues
+    console.log('🔥 DEVELOPMENT: Processing message:', message.type);
+    console.log('🔥 DEVELOPMENT: Message data:', message.data);
+
     const messageType = message.type ? message.type.toString().trim() : '';
-    
+
     switch (messageType) {
       case 'claude_thinking':
         setIsThinking(true);
+        setExecutionProgress(25);
         if (message.data && message.data.thinking) {
           setThinkingText(message.data.thinking);
-          addSystemMessage('🤔 Claude is thinking...', 'system');
+          addSystemMessage('🤔 Claudeが思考中...', 'system');
         }
         break;
-        
+
       case 'claude_output':
-        console.log('🔥 DEVELOPMENT_FIXED_v1: Successfully handling claude_output message');
+        console.log('🔥 DEVELOPMENT: Successfully handling claude_output message');
         setIsExecuting(false);
         setIsThinking(false);
+        setExecutionProgress(100);
         if (message.data && message.data.output) {
-          console.log('🔥 DEVELOPMENT_FIXED_v1: Adding terminal output:', message.data.output.substring(0, 100));
+          console.log('🔥 DEVELOPMENT: Adding terminal output:', message.data.output.substring(0, 100));
           addTerminalOutput(message.data.output, 'output');
-          addSystemMessage('🔥 FIXED_v1: Terminal output added successfully');
         }
         if (message.data?.status === 'completed') {
-          addSystemMessage('✅ Command completed successfully');
+          addSystemMessage('✅ コマンドが正常に完了しました');
         }
+        setTimeout(() => setExecutionProgress(0), 2000);
         break;
-        
+
       case 'claude_error':
         console.log('❌ DEVELOPMENT: Handling claude_error message');
         setIsExecuting(false);
-        if (message.data && message.data.error) {
-          addTerminalOutput(message.data.error, 'error');
-        }
-        addSystemMessage('❌ Command failed with error', 'error');
+        setIsThinking(false);
+        setExecutionProgress(0);
+
+        const errorMessage = message.data?.error || 'Unknown error occurred';
+        const errorEntry: ErrorEntry = {
+          id: Date.now().toString(),
+          message: errorMessage,
+          timestamp: new Date(),
+          command: message.data?.command
+        };
+
+        setErrorHistory(prev => [errorEntry, ...prev.slice(0, 9)]);
+        addTerminalOutput(errorMessage, 'error');
+        addSystemMessage('❌ コマンドがエラーで失敗しました', 'error');
         break;
-        
+
       case 'connection_established':
         console.log('🔗 DEVELOPMENT: Connection established');
         addSystemMessage(`Connected to server v${message.data?.server_version || 'unknown'}`);
         break;
-        
+
       case 'error':
         console.log('⚠️ DEVELOPMENT: Server error');
         addSystemMessage(message.data?.message || 'Unknown error', 'error');
         break;
-        
+
       case 'pong':
-        // Handle ping/pong silently
         break;
-        
+
+      case 'preview_list_response':
+        console.log('📋 DEVELOPMENT: Received preview list');
+        if (message.data && message.data.items) {
+          const items: PreviewItem[] = message.data.items.map((item: any) => ({
+            id: item.path || `${item.port}`,
+            name: item.name || `Preview ${item.path || item.port}`,
+            type: item.type,
+            path: item.path,
+            port: item.port,
+            lastModified: new Date(item.lastModified || Date.now())
+          }));
+          setPreviewItems(items);
+        }
+        break;
+
+      case 'preview_image_response':
+        console.log('🖼️ DEVELOPMENT: Received preview image');
+        if (message.data && message.data.imageData) {
+          setPreviewImage(`data:image/png;base64,${message.data.imageData}`);
+          setIsLoadingPreview(false);
+        }
+        break;
+
+      case 'preview_webapp_response':
+        console.log('🌐 DEVELOPMENT: Received webapp response');
+        if (message.data && message.data.url) {
+          setSelectedPreviewItem({
+            id: 'webapp',
+            name: 'Web Application',
+            type: 'webapp',
+            port: message.data.port,
+            lastModified: new Date()
+          });
+          setIsLoadingPreview(false);
+        }
+        break;
+
       default:
         console.log('❓ DEVELOPMENT: Unhandled message type:', messageType);
-        // Don't show debug messages for unknown types to keep terminal clean
         break;
     }
   };
@@ -197,9 +262,11 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
       timestamp: new Date(),
     };
 
-    setTerminalLines(prev => [...prev, newLine]);
-    
-    // Auto-scroll to bottom
+    setTerminalLines(prev => {
+      const updated = [...prev, newLine];
+      return updated.length > 1000 ? updated.slice(-1000) : updated;
+    });
+
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
@@ -210,7 +277,6 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
   };
 
   const addTerminalOutput = (text: string, type: 'output' | 'error') => {
-    // Split multi-line output into separate lines
     const lines = text.split('\n');
     lines.forEach(line => {
       if (line.trim()) {
@@ -230,17 +296,14 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
       return;
     }
 
-    // Add command to history
     const trimmedCommand = command.trim();
     if (trimmedCommand && commandHistory[commandHistory.length - 1] !== trimmedCommand) {
       setCommandHistory(prev => [...prev, trimmedCommand]);
     }
     setHistoryIndex(-1);
 
-    // Add command to terminal
     addTerminalLine(`$ ${command}`, 'command');
 
-    // Send command to server
     const success = WebSocketService.send({
       type: 'claude_execute',
       data: {
@@ -255,363 +318,509 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
 
     if (success) {
       setIsExecuting(true);
-      addSystemMessage('Executing command...');
+      setExecutionProgress(10);
+      addSystemMessage('コマンドを実行中...');
       setCommand('');
       setShowSuggestions(false);
     } else {
-      addSystemMessage('Failed to send command', 'error');
+      addSystemMessage('コマンドの送信に失敗しました', 'error');
     }
   };
 
-  const executeQuickCommand = (quickCommand: string) => {
-    setCommand(quickCommand);
-    // Don't execute immediately, let user review the command
+  const executeQuickCommand = (quickCommand: string, immediate: boolean = false) => {
+    // Handle special preview navigation command
+    if (quickCommand === 'PREVIEW_NAVIGATION') {
+      setActiveTab('preview');
+      return;
+    }
+
+    if (immediate && isConnected) {
+      setCommand(quickCommand);
+      setTimeout(() => {
+        const success = WebSocketService.send({
+          type: 'claude_execute',
+          data: {
+            project_id: projectId,
+            command: quickCommand,
+            context: {
+              current_dir: '/workspace',
+              git_branch: 'main'
+            }
+          }
+        });
+
+        if (success) {
+          setIsExecuting(true);
+          setExecutionProgress(10);
+          addTerminalLine(`$ ${quickCommand}`, 'command');
+          addSystemMessage('クイックコマンドを実行中...');
+          setCommand('');
+        }
+      }, 100);
+    } else {
+      setCommand(quickCommand);
+    }
   };
 
   const clearTerminal = () => {
     setTerminalLines([]);
-    addSystemMessage('Terminal cleared');
+    addSystemMessage('ターミナルをクリアしました');
   };
 
-  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
-    const { key } = e.nativeEvent;
-    
-    if (key === 'Tab') {
-      e.preventDefault();
-      handleTabCompletion();
-    } else if (key === 'ArrowUp') {
-      e.preventDefault();
-      handleArrowUp();
-    } else if (key === 'ArrowDown') {
-      e.preventDefault();
-      handleArrowDown();
-    } else if (key === 'Escape') {
-      e.preventDefault();
-      setShowSuggestions(false);
+  const clearErrorHistory = () => {
+    setErrorHistory([]);
+    addSystemMessage('エラー履歴をクリアしました');
+  };
+
+  const refreshPreviewList = () => {
+    console.log('🔄 DEVELOPMENT: Refreshing preview list');
+    WebSocketService.send({
+      type: 'preview_list_request',
+      data: { project_id: projectId }
+    });
+  };
+
+  const openPreviewItem = (item: PreviewItem) => {
+    console.log('👀 DEVELOPMENT: Opening preview item:', item);
+    setIsLoadingPreview(true);
+    setSelectedPreviewItem(item);
+
+    if (item.type === 'matplotlib') {
+      WebSocketService.send({
+        type: 'preview_get_image',
+        data: { project_id: projectId, image_path: item.path }
+      });
+    } else if (item.type === 'webapp') {
+      WebSocketService.send({
+        type: 'preview_get_webapp',
+        data: { project_id: projectId, port: item.port }
+      });
     }
   };
 
-  const handleTabCompletion = () => {
-    const currentCommand = command.toLowerCase().trim();
-    const commonCommands = [
-      'ls', 'ls -la', 'pwd', 'cd', 'mkdir', 'rm', 'cp', 'mv',
-      'cat', 'vim', 'nano', 'grep', 'find', 'ps', 'top', 'df',
-      'git status', 'git add', 'git commit', 'git push', 'git pull',
-      'python3', 'npm', 'node', 'docker', 'curl', 'wget'
+  useEffect(() => {
+    if (activeTab === 'preview') {
+      refreshPreviewList();
+    }
+  }, [activeTab]);
+
+  const renderQuickCommands = () => {
+    const quickCommands = [
+      { icon: '📂', text: 'List Files', command: 'ls -la', color: '#4CAF50' },
+      { icon: '📍', text: 'Current Dir', command: 'pwd', color: '#2196F3' },
+      { icon: '🌿', text: 'Git Status', command: 'git status', color: '#FF9800' },
+      { icon: '📝', text: 'Git Log', command: 'git log --oneline -10', color: '#9C27B0' },
+      { icon: '🌐', text: 'Web App', command: 'HTML、CSS、JavaScriptを使用してシンプルなWebアプリケーションを作成してください。基本的なUIを持つindex.htmlファイル、スタイリング用のstyles.css、インタラクティブな機能のためのapp.jsを含めてください。レスポンシブでモダンなデザインにしてください。', color: '#00BCD4' },
+      { icon: '🖥️', text: 'Terminal App', command: 'Pythonでコマンドライン端末アプリケーションを作成してください。コマンド履歴、自動補完、カラー出力機能を含めてください。コマンドライン引数にはargparseを使用し、便利なユーティリティを実装してください。', color: '#FF5722' },
+      { icon: '🐍', text: 'Python Code', command: 'matplotlibを使用してデータ可視化を行うPythonコードを書いてください。チャート、グラフ、プロットを作成してください。必要に応じてpandasでデータ処理を行い、可視化結果をプレビュー用にPNGファイルとして保存してください。', color: '#FFC107' },
+      { icon: '👀', text: 'Preview', command: 'PREVIEW_NAVIGATION', color: '#E91E63' },
     ];
-    
-    const suggestions = commonCommands.filter(cmd => 
-      cmd.startsWith(currentCommand) && cmd !== currentCommand
+
+    return (
+      <View style={styles.quickCommandsContainer}>
+        <Text style={styles.quickCommandsTitle}>Quick Commands</Text>
+        <View style={styles.quickCommandsGrid}>
+          {quickCommands.map((cmd, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[styles.gridCommandButton, { borderLeftColor: cmd.color }]}
+              onPress={() => executeQuickCommand(cmd.command)}
+              onLongPress={() => executeQuickCommand(cmd.command, true)}
+              delayLongPress={800}
+            >
+              <Text style={styles.gridCommandIcon}>{cmd.icon}</Text>
+              <Text style={styles.gridCommandText}>{cmd.text}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <Text style={styles.quickCommandsHint}>タップで設定、長押しで実行</Text>
+      </View>
     );
-    
-    if (suggestions.length === 1) {
-      setCommand(suggestions[0] + ' ');
-      setShowSuggestions(false);
-    } else if (suggestions.length > 1) {
-      setTabSuggestions(suggestions);
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
-    }
   };
 
-  const handleArrowUp = () => {
-    if (commandHistory.length > 0) {
-      const newIndex = historyIndex === -1 ? commandHistory.length - 1 
-                      : Math.max(0, historyIndex - 1);
-      setHistoryIndex(newIndex);
-      setCommand(commandHistory[newIndex]);
-      setShowSuggestions(false);
-    }
+  const renderProgressBar = () => {
+    if (executionProgress === 0) return null;
+
+    return (
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBar}>
+          <View style={[styles.progressFill, { width: `${executionProgress}%` }]} />
+        </View>
+        <Text style={styles.progressText}>{executionProgress}%</Text>
+      </View>
+    );
   };
 
-  const handleArrowDown = () => {
-    if (commandHistory.length > 0 && historyIndex >= 0) {
-      const newIndex = historyIndex + 1;
-      if (newIndex >= commandHistory.length) {
-        setHistoryIndex(-1);
-        setCommand('');
-      } else {
-        setHistoryIndex(newIndex);
-        setCommand(commandHistory[newIndex]);
+  const renderErrorPanel = () => {
+    if (errorHistory.length === 0) return null;
+
+    return (
+      <TouchableOpacity
+        style={styles.errorBadge}
+        onPress={() => setShowErrorPanel(true)}
+      >
+        <Text style={styles.errorBadgeText}>⚠️ {errorHistory.length}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderTabBar = () => (
+    <View style={styles.tabBar}>
+      <TouchableOpacity
+        style={[styles.tabButton, activeTab === 'terminal' && styles.tabButtonActive]}
+        onPress={() => setActiveTab('terminal')}
+      >
+        <Text style={[styles.tabButtonText, activeTab === 'terminal' && styles.tabButtonTextActive]}>
+          ターミナル
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.tabButton, activeTab === 'preview' && styles.tabButtonActive]}
+        onPress={() => setActiveTab('preview')}
+      >
+        <Text style={[styles.tabButtonText, activeTab === 'preview' && styles.tabButtonTextActive]}>
+          プレビュー
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderPreviewContent = () => {
+    if (isLoadingPreview) {
+      return (
+        <View style={styles.previewLoading}>
+          <ActivityIndicator size="large" color="#4CAF50" />
+          <Text style={styles.previewLoadingText}>プレビューを読み込み中...</Text>
+        </View>
+      );
+    }
+
+    if (selectedPreviewItem) {
+      if (selectedPreviewItem.type === 'matplotlib' && previewImage) {
+        return (
+          <ScrollView style={styles.previewContent} contentContainerStyle={styles.previewScrollContent}>
+            <Image source={{ uri: previewImage }} style={styles.previewImage} resizeMode="contain" />
+          </ScrollView>
+        );
+      } else if (selectedPreviewItem.type === 'webapp' && selectedPreviewItem.port) {
+        const webappUrl = serverUrl.replace('/ws', '').replace(/:\d+/, `:${selectedPreviewItem.port}`);
+        return (
+          <View style={styles.previewWebApp}>
+            <View style={styles.webAppHeader}>
+              <Text style={styles.webAppTitle}>Webアプリケーション</Text>
+              <Text style={styles.webAppUrl}>{webappUrl}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.openBrowserButton}
+              onPress={() => Linking.openURL(webappUrl)}
+            >
+              <Text style={styles.openBrowserText}>🌐 ブラウザで開く</Text>
+            </TouchableOpacity>
+            <Text style={styles.webAppHint}>
+              Webアプリケーションはポート{selectedPreviewItem.port}で実行中です。
+              上のボタンをタップしてデバイスのブラウザで開いてください。
+            </Text>
+          </View>
+        );
       }
-      setShowSuggestions(false);
     }
-  };
 
-  const selectSuggestion = (suggestion: string) => {
-    setCommand(suggestion + ' ');
-    setShowSuggestions(false);
-    inputRef.current?.focus();
-  };
-
-  const getLineStyle = (type: TerminalLine['type']) => {
-    switch (type) {
-      case 'command': return styles.commandLine;
-      case 'output': return styles.outputLine;
-      case 'error': return styles.errorLine;
-      case 'system': return styles.systemLine;
-      default: return styles.outputLine;
-    }
+    return (
+      <View style={styles.previewEmpty}>
+        <ScrollView style={styles.previewList}>
+          <View style={styles.previewHeader}>
+            <Text style={styles.previewTitle}>利用可能なプレビュー</Text>
+            <TouchableOpacity onPress={refreshPreviewList} style={styles.refreshButton}>
+              <Text style={styles.refreshButtonText}>🔄</Text>
+            </TouchableOpacity>
+          </View>
+          {previewItems.length === 0 ? (
+            <Text style={styles.previewEmptyText}>
+              プレビューアイテムが見つかりません。WebアプリやPythonの可視化を作成すると、ここに表示されます。
+            </Text>
+          ) : (
+            previewItems.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.previewItem}
+                onPress={() => openPreviewItem(item)}
+              >
+                <Text style={styles.previewItemIcon}>
+                  {item.type === 'matplotlib' ? '📊' : item.type === 'webapp' ? '🌐' : '📓'}
+                </Text>
+                <View style={styles.previewItemInfo}>
+                  <Text style={styles.previewItemName}>{item.name}</Text>
+                  <Text style={styles.previewItemPath}>
+                    {item.type === 'matplotlib' ? item.path : `Port ${item.port}`}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
+      </View>
+    );
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-    >
-      {/* Status Bar */}
-      <View style={styles.statusBar}>
-        <View style={styles.statusLeft}>
-          <Text style={styles.projectInfo}>📁 {projectName}</Text>
-          <Text style={[styles.connectionStatus, { color: isConnected ? '#28a745' : '#dc3545' }]}>
-            {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.clearButton} onPress={clearTerminal}>
-          <Text style={styles.clearButtonText}>Clear</Text>
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.container}>
+      {renderQuickCommands()}
+      {renderProgressBar()}
 
-      {/* Terminal Output */}
-      <ScrollView
-        ref={scrollViewRef}
-        style={styles.terminal}
-        contentContainerStyle={styles.terminalContent}
-      >
-        {terminalLines.length === 0 ? (
-          <View style={styles.terminalWelcome}>
-            <Text style={styles.welcomeText}>🚀 RemoteClaude Development Terminal</Text>
-            <Text style={styles.welcomeSubText}>
-              Ready to execute Claude commands for {projectName}
-            </Text>
-            <Text style={styles.welcomeHint}>
-              Try: "Create a simple hello world file" or use quick commands below
-            </Text>
-          </View>
+      <View style={styles.terminalContainer}>
+        {renderTabBar()}
+
+        {activeTab === 'terminal' ? (
+          <>
+            <View style={styles.terminalHeader}>
+              <Text style={styles.terminalTitle}>ターミナル出力</Text>
+              <View style={styles.terminalActions}>
+                {renderErrorPanel()}
+                <TouchableOpacity onPress={clearTerminal} style={styles.clearButton}>
+                  <Text style={styles.clearButtonText}>クリア</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <ScrollView
+              ref={scrollViewRef}
+              style={styles.terminal}
+              contentContainerStyle={styles.terminalContent}
+              showsVerticalScrollIndicator={true}
+            >
+              {terminalLines.map((line) => (
+                <Text
+                  key={line.id}
+                  style={[
+                    styles.terminalLine,
+                    line.type === 'command' && styles.commandLine,
+                    line.type === 'error' && styles.errorLine,
+                    line.type === 'system' && styles.systemLine,
+                  ]}
+                >
+                  {line.text}
+                </Text>
+              ))}
+
+              {isThinking && (
+                <View style={styles.thinkingContainer}>
+                  <ActivityIndicator size="small" color="#4CAF50" />
+                  <Text style={styles.thinkingText}>
+                    {thinkingText || 'Claudeがリクエストを処理中...'}
+                  </Text>
+                </View>
+              )}
+            </ScrollView>
+          </>
         ) : (
-          terminalLines.map((line) => (
-            <Text key={line.id} style={getLineStyle(line.type)}>
-              {line.text}
-            </Text>
-          ))
+          renderPreviewContent()
         )}
-        {isExecuting && (
-          <Text style={styles.executingLine}>⏳ Executing command...</Text>
-        )}
-        {isThinking && (
-          <View style={styles.thinkingContainer}>
-            <Text style={styles.thinkingLine}>🤔 Claude is thinking...</Text>
-            {thinkingText && (
-              <Text style={styles.thinkingDetail}>{thinkingText}</Text>
-            )}
-          </View>
-        )}
-      </ScrollView>
-
-      {/* Quick Commands */}
-      <View style={styles.quickCommands}>
-        <View style={styles.quickCommandsHeader}>
-          <Text style={styles.quickCommandsTitle}>🚀 Quick Commands</Text>
-          <TouchableOpacity
-            style={styles.moreCommandsButton}
-            onPress={() => navigation.navigate('QuickCommands', {
-              projectId,
-              projectName,
-              connectionUrl,
-              sessionKey,
-            })}
-          >
-            <Text style={styles.moreCommandsText}>⚡ View All</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('ls -la')}
-          >
-            <Text style={styles.quickCommandText}>📂 List Files</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('pwd')}
-          >
-            <Text style={styles.quickCommandText}>📍 Current Dir</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('git status')}
-          >
-            <Text style={styles.quickCommandText}>📝 Git Status</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => navigation.navigate('Configuration', {
-              connectionUrl,
-              sessionKey,
-            })}
-          >
-            <Text style={styles.quickCommandText}>⚙️ Settings</Text>
-          </TouchableOpacity>
-
-          {/* Simplified command set */}
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('python3 --version')}
-          >
-            <Text style={styles.quickCommandText}>🐍 Python Ver</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('python3 -c "print(\'Hello from Python!\')"')}
-          >
-            <Text style={styles.quickCommandText}>🐍 Python Hello</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('python3 -c "import sys; print(sys.path)"')}
-          >
-            <Text style={styles.quickCommandText}>🐍 Python Path</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('pip3 list')}
-          >
-            <Text style={styles.quickCommandText}>📦 Pip Packages</Text>
-          </TouchableOpacity>
-          
-          {/* File Operations */}
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('find . -name "*.py" -type f')}
-          >
-            <Text style={styles.quickCommandText}>🔍 Find Python</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('find . -name "*.js" -type f')}
-          >
-            <Text style={styles.quickCommandText}>🔍 Find JS</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('wc -l *.py 2>/dev/null || echo "No Python files found"')}
-          >
-            <Text style={styles.quickCommandText}>📏 Count Lines</Text>
-          </TouchableOpacity>
-          
-          {/* Development Tools */}
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('which python3 node npm git')}
-          >
-            <Text style={styles.quickCommandText}>🛠️ Tools Check</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('env | grep -E "(PATH|PYTHON|NODE)"')}
-          >
-            <Text style={styles.quickCommandText}>🌍 Environment</Text>
-          </TouchableOpacity>
-          
-          {/* Network & System */}
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('curl -s https://httpbin.org/ip')}
-          >
-            <Text style={styles.quickCommandText}>🌐 My IP</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickCommandButton}
-            onPress={() => executeQuickCommand('date')}
-          >
-            <Text style={styles.quickCommandText}>🕐 Date/Time</Text>
-          </TouchableOpacity>
-        </ScrollView>
       </View>
 
-      {/* Tab Suggestions */}
-      {showSuggestions && tabSuggestions.length > 0 && (
-        <View style={styles.suggestionsContainer}>
-          <Text style={styles.suggestionsTitle}>💡 Tab Suggestions:</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {tabSuggestions.map((suggestion, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.suggestionButton}
-                onPress={() => selectSuggestion(suggestion)}
-              >
-                <Text style={styles.suggestionText}>{suggestion}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      {/* Command Input */}
       <View style={styles.inputContainer}>
         <TextInput
-          ref={inputRef}
+          ref={textInputRef}
           style={styles.commandInput}
           value={command}
           onChangeText={setCommand}
-          onKeyPress={handleKeyPress}
-          placeholder="Enter Claude command or shell command... (↑ for history, Tab for completion)"
+          placeholder="コマンドを入力..."
           placeholderTextColor="#999"
           multiline={false}
           returnKeyType="send"
           onSubmitEditing={executeCommand}
           editable={!isExecuting}
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="off"
-          spellCheck={false}
         />
         <TouchableOpacity
-          style={[styles.sendButton, { opacity: isExecuting ? 0.5 : 1 }]}
-          onPress={executeCommand}
-          disabled={isExecuting}
+          style={[styles.executeButton, isExecuting && styles.executeButtonDisabled]}
+          onPress={() => {
+            console.log('🔥 DEVELOPMENT: Execute button pressed, isConnected:', isConnected, 'isExecuting:', isExecuting);
+            executeCommand();
+          }}
+          disabled={isExecuting || !isConnected}
         >
-          <Text style={styles.sendButtonText}>
-            {isExecuting ? '⏳' : '🚀'}
-          </Text>
+          {isExecuting ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.executeButtonText}>▶</Text>
+          )}
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+
+      <Modal
+        visible={showErrorPanel}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Error History</Text>
+            <View style={styles.modalActions}>
+              <TouchableOpacity onPress={clearErrorHistory} style={styles.modalButton}>
+                <Text style={styles.modalButtonText}>Clear All</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setShowErrorPanel(false)} style={styles.modalButton}>
+                <Text style={styles.modalButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <ScrollView style={styles.errorList}>
+            {errorHistory.map((error) => (
+              <View key={error.id} style={styles.errorItem}>
+                <Text style={styles.errorTime}>
+                  {error.timestamp.toLocaleTimeString()}
+                </Text>
+                {error.command && (
+                  <Text style={styles.errorCommand}>Command: {error.command}</Text>
+                )}
+                <Text style={styles.errorMessage}>{error.message}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1e1e1e',
+    backgroundColor: '#1a1a1a',
   },
-  statusBar: {
+  headerButtons: {
+    flexDirection: 'row',
+    marginRight: 10,
+  },
+  headerButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  headerButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  quickCommandsContainer: {
+    backgroundColor: '#2a2a2a',
+    padding: 8,
+    margin: 8,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  quickCommandsTitle: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  quickCommandsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  gridCommandButton: {
+    width: '48%',
+    backgroundColor: '#3a3a3a',
+    borderRadius: 6,
+    padding: 8,
+    marginBottom: 6,
+    borderLeftWidth: 3,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 2,
+  },
+  gridCommandIcon: {
+    fontSize: 18,
+    marginBottom: 4,
+  },
+  gridCommandText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  quickCommandsHint: {
+    color: '#888',
+    fontSize: 9,
+    textAlign: 'center',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    backgroundColor: '#2a2a2a',
+    marginHorizontal: 10,
+    borderRadius: 8,
+  },
+  progressBar: {
+    flex: 1,
+    height: 4,
+    backgroundColor: '#444',
+    borderRadius: 2,
+    marginRight: 10,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#4CAF50',
+    borderRadius: 2,
+  },
+  progressText: {
+    color: '#4CAF50',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  terminalContainer: {
+    flex: 1,
+    margin: 10,
+    backgroundColor: '#1e1e1e',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  terminalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#2d2d2d',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    padding: 15,
+    backgroundColor: '#2a2a2a',
     borderBottomWidth: 1,
-    borderBottomColor: '#404040',
+    borderBottomColor: '#444',
   },
-  statusLeft: {
-    flex: 1,
-  },
-  projectInfo: {
+  terminalTitle: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 2,
+    fontWeight: '600',
   },
-  connectionStatus: {
+  terminalActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  errorBadge: {
+    backgroundColor: '#f44336',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 10,
+  },
+  errorBadgeText: {
+    color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
   },
   clearButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#666',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -619,190 +828,297 @@ const styles = StyleSheet.create({
   clearButtonText: {
     color: '#fff',
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   terminal: {
     flex: 1,
-    backgroundColor: '#1e1e1e',
+    backgroundColor: '#0a0a0a',
   },
   terminalContent: {
     padding: 15,
-    flexGrow: 1,
   },
-  terminalWelcome: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  welcomeText: {
-    color: '#007AFF',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  welcomeSubText: {
-    color: '#ccc',
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  welcomeHint: {
-    color: '#999',
-    fontSize: 14,
-    textAlign: 'center',
-    fontStyle: 'italic',
+  terminalLine: {
+    color: '#e0e0e0',
+    fontSize: 13,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    marginBottom: 2,
+    lineHeight: 18,
   },
   commandLine: {
-    color: '#00ff00',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  outputLine: {
-    color: '#fff',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    fontSize: 13,
-    marginBottom: 2,
+    color: '#4CAF50',
+    fontWeight: '600',
   },
   errorLine: {
-    color: '#ff6b6b',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    fontSize: 13,
-    marginBottom: 2,
+    color: '#f44336',
   },
   systemLine: {
-    color: '#ffd93d',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    fontSize: 12,
-    marginBottom: 2,
+    color: '#2196F3',
     fontStyle: 'italic',
   },
-  executingLine: {
-    color: '#007AFF',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    fontSize: 13,
-    marginBottom: 2,
-    fontStyle: 'italic',
-  },
-  quickCommands: {
-    backgroundColor: '#2d2d2d',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#404040',
-  },
-  quickCommandsHeader: {
+  thinkingContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
   },
-  quickCommandsTitle: {
-    color: '#ccc',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  moreCommandsButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  moreCommandsText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  quickCommandButton: {
-    backgroundColor: '#404040',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 15,
-    marginRight: 8,
-  },
-  quickCommandText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
+  thinkingText: {
+    color: '#4CAF50',
+    marginLeft: 10,
+    fontSize: 13,
+    fontStyle: 'italic',
   },
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    backgroundColor: '#2d2d2d',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#404040',
+    padding: 15,
+    backgroundColor: '#2a2a2a',
+    alignItems: 'center',
   },
   commandInput: {
     flex: 1,
-    backgroundColor: '#404040',
+    backgroundColor: '#3a3a3a',
     color: '#fff',
-    fontSize: 16,
-    paddingHorizontal: 12,
+    paddingHorizontal: 15,
     paddingVertical: 12,
     borderRadius: 8,
-    marginRight: 10,
+    fontSize: 14,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
-  sendButton: {
-    backgroundColor: '#007AFF',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  executeButton: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginLeft: 10,
+    minWidth: 50,
+    alignItems: 'center',
+  },
+  executeButtonDisabled: {
+    backgroundColor: '#666',
+  },
+  executeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#2a2a2a',
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  modalTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  modalActions: {
+    flexDirection: 'row',
+  },
+  modalButton: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 6,
+    marginLeft: 10,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  errorList: {
+    flex: 1,
+    padding: 15,
+  },
+  errorItem: {
+    backgroundColor: '#2a2a2a',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: '#f44336',
+  },
+  errorTime: {
+    color: '#888',
+    fontSize: 12,
+    marginBottom: 5,
+  },
+  errorCommand: {
+    color: '#4CAF50',
+    fontSize: 13,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    marginBottom: 5,
+  },
+  errorMessage: {
+    color: '#f44336',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  // Tab Bar Styles
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#2a2a2a',
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    backgroundColor: '#2a2a2a',
+  },
+  tabButtonActive: {
+    backgroundColor: '#1e1e1e',
+    borderBottomWidth: 2,
+    borderBottomColor: '#4CAF50',
+  },
+  tabButtonText: {
+    color: '#888',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  tabButtonTextActive: {
+    color: '#4CAF50',
+    fontWeight: '600',
+  },
+  // Preview Styles
+  previewContent: {
+    flex: 1,
+    backgroundColor: '#0a0a0a',
+  },
+  previewScrollContent: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  previewImage: {
+    width: Dimensions.get('window').width - 40,
+    height: 300,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+  },
+  previewWebApp: {
+    flex: 1,
+    backgroundColor: '#0a0a0a',
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  sendButtonText: {
-    fontSize: 20,
+  webAppHeader: {
+    alignItems: 'center',
+    marginBottom: 30,
   },
-  // New styles for keyboard shortcuts and thinking display
-  thinkingContainer: {
-    backgroundColor: '#2d2d2d',
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: '#007AFF',
-  },
-  thinkingLine: {
-    color: '#007AFF',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    fontSize: 13,
-    marginBottom: 5,
-    fontStyle: 'italic',
-  },
-  thinkingDetail: {
-    color: '#ccc',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-    fontSize: 11,
-    lineHeight: 16,
-  },
-  suggestionsContainer: {
-    backgroundColor: '#2d2d2d',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#404040',
-  },
-  suggestionsTitle: {
-    color: '#007AFF',
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  suggestionButton: {
-    backgroundColor: '#404040',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    marginRight: 8,
-  },
-  suggestionText: {
+  webAppTitle: {
     color: '#fff',
-    fontSize: 11,
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  webAppUrl: {
+    color: '#4CAF50',
+    fontSize: 14,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    textAlign: 'center',
+  },
+  openBrowserButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  openBrowserText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  webAppHint: {
+    color: '#888',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    maxWidth: 300,
+  },
+  previewLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#0a0a0a',
+  },
+  previewLoadingText: {
+    color: '#4CAF50',
+    fontSize: 16,
+    marginTop: 10,
+  },
+  previewEmpty: {
+    flex: 1,
+    backgroundColor: '#0a0a0a',
+  },
+  previewList: {
+    flex: 1,
+    padding: 15,
+  },
+  previewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  previewTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  refreshButton: {
+    padding: 8,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 6,
+  },
+  refreshButtonText: {
+    fontSize: 16,
+  },
+  previewEmptyText: {
+    color: '#888',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 40,
+    lineHeight: 20,
+  },
+  previewItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2a2a2a',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
+  },
+  previewItemIcon: {
+    fontSize: 24,
+    marginRight: 15,
+  },
+  previewItemInfo: {
+    flex: 1,
+  },
+  previewItemName: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  previewItemPath: {
+    color: '#888',
+    fontSize: 12,
   },
 });
+
+export default DevelopmentScreen;

@@ -7,9 +7,8 @@ export type RootStackParamList = {
   };
   Development: {
     projectId: string;
-    projectName: string;
-    connectionUrl: string;
-    sessionKey: string;
+    projectName?: string;
+    serverUrl: string;
     serverInfo?: {
       id: string;
       name: string;
@@ -31,5 +30,11 @@ export type RootStackParamList = {
     projectName: string;
     connectionUrl: string;
     sessionKey: string;
+  };
+  DetailedSettings: undefined;
+  Preview: {
+    serverUrl: string;
+    projectId: string;
+    projectName?: string;
   };
 };

@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -87,6 +88,9 @@ func NewServer(port string) *Server {
 			},
 			EnableCompression: true,
 			HandshakeTimeout:  30 * time.Second,
+			// Set message size limits to prevent PayloadTooLargeError
+			ReadBufferSize:  10 * 1024 * 1024, // 10MB read buffer
+			WriteBufferSize: 10 * 1024 * 1024, // 10MB write buffer
 		},
 	}
 }
@@ -476,6 +480,13 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 	case "quick_command_execute":
 		s.handleQuickCommandExecute(conn, msg)
 
+	case "preview_list_request":
+		s.handlePreviewListRequest(conn, msg)
+	case "preview_get_image":
+		s.handlePreviewGetImage(conn, msg)
+	case "preview_get_webapp":
+		s.handlePreviewGetWebApp(conn, msg)
+
 	default:
 		s.sendError(conn, fmt.Sprintf("Unknown message type: %s", msgType))
 	}
@@ -698,12 +709,20 @@ func (s *Server) handleProjectRemove(conn *websocket.Conn, msg map[string]interf
 		s.sendError(conn, fmt.Sprintf("Failed to remove project: %v", err))
 		return
 	}
-	
+
+	// Clean up associated session data
+	s.sessionsMutex.Lock()
+	if _, exists := s.sessions[projectID]; exists {
+		delete(s.sessions, projectID)
+		log.Printf("🧹 Cleaned up session data for removed project: %s", projectID)
+	}
+	s.sessionsMutex.Unlock()
+
 	s.sendMessage(conn, "project_remove_response", map[string]interface{}{
 		"project_id": projectID,
 		"message":    fmt.Sprintf("✅ Project '%s' removed successfully!", projectID),
 	})
-	
+
 	log.Printf("✅ Removed Docker project: %s", projectID)
 }
 
@@ -932,67 +951,32 @@ func (s *Server) handleClaudeExecute(conn *websocket.Conn, msg map[string]interf
 		return
 	}
 
-	log.Printf("🤖 Executing command: %s", command)
-
-	// Determine if it's a Claude command or shell command
-	var cmd *exec.Cmd
-	var output []byte
-	var err error
-
-	if strings.HasPrefix(command, "claude ") || command == "claude" {
-		// Execute Claude CLI command
-		claudeArgs := strings.Fields(command)
-		if len(claudeArgs) == 1 {
-			// Just "claude" - show help
-			cmd = exec.Command("claude", "--help")
-		} else {
-			// Claude with arguments
-			cmd = exec.Command("claude", claudeArgs[1:]...)
-		}
-		log.Printf("🤖 Executing Claude CLI: %v", cmd.Args)
-	} else if strings.HasPrefix(command, "/") || 
-			  strings.HasPrefix(command, "ls") || 
-			  strings.HasPrefix(command, "pwd") || 
-			  strings.HasPrefix(command, "cat") || 
-			  strings.HasPrefix(command, "echo") ||
-			  strings.HasPrefix(command, "git") {
-		// Execute shell command
-		cmd = exec.Command("sh", "-c", command)
-		log.Printf("🔧 Executing shell command: %s", command)
-	} else {
-		// Treat as Claude prompt - handle Japanese/Unicode text properly
-		if containsNonASCII(command) {
-			log.Printf("🗾 Detected non-ASCII characters, using safe encoding")
-			// Use stdin to pass the command to avoid shell encoding issues
-			cmd = exec.Command("claude")
-			cmd.Stdin = strings.NewReader(command)
-		} else {
-			cmd = exec.Command("claude", "-p", command)
-		}
-		log.Printf("🤖 Executing Claude with prompt: %s", command)
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Missing or invalid project_id")
+		return
 	}
 
-	// Set working directory to projects directory if it exists
-	if projectPath := "./projects"; s.pathExists(projectPath) {
-		cmd.Dir = projectPath
-	}
+	log.Printf("🤖 Executing command in project %s: %s", projectID, command)
 
-	// Execute command
-	output, err = cmd.CombinedOutput()
+	// Execute command using DockerManager in the specified container
+	output, err := s.dockerManager.ExecuteCommand(projectID, command)
 
 	if err != nil {
 		s.sendMessage(conn, "claude_error", map[string]interface{}{
-			"error":   err.Error(),
-			"command": command,
-			"output":  string(output),
+			"error":      err.Error(),
+			"command":    command,
+			"output":     output,
+			"project_id": projectID,
 		})
 		return
 	}
 
 	s.sendMessage(conn, "claude_output", map[string]interface{}{
-		"output":  string(output),
-		"command": command,
-		"status":  "completed",
+		"output":     output,
+		"command":    command,
+		"status":     "completed",
+		"project_id": projectID,
 	})
 }
 
@@ -1930,6 +1914,312 @@ func (s *Server) processSpecialCommand(command, projectID string) string {
 	return processed
 }
 
+// Preview functionality handlers
+func (s *Server) handlePreviewListRequest(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("👁️ Handling preview list request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid preview list message format")
+		return
+	}
+
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Missing or invalid project ID")
+		return
+	}
+
+	// Get preview items for the project
+	previews := s.getPreviewItems(projectID)
+
+	s.sendMessage(conn, "preview_list_response", map[string]interface{}{
+		"project_id": projectID,
+		"previews":   previews,
+		"status":     "success",
+	})
+
+	log.Printf("✅ Sent preview list for project %s (%d items)", projectID, len(previews))
+}
+
+func (s *Server) getPreviewItems(projectID string) []map[string]interface{} {
+	var previews []map[string]interface{}
+
+	// Scan for matplotlib images in container
+	matplotlibImages := s.scanMatplotlibImages(projectID)
+	for _, img := range matplotlibImages {
+		previews = append(previews, img)
+	}
+
+	// Scan for running web applications
+	webApps := s.scanWebApplications(projectID)
+	for _, app := range webApps {
+		previews = append(previews, app)
+	}
+
+	// Check for Jupyter notebook
+	if s.isJupyterRunning(projectID) {
+		previews = append(previews, map[string]interface{}{
+			"id":          "jupyter_notebook",
+			"type":        "notebook",
+			"name":        "Jupyter Notebook",
+			"description": "Jupyter notebook interface",
+			"status":      "running",
+			"port":        8888,
+			"url":         "http://localhost:8888",
+		})
+	}
+
+	return previews
+}
+
+func (s *Server) scanMatplotlibImages(projectID string) []map[string]interface{} {
+	var images []map[string]interface{}
+
+	// Common matplotlib output directories
+	searchPaths := []string{
+		"/workspace/plots",
+		"/workspace/images",
+		"/workspace/figures",
+		"/workspace",
+		"/tmp/matplotlib",
+	}
+
+	for _, path := range searchPaths {
+		// Execute command to find matplotlib images
+		cmd := fmt.Sprintf("find %s -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.svg' -newer /tmp/matplotlib_start 2>/dev/null | head -10", path)
+		output, err := s.dockerManager.ExecuteCommand(projectID, cmd)
+
+		if err == nil && output != "" {
+			lines := strings.Split(strings.TrimSpace(output), "\n")
+			for i, line := range lines {
+				if line != "" {
+					// Get file info
+					statCmd := fmt.Sprintf("stat -f '%%z|%%Sm' '%s' 2>/dev/null || stat -c '%%s|%%y' '%s' 2>/dev/null", line, line)
+					statOutput, _ := s.dockerManager.ExecuteCommand(projectID, statCmd)
+
+					size := "unknown"
+					timestamp := "unknown"
+					if statOutput != "" {
+						parts := strings.Split(strings.TrimSpace(statOutput), "|")
+						if len(parts) >= 2 {
+							size = parts[0]
+							timestamp = parts[1]
+						}
+					}
+
+					images = append(images, map[string]interface{}{
+						"id":          fmt.Sprintf("matplotlib_%s_%d", projectID, i),
+						"type":        "matplotlib",
+						"name":        fmt.Sprintf("Plot: %s", filepath.Base(line)),
+						"description": fmt.Sprintf("Matplotlib output (%s bytes)", size),
+						"status":      "ready",
+						"path":        line,
+						"size":        size,
+						"timestamp":   timestamp,
+					})
+				}
+			}
+		}
+	}
+
+	return images
+}
+
+func (s *Server) scanWebApplications(projectID string) []map[string]interface{} {
+	var webApps []map[string]interface{}
+
+	// Common ports for web applications
+	ports := []int{3000, 8000, 8080, 5000, 9000, 8888, 4200, 3001}
+
+	for _, port := range ports {
+		// Check if port is listening
+		cmd := fmt.Sprintf("netstat -tuln 2>/dev/null | grep ':%d ' || ss -tuln 2>/dev/null | grep ':%d '", port, port)
+		output, err := s.dockerManager.ExecuteCommand(projectID, cmd)
+
+		if err == nil && output != "" {
+			// Try to get process info
+			processCmd := fmt.Sprintf("lsof -i :%d 2>/dev/null | tail -n +2 | head -1 | awk '{print $1}' || echo 'unknown'", port)
+			processOutput, _ := s.dockerManager.ExecuteCommand(projectID, processCmd)
+			processName := strings.TrimSpace(processOutput)
+			if processName == "" {
+				processName = "unknown"
+			}
+
+			webApps = append(webApps, map[string]interface{}{
+				"id":          fmt.Sprintf("webapp_%s_%d", projectID, port),
+				"type":        "webapp",
+				"name":        fmt.Sprintf("Web App (:%d)", port),
+				"description": fmt.Sprintf("Running %s on port %d", processName, port),
+				"status":      "running",
+				"port":        port,
+				"url":         fmt.Sprintf("http://localhost:%d", port),
+				"process":     processName,
+			})
+		}
+	}
+
+	return webApps
+}
+
+func (s *Server) isJupyterRunning(projectID string) bool {
+	// Check if Jupyter is running
+	cmd := "pgrep -f jupyter || ps aux | grep -i jupyter | grep -v grep"
+	output, err := s.dockerManager.ExecuteCommand(projectID, cmd)
+	return err == nil && output != ""
+}
+
+func (s *Server) handlePreviewGetImage(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("🖼️ Handling preview get image request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid preview get image message format")
+		return
+	}
+
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Missing or invalid project ID")
+		return
+	}
+
+	imagePath, ok := data["image_path"].(string)
+	if !ok || imagePath == "" {
+		s.sendError(conn, "Missing or invalid image path")
+		return
+	}
+
+	// Security check: ensure path is within allowed directories
+	allowedPaths := []string{"/workspace", "/tmp/matplotlib"}
+	isAllowed := false
+	for _, allowed := range allowedPaths {
+		if strings.HasPrefix(imagePath, allowed) {
+			isAllowed = true
+			break
+		}
+	}
+
+	if !isAllowed {
+		s.sendError(conn, "Access to image path not allowed")
+		return
+	}
+
+	// Read image file and encode to base64
+	cmd := fmt.Sprintf("base64 '%s' 2>/dev/null", imagePath)
+	output, err := s.dockerManager.ExecuteCommand(projectID, cmd)
+
+	if err != nil {
+		s.sendError(conn, fmt.Sprintf("Failed to read image: %v", err))
+		return
+	}
+
+	if output == "" {
+		s.sendError(conn, "Image file not found or empty")
+		return
+	}
+
+	// Get image metadata
+	statCmd := fmt.Sprintf("stat -f '%%z|%%Sm' '%s' 2>/dev/null || stat -c '%%s|%%y' '%s' 2>/dev/null", imagePath, imagePath)
+	statOutput, _ := s.dockerManager.ExecuteCommand(projectID, statCmd)
+
+	size := "unknown"
+	timestamp := "unknown"
+	if statOutput != "" {
+		parts := strings.Split(strings.TrimSpace(statOutput), "|")
+		if len(parts) >= 2 {
+			size = parts[0]
+			timestamp = parts[1]
+		}
+	}
+
+	// Determine image type
+	imageType := "png"
+	if strings.HasSuffix(strings.ToLower(imagePath), ".jpg") || strings.HasSuffix(strings.ToLower(imagePath), ".jpeg") {
+		imageType = "jpeg"
+	} else if strings.HasSuffix(strings.ToLower(imagePath), ".svg") {
+		imageType = "svg+xml"
+	}
+
+	s.sendMessage(conn, "preview_image_response", map[string]interface{}{
+		"project_id": projectID,
+		"image_data": strings.TrimSpace(output),
+		"image_type": imageType,
+		"filename":   filepath.Base(imagePath),
+		"size":       size,
+		"timestamp":  timestamp,
+		"status":     "success",
+	})
+
+	log.Printf("✅ Sent image data for %s (%s bytes)", imagePath, size)
+}
+
+func (s *Server) handlePreviewGetWebApp(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("🌐 Handling preview get webapp request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid preview get webapp message format")
+		return
+	}
+
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Missing or invalid project ID")
+		return
+	}
+
+	port, ok := data["port"].(float64)
+	if !ok {
+		s.sendError(conn, "Missing or invalid port")
+		return
+	}
+
+	portInt := int(port)
+
+	// Verify the port is actually listening
+	cmd := fmt.Sprintf("netstat -tuln 2>/dev/null | grep ':%d ' || ss -tuln 2>/dev/null | grep ':%d '", portInt, portInt)
+	output, err := s.dockerManager.ExecuteCommand(projectID, cmd)
+
+	if err != nil || output == "" {
+		s.sendError(conn, fmt.Sprintf("Web application not running on port %d", portInt))
+		return
+	}
+
+	// Try to get a simple health check from the webapp
+	healthCmd := fmt.Sprintf("curl -s -m 5 -o /dev/null -w '%%{http_code}' http://localhost:%d/ || echo '000'", portInt)
+	healthOutput, _ := s.dockerManager.ExecuteCommand(projectID, healthCmd)
+	healthStatus := strings.TrimSpace(healthOutput)
+
+	// Get process information
+	processCmd := fmt.Sprintf("lsof -i :%d 2>/dev/null | tail -n +2 | head -1 | awk '{print $1\" \"$2}' || echo 'unknown 0'", portInt)
+	processOutput, _ := s.dockerManager.ExecuteCommand(projectID, processCmd)
+	processParts := strings.Split(strings.TrimSpace(processOutput), " ")
+	processName := "unknown"
+	processPID := "0"
+	if len(processParts) >= 2 {
+		processName = processParts[0]
+		processPID = processParts[1]
+	}
+
+	status := "running"
+	if healthStatus == "000" {
+		status = "unreachable"
+	}
+
+	s.sendMessage(conn, "preview_webapp_response", map[string]interface{}{
+		"project_id":    projectID,
+		"port":          portInt,
+		"url":           fmt.Sprintf("http://localhost:%d", portInt),
+		"status":        status,
+		"health_code":   healthStatus,
+		"process_name":  processName,
+		"process_pid":   processPID,
+		"proxy_url":     fmt.Sprintf("/proxy/%s/%d", projectID, portInt),
+	})
+
+	log.Printf("✅ Sent webapp info for port %d (status: %s)", portInt, status)
+}
 
 func main() {
 	// Get port from command line or environment
