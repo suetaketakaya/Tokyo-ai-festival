@@ -1,0 +1,499 @@
+{
+  "timestamp": "2025-09-21T05:57:56.500Z",
+  "environment": "gui_apptesting",
+  "validation_results": {
+    "total_checks": 64,
+    "passed": 45,
+    "failed": 3,
+    "warnings": 16,
+    "success_rate": 94
+  },
+  "details": [
+    {
+      "timestamp": "2025-09-21T05:57:55.212Z",
+      "level": "header",
+      "message": "System Requirements Validation",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.213Z",
+      "level": "success",
+      "message": "Node.js version: v20.17.0 (Compatible)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.213Z",
+      "level": "info",
+      "message": "Operating System: Darwin 24.0.0",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.213Z",
+      "level": "info",
+      "message": "Architecture: arm64",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.213Z",
+      "level": "info",
+      "message": "Platform: darwin",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.213Z",
+      "level": "info",
+      "message": "CPU Cores: 10",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.213Z",
+      "level": "info",
+      "message": "Total Memory: 16 GB",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.231Z",
+      "level": "success",
+      "message": "node: v20.17.0",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.347Z",
+      "level": "success",
+      "message": "npm: 11.4.2",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.363Z",
+      "level": "success",
+      "message": "git: git version 2.39.5 (Apple Git-154)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.408Z",
+      "level": "warning",
+      "message": "go: Not found (Optional)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.422Z",
+      "level": "success",
+      "message": "docker: Docker version 28.0.4, build b8034c0 (Optional)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.647Z",
+      "level": "success",
+      "message": "expo: 6.3.10 (Optional)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "header",
+      "message": "Project Structure Validation",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required file: package.json (4029 bytes)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required file: setup.sh (16424 bytes)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required file: start-servers.sh (10293 bytes)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required file: stop-servers.sh (7106 bytes)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required file: install-dependencies.sh (15196 bytes)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required file: comprehensive-gui-test.js (27870 bytes)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required file: fixed-command-tester.js (19374 bytes)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required file: reliable-gui-monitor.js (23274 bytes)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required file: performance-analyzer.js (12378 bytes)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "error",
+      "message": "Required directory missing: logs",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "error",
+      "message": "Required directory missing: pids",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Required directory: reports (6 files)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "error",
+      "message": "Required directory missing: config",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Optional file: simple-monitor.js",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "success",
+      "message": "Optional file: simple-command-tester.js",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "warning",
+      "message": "Optional file missing: .env",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.648Z",
+      "level": "warning",
+      "message": "Optional file missing: .gitignore",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "Server directory found: /Users/suetaketakaya/1.prog/remote_manual/server",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "Go server binary found",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "Expo app directory found: /Users/suetaketakaya/1.prog/remote_manual/RemoteClaudeApp",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "header",
+      "message": "Package.json Validation",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "package.json field: name",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "package.json field: version",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "package.json field: description",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "package.json field: scripts",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "package.json field: dependencies",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "Production dependencies: 17",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "Critical dependency: express v^4.18.2",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "Critical dependency: ws v^8.14.2",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "Critical dependency: axios v^1.6.2",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "Development dependencies: 17",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "npm scripts: 20",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "success",
+      "message": "Script available: test",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "warning",
+      "message": "Script missing: start",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "warning",
+      "message": "Script missing: stop",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.649Z",
+      "level": "header",
+      "message": "Node Modules Validation",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "success",
+      "message": "Node modules installed: 662 packages",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "success",
+      "message": "Critical module found: express",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "success",
+      "message": "Critical module found: ws",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "success",
+      "message": "Critical module found: axios",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "success",
+      "message": "Critical module found: cors",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "success",
+      "message": "package-lock.json found",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "header",
+      "message": "Configuration Files Validation",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "warning",
+      "message": "Environment configuration missing",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "warning",
+      "message": "Script configuration missing",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.651Z",
+      "level": "warning",
+      "message": ".env file missing",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.652Z",
+      "level": "header",
+      "message": "Script Permissions Validation",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.652Z",
+      "level": "success",
+      "message": "Script executable: setup.sh",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.652Z",
+      "level": "success",
+      "message": "Script executable: start-servers.sh",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.652Z",
+      "level": "success",
+      "message": "Script executable: stop-servers.sh",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.652Z",
+      "level": "success",
+      "message": "Script executable: install-dependencies.sh",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.652Z",
+      "level": "header",
+      "message": "Port Availability Check",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.698Z",
+      "level": "warning",
+      "message": "Port 8080: In use",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.744Z",
+      "level": "warning",
+      "message": "Port 8081: In use",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.790Z",
+      "level": "warning",
+      "message": "Port 8082: In use",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.835Z",
+      "level": "warning",
+      "message": "Port 8090: In use",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.880Z",
+      "level": "warning",
+      "message": "Port 8091: In use",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.920Z",
+      "level": "success",
+      "message": "Port 3001: Available",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:55.968Z",
+      "level": "warning",
+      "message": "Port 3002: In use",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:56.010Z",
+      "level": "warning",
+      "message": "Port 3004: In use",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:56.051Z",
+      "level": "warning",
+      "message": "Port 3005: In use",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:56.051Z",
+      "level": "header",
+      "message": "Disk Space Check",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:56.055Z",
+      "level": "success",
+      "message": "Project size: 82 MB",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:56.500Z",
+      "level": "info",
+      "message": "node_modules size: 189 MB",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:56.500Z",
+      "level": "info",
+      "message": "Available memory: 0 GB",
+      "details": null
+    },
+    {
+      "timestamp": "2025-09-21T05:57:56.500Z",
+      "level": "header",
+      "message": "Validation Report Generation",
+      "details": null
+    }
+  ],
+  "recommendations": [
+    "🔴 Critical issues found - please address failed validations",
+    "🟡 Multiple warnings detected - consider addressing for better stability",
+    "🟢 Excellent validation score - environment is well configured",
+    "📦 Ensure all dependencies are properly installed"
+  ]
+}

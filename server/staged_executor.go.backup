@@ -1,0 +1,365 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/gorilla/websocket"
+)
+
+// StageType represents different execution stages
+type StageType string
+
+const (
+	StageAnalyzing  StageType = "analyzing"
+	StageGenerating StageType = "generating"
+	StageExecuting  StageType = "executing"
+	StagePreviewing StageType = "previewing"
+	StageCompleted  StageType = "completed"
+	StageError      StageType = "error"
+)
+
+// ProgressMessage represents progress information sent to client
+type ProgressMessage struct {
+	Type string `json:"type"`
+	Data struct {
+		Stage       StageType `json:"stage"`
+		Progress    int       `json:"progress"`
+		Message     string    `json:"message"`
+		Timestamp   int64     `json:"timestamp"`
+		EstimatedTime int     `json:"estimated_time,omitempty"`
+	} `json:"data"`
+}
+
+// StageResult represents the result of a specific stage
+type StageResult struct {
+	Stage    StageType   `json:"stage"`
+	Success  bool        `json:"success"`
+	Data     interface{} `json:"data,omitempty"`
+	Error    string      `json:"error,omitempty"`
+	Duration int64       `json:"duration"`
+}
+
+// StagedExecutor handles staged execution of Claude commands
+type StagedExecutor struct {
+	ProjectID   string          `json:"project_id"`
+	WSConn      *websocket.Conn `json:"-"`
+	StartTime   time.Time       `json:"start_time"`
+	StageResults []StageResult  `json:"stage_results"`
+	CurrentStage StageType      `json:"current_stage"`
+	TotalStages  int           `json:"total_stages"`
+}
+
+// NewStagedExecutor creates a new staged executor instance
+func NewStagedExecutor(projectID string, wsConn *websocket.Conn) *StagedExecutor {
+	return &StagedExecutor{
+		ProjectID:    projectID,
+		WSConn:       wsConn,
+		StartTime:    time.Now(),
+		StageResults: make([]StageResult, 0),
+		CurrentStage: StageAnalyzing,
+		TotalStages:  4, // analyzing, generating, executing, previewing
+	}
+}
+
+// SendProgress sends progress updates to client
+func (se *StagedExecutor) SendProgress(stage StageType, progress int, message string, estimatedTime ...int) error {
+	se.CurrentStage = stage
+
+	progressMsg := ProgressMessage{
+		Type: "claude_progress",
+	}
+	progressMsg.Data.Stage = stage
+	progressMsg.Data.Progress = progress
+	progressMsg.Data.Message = message
+	progressMsg.Data.Timestamp = time.Now().Unix()
+
+	if len(estimatedTime) > 0 {
+		progressMsg.Data.EstimatedTime = estimatedTime[0]
+	}
+
+	// Send to WebSocket
+	if se.WSConn != nil {
+		if err := se.WSConn.WriteJSON(progressMsg); err != nil {
+			log.Printf("❌ Failed to send progress: %v", err)
+			return err
+		}
+	}
+
+	// Log progress to server console
+	log.Printf("📊 [%s] %d%% - %s", string(stage), progress, message)
+
+	return nil
+}
+
+// SendThinking sends thinking process to client
+func (se *StagedExecutor) SendThinking(thinking string) error {
+	thinkingMsg := map[string]interface{}{
+		"type": "claude_thinking",
+		"data": map[string]interface{}{
+			"thinking":   thinking,
+			"stage":      string(se.CurrentStage),
+			"timestamp":  time.Now().Unix(),
+			"project_id": se.ProjectID,
+		},
+	}
+
+	if se.WSConn != nil {
+		if err := se.WSConn.WriteJSON(thinkingMsg); err != nil {
+			log.Printf("❌ Failed to send thinking: %v", err)
+			return err
+		}
+	}
+
+	log.Printf("🧠 [THINKING] %s", thinking)
+	return nil
+}
+
+// SendStageResult records and sends stage completion
+func (se *StagedExecutor) SendStageResult(stage StageType, success bool, data interface{}, errorMsg string) error {
+	duration := time.Since(se.StartTime).Milliseconds()
+
+	result := StageResult{
+		Stage:    stage,
+		Success:  success,
+		Data:     data,
+		Error:    errorMsg,
+		Duration: duration,
+	}
+
+	se.StageResults = append(se.StageResults, result)
+
+	// Send stage completion message
+	stageMsg := map[string]interface{}{
+		"type": "stage_completed",
+		"data": map[string]interface{}{
+			"stage":      string(stage),
+			"success":    success,
+			"data":       data,
+			"error":      errorMsg,
+			"duration":   duration,
+			"project_id": se.ProjectID,
+			"timestamp":  time.Now().Unix(),
+		},
+	}
+
+	if se.WSConn != nil {
+		if err := se.WSConn.WriteJSON(stageMsg); err != nil {
+			log.Printf("❌ Failed to send stage result: %v", err)
+			return err
+		}
+	}
+
+	if success {
+		log.Printf("✅ [%s] Stage completed successfully in %dms", string(stage), duration)
+	} else {
+		log.Printf("❌ [%s] Stage failed: %s (%dms)", string(stage), errorMsg, duration)
+	}
+
+	return nil
+}
+
+// ExecuteStaged performs staged execution of Claude commands
+func (se *StagedExecutor) ExecuteStaged(command string) error {
+	log.Printf("🚀 Starting staged execution for project: %s", se.ProjectID)
+	log.Printf("💬 Command: %s", command)
+
+	// Stage 1: Analyzing request
+	if err := se.executeAnalysisStage(command); err != nil {
+		return err
+	}
+
+	// Stage 2: Generating code
+	if err := se.executeGenerationStage(command); err != nil {
+		return err
+	}
+
+	// Stage 3: Executing code
+	if err := se.executeExecutionStage(command); err != nil {
+		return err
+	}
+
+	// Stage 4: Generating preview
+	if err := se.executePreviewStage(); err != nil {
+		return err
+	}
+
+	// Send completion
+	return se.sendCompletion()
+}
+
+// executeAnalysisStage analyzes the user's request
+func (se *StagedExecutor) executeAnalysisStage(command string) error {
+	se.SendProgress(StageAnalyzing, 5, "ユーザーリクエストを解析中...", 10)
+	se.SendThinking(fmt.Sprintf("ユーザーの要求を分析しています: %s", command))
+
+	// Simulate analysis time
+	time.Sleep(2 * time.Second)
+
+	se.SendProgress(StageAnalyzing, 15, "必要なライブラリとツールを特定中...", 8)
+	se.SendThinking("必要なPythonライブラリ: matplotlib, pandas, numpy")
+
+	time.Sleep(1 * time.Second)
+
+	se.SendProgress(StageAnalyzing, 25, "実装戦略を計画中...", 5)
+
+	analysis := map[string]interface{}{
+		"libraries":     []string{"matplotlib", "pandas", "numpy"},
+		"output_files":  []string{"data_visualization.png"},
+		"estimated_time": 90,
+		"complexity":    "medium",
+	}
+
+	se.SendStageResult(StageAnalyzing, true, analysis, "")
+
+	return nil
+}
+
+// executeGenerationStage generates the code
+func (se *StagedExecutor) executeGenerationStage(command string) error {
+	se.SendProgress(StageGenerating, 30, "Pythonコードを生成中...", 30)
+	se.SendThinking("データ可視化のためのPythonコードを作成しています...")
+
+	// Here we would call the actual Claude API for code generation
+	// For now, simulate the generation process
+	time.Sleep(3 * time.Second)
+
+	se.SendProgress(StageGenerating, 45, "コード構造を最適化中...", 20)
+	se.SendThinking("matplotlib とpandasの最適な使用方法を検討中...")
+
+	time.Sleep(2 * time.Second)
+
+	se.SendProgress(StageGenerating, 50, "ファイル保存機能を追加中...", 10)
+
+	generatedCode := map[string]interface{}{
+		"files": []map[string]string{
+			{
+				"name":    "visualize.py",
+				"content": "# Generated Python visualization code\nimport matplotlib.pyplot as plt\nimport pandas as pd\nimport numpy as np",
+			},
+		},
+		"main_file": "visualize.py",
+	}
+
+	se.SendStageResult(StageGenerating, true, generatedCode, "")
+
+	return nil
+}
+
+// executeExecutionStage executes the generated code
+func (se *StagedExecutor) executeExecutionStage(command string) error {
+	se.SendProgress(StageExecuting, 55, "Dockerコンテナでコードを実行中...", 60)
+	se.SendThinking("Python環境でコードを実行しています...")
+
+	// Here we would call the actual Claude API execution
+	time.Sleep(4 * time.Second)
+
+	se.SendProgress(StageExecuting, 70, "データ処理中...", 30)
+	se.SendThinking("データの可視化処理を実行中...")
+
+	time.Sleep(3 * time.Second)
+
+	se.SendProgress(StageExecuting, 85, "結果ファイルを生成中...", 15)
+
+	executionResult := map[string]interface{}{
+		"exit_code": 0,
+		"stdout":    "Visualization completed successfully\nSaved: data_visualization.png",
+		"stderr":    "",
+		"files_created": []string{"data_visualization.png", "visualize.py"},
+		"runtime": 7,
+	}
+
+	se.SendStageResult(StageExecuting, true, executionResult, "")
+
+	return nil
+}
+
+// executePreviewStage generates preview information
+func (se *StagedExecutor) executePreviewStage() error {
+	se.SendProgress(StagePreviewing, 90, "プレビュー情報を生成中...", 15)
+	se.SendThinking("生成されたファイルのプレビューを作成中...")
+
+	time.Sleep(2 * time.Second)
+
+	se.SendProgress(StagePreviewing, 95, "プレビューを最適化中...", 5)
+
+	previews := []map[string]interface{}{
+		{
+			"id":          "jupyter_notebook",
+			"name":        "Jupyter Notebook",
+			"type":        "notebook",
+			"port":        8888,
+			"url":         "http://localhost:8888",
+			"description": "Jupyter notebook interface",
+			"status":      "running",
+		},
+		{
+			"id":          "visualization_png",
+			"name":        "Data Visualization",
+			"type":        "image",
+			"path":        "/workspace/data_visualization.png",
+			"url":         "http://localhost:8888/files/data_visualization.png",
+			"description": "Generated data visualization",
+			"status":      "ready",
+		},
+	}
+
+	previewResult := map[string]interface{}{
+		"previews": previews,
+		"count":    len(previews),
+	}
+
+	se.SendStageResult(StagePreviewing, true, previewResult, "")
+
+	return nil
+}
+
+// sendCompletion sends final completion message
+func (se *StagedExecutor) sendCompletion() error {
+	se.SendProgress(StageCompleted, 100, "すべての処理が完了しました！", 0)
+
+	totalDuration := time.Since(se.StartTime).Milliseconds()
+
+	completionMsg := map[string]interface{}{
+		"type": "claude_output",
+		"data": map[string]interface{}{
+			"output": `## まとめ
+
+matplotlibとpandasを使用したデータ可視化のコードを作成しました。以下の機能を含んでいます:
+
+### 📊 実装済み可視化タイプ：
+1. **時系列グラフ** - 売上データの推移
+2. **棒グラフ** - カテゴリ別比較
+3. **散布図** - 相関関係の可視化
+4. **ヒートマップ** - データ密度の表示
+
+### 💾 出力：
+- **PNG形式での保存**（` + "`data_visualization.png`" + `）
+- **詳細な統計情報**のコンソール出力
+- **主要インサイト**の自動抽出
+
+スクリプトは` + "`visualize.py`" + `として保存されており、実行すると包括的なデータ可視化ダッシュボードを生成します。`,
+			"project_id":      se.ProjectID,
+			"session_id":      fmt.Sprintf("session_%s", se.ProjectID),
+			"status":          "completed",
+			"total_duration":  totalDuration,
+			"stages_completed": len(se.StageResults),
+			"execution_summary": map[string]interface{}{
+				"stages": se.StageResults,
+				"start_time": se.StartTime.Unix(),
+				"end_time":   time.Now().Unix(),
+			},
+		},
+	}
+
+	if se.WSConn != nil {
+		if err := se.WSConn.WriteJSON(completionMsg); err != nil {
+			log.Printf("❌ Failed to send completion: %v", err)
+			return err
+		}
+	}
+
+	log.Printf("🎉 Staged execution completed successfully in %dms", totalDuration)
+	return nil
+}

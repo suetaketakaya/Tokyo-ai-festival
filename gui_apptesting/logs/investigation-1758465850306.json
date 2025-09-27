@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-09-21T14:44:10.306Z",
+  "connectionQuality": "unstable",
+  "reconnectAttempts": 0,
+  "lastSuccessfulConnection": 1758458958139,
+  "recentErrorCount": 20,
+  "errorBreakdown": {
+    "1006": 20
+  },
+  "averageLatency": null,
+  "pattern": {
+    "pattern": "frequent_disconnections",
+    "recommendation": "increase_reconnect_delay"
+  },
+  "recommendations": [
+    "Consider increasing ping interval",
+    "Check network stability",
+    "Implement connection pooling",
+    "Consider fallback server",
+    "Implement progressive backoff"
+  ]
+}

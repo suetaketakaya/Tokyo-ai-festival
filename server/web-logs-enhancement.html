@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemoteClaude Server Logs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+        }
+
+        .logs-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .logs-header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logs-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn.active {
+            background: #4CAF50;
+        }
+
+        .filter-select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .logs-content {
+            height: 70vh;
+            overflow-y: auto;
+            padding: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            display: flex;
+            padding: 8px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s ease;
+        }
+
+        .log-entry:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .log-timestamp {
+            min-width: 200px;
+            color: #888;
+            margin-right: 15px;
+        }
+
+        .log-level {
+            min-width: 80px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .log-message {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        /* Log level colors */
+        .log-info { color: #2196F3; }
+        .log-success { color: #4CAF50; }
+        .log-warning { color: #FF9800; }
+        .log-error { color: #f44336; }
+        .log-debug { color: #9C27B0; }
+        .log-websocket { color: #00BCD4; }
+        .log-claude { color: #FF6B35; }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .connection-status.connected {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .connection-status.disconnected {
+            background: #f44336;
+            color: white;
+        }
+
+        .log-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 12px;
+            border-radius: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .logs-content {
+                height: 60vh;
+                font-size: 12px;
+            }
+
+            .log-entry {
+                padding: 6px 15px;
+                flex-direction: column;
+            }
+
+            .log-timestamp, .log-level {
+                min-width: auto;
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+        }
+
+        .scroll-to-bottom {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .scroll-to-bottom:hover {
+            background: #1976D2;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 RemoteClaude Server Logs</h1>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span>🟢</span>
+                    <span id="server-status">Server Running</span>
+                </div>
+                <div class="status-item">
+                    <span>📡</span>
+                    <span id="websocket-port">WebSocket: 8091</span>
+                </div>
+                <div class="status-item">
+                    <span>📊</span>
+                    <span id="client-count">Clients: 0</span>
+                </div>
+                <div class="status-item">
+                    <span>⏰</span>
+                    <span id="uptime">Uptime: --</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="logs-container">
+            <div class="logs-header">
+                <div class="log-stats">
+                    <div class="stat-item">
+                        <span>Total: </span><span id="total-logs">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Filtered: </span><span id="filtered-logs">0</span>
+                    </div>
+                </div>
+                <div class="logs-controls">
+                    <select class="filter-select" id="log-filter">
+                        <option value="all">All Logs</option>
+                        <option value="info">Info</option>
+                        <option value="success">Success</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                        <option value="websocket">WebSocket</option>
+                        <option value="claude">Claude</option>
+                    </select>
+                    <button class="btn" id="auto-scroll-btn">📍 Auto Scroll</button>
+                    <button class="btn" id="pause-btn">⏸️ Pause</button>
+                    <button class="btn" id="clear-btn">🗑️ Clear</button>
+                    <button class="btn" id="export-btn">💾 Export</button>
+                </div>
+            </div>
+            <div class="logs-content" id="logs-content">
+                <!-- Log entries will be inserted here -->
+            </div>
+            <button class="scroll-to-bottom" id="scroll-to-bottom" style="display: none;">⬇️</button>
+        </div>
+    </div>
+
+    <div class="connection-status connected" id="connection-status">
+        🟢 Connected
+    </div>
+
+    <script>
+        class ServerLogsViewer {
+            constructor() {
+                this.logs = [];
+                this.filteredLogs = [];
+                this.currentFilter = 'all';
+                this.autoScroll = true;
+                this.isPaused = false;
+                this.maxLogs = 1000;
+
+                this.initializeElements();
+                this.setupEventListeners();
+                this.startLogStreaming();
+                this.updateStats();
+            }
+
+            initializeElements() {
+                this.logsContent = document.getElementById('logs-content');
+                this.logFilter = document.getElementById('log-filter');
+                this.autoScrollBtn = document.getElementById('auto-scroll-btn');
+                this.pauseBtn = document.getElementById('pause-btn');
+                this.clearBtn = document.getElementById('clear-btn');
+                this.exportBtn = document.getElementById('export-btn');
+                this.scrollToBottomBtn = document.getElementById('scroll-to-bottom');
+                this.connectionStatus = document.getElementById('connection-status');
+                this.totalLogsSpan = document.getElementById('total-logs');
+                this.filteredLogsSpan = document.getElementById('filtered-logs');
+            }
+
+            setupEventListeners() {
+                this.logFilter.addEventListener('change', (e) => {
+                    this.currentFilter = e.target.value;
+                    this.filterLogs();
+                });
+
+                this.autoScrollBtn.addEventListener('click', () => {
+                    this.autoScroll = !this.autoScroll;
+                    this.autoScrollBtn.classList.toggle('active', this.autoScroll);
+                    this.autoScrollBtn.innerHTML = this.autoScroll ? '📍 Auto Scroll' : '📍 Manual';
+                });
+
+                this.pauseBtn.addEventListener('click', () => {
+                    this.isPaused = !this.isPaused;
+                    this.pauseBtn.classList.toggle('active', this.isPaused);
+                    this.pauseBtn.innerHTML = this.isPaused ? '▶️ Resume' : '⏸️ Pause';
+                });
+
+                this.clearBtn.addEventListener('click', () => {
+                    this.clearLogs();
+                });
+
+                this.exportBtn.addEventListener('click', () => {
+                    this.exportLogs();
+                });
+
+                this.scrollToBottomBtn.addEventListener('click', () => {
+                    this.scrollToBottom();
+                });
+
+                this.logsContent.addEventListener('scroll', () => {
+                    const { scrollTop, scrollHeight, clientHeight } = this.logsContent;
+                    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+
+                    this.scrollToBottomBtn.style.display = isAtBottom ? 'none' : 'flex';
+                });
+            }
+
+            startLogStreaming() {
+                // Simulate log streaming from server
+                this.simulateServerLogs();
+
+                // In real implementation, this would connect to WebSocket endpoint
+                // const ws = new WebSocket(\`ws://\${window.location.host}/ws/logs\`);
+                // ws.onmessage = (event) => {
+                //     const logData = JSON.parse(event.data);
+                //     this.addLog(logData);
+                // };
+            }
+
+            simulateServerLogs() {
+                const logTypes = [
+                    { level: 'info', message: '🌐 Web interface request from 192.168.0.135', color: 'log-info' },
+                    { level: 'success', message: '✅ Mobile app connected from: 192.168.0.135:57750', color: 'log-success' },
+                    { level: 'websocket', message: '📱 Received from app: map[data:map[] type:project_list_request]', color: 'log-websocket' },
+                    { level: 'claude', message: '🤖 Executing Claude command: matplotlib visualization', color: 'log-claude' },
+                    { level: 'success', message: '📤 Successfully sent WebSocket message type: claude_output', color: 'log-success' },
+                    { level: 'info', message: '🔧 Docker container status check completed', color: 'log-info' },
+                    { level: 'warning', message: '⚠️ High memory usage detected: 85%', color: 'log-warning' },
+                    { level: 'debug', message: '🐛 Debug: Connection quality check - excellent', color: 'log-debug' },
+                ];
+
+                let logIndex = 0;
+                setInterval(() => {
+                    if (!this.isPaused) {
+                        const logType = logTypes[logIndex % logTypes.length];
+                        this.addLog({
+                            timestamp: new Date().toISOString(),
+                            level: logType.level,
+                            message: logType.message,
+                            color: logType.color
+                        });
+                        logIndex++;
+                    }
+                }, Math.random() * 3000 + 1000); // Random interval 1-4 seconds
+            }
+
+            addLog(logData) {
+                if (this.logs.length >= this.maxLogs) {
+                    this.logs.shift();
+                }
+
+                this.logs.push(logData);
+                this.filterLogs();
+                this.updateStats();
+            }
+
+            filterLogs() {
+                if (this.currentFilter === 'all') {
+                    this.filteredLogs = [...this.logs];
+                } else {
+                    this.filteredLogs = this.logs.filter(log => log.level === this.currentFilter);
+                }
+
+                this.renderLogs();
+            }
+
+            renderLogs() {
+                const html = this.filteredLogs.map(log => \`
+                    <div class="log-entry">
+                        <div class="log-timestamp">\${new Date(log.timestamp).toLocaleString('ja-JP')}</div>
+                        <div class="log-level \${log.color}">\${log.level.toUpperCase()}</div>
+                        <div class="log-message">\${log.message}</div>
+                    </div>
+                \`).join('');
+
+                this.logsContent.innerHTML = html;
+
+                if (this.autoScroll) {
+                    this.scrollToBottom();
+                }
+            }
+
+            scrollToBottom() {
+                this.logsContent.scrollTop = this.logsContent.scrollHeight;
+            }
+
+            clearLogs() {
+                if (confirm('Are you sure you want to clear all logs?')) {
+                    this.logs = [];
+                    this.filteredLogs = [];
+                    this.renderLogs();
+                    this.updateStats();
+                }
+            }
+
+            exportLogs() {
+                const logText = this.filteredLogs.map(log =>
+                    \`\${new Date(log.timestamp).toISOString()} [\${log.level.toUpperCase()}] \${log.message}\`
+                ).join('\\n');
+
+                const blob = new Blob([logText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = \`remoteclaude-logs-\${new Date().toISOString().slice(0, 10)}.txt\`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            updateStats() {
+                this.totalLogsSpan.textContent = this.logs.length;
+                this.filteredLogsSpan.textContent = this.filteredLogs.length;
+            }
+        }
+
+        // Initialize the logs viewer
+        document.addEventListener('DOMContentLoaded', () => {
+            new ServerLogsViewer();
+        });
+    </script>
+</body>
+</html>

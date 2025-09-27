@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemoteClaude Enhanced Logs Bookmarklet</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        .instruction {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .bookmarklet-container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .bookmarklet-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #4CAF50, #45A049);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: move;
+        }
+        .bookmarklet-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+        }
+        .demo-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .demo-button {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid rgba(255, 193, 7, 0.4);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 RemoteClaude Enhanced Logs</h1>
+
+        <div class="instruction">
+            <h2>🚀 Quick Setup</h2>
+            <p>To add enhanced logging functionality to your RemoteClaude web interface, simply drag the button below to your browser's bookmarks bar and click it when viewing your server control panel.</p>
+        </div>
+
+        <div class="bookmarklet-container">
+            <h3>📌 Drag this to your bookmarks bar:</h3>
+            <a href="javascript:(function(){const script=document.createElement('script');script.src='http://192.168.0.135:8080/logs-integration-inject.js?v='+Date.now();document.head.appendChild(script);console.log('📋 Loading Enhanced Logs...');})()"
+               class="bookmarklet-link"
+               title="Drag me to your bookmarks bar">
+                📋 Enhanced Logs
+            </a>
+            <p><small>Then click the bookmark when viewing your RemoteClaude control panel</small></p>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Alternative Method:</strong> If the bookmarklet doesn't work, you can manually inject the script by opening the browser console (F12) and pasting this code:
+            <br><br>
+            <code style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; display: block; font-family: monospace;">
+                const script = document.createElement('script');<br>
+                script.src = 'http://192.168.0.135:8080/logs-integration-inject.js?v=' + Date.now();<br>
+                document.head.appendChild(script);
+            </code>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>📊 Real-time Streaming</h3>
+                <p>Live log updates every 2 seconds with automatic refresh</p>
+            </div>
+            <div class="feature">
+                <h3>🎯 Advanced Filtering</h3>
+                <p>Filter by log level: Info, Success, Warning, Error, WebSocket, Claude</p>
+            </div>
+            <div class="feature">
+                <h3>⚡ Smart Controls</h3>
+                <p>Auto-scroll, pause/resume, clear logs, and export functionality</p>
+            </div>
+            <div class="feature">
+                <h3>🎨 Visual Enhancement</h3>
+                <p>Color-coded log levels with professional dark theme</p>
+            </div>
+            <div class="feature">
+                <h3>📱 Responsive Design</h3>
+                <p>Works perfectly on desktop and mobile devices</p>
+            </div>
+            <div class="feature">
+                <h3>💾 Export Capability</h3>
+                <p>Download logs as text files for analysis</p>
+            </div>
+        </div>
+
+        <div class="instruction">
+            <h2>📋 How to Use</h2>
+            <div class="step">
+                <strong>Step 1:</strong> Drag the "Enhanced Logs" button above to your browser's bookmarks bar
+            </div>
+            <div class="step">
+                <strong>Step 2:</strong> Navigate to your RemoteClaude control panel (http://192.168.0.135:8080)
+            </div>
+            <div class="step">
+                <strong>Step 3:</strong> Click the "Enhanced Logs" bookmark you just created
+            </div>
+            <div class="step">
+                <strong>Step 4:</strong> Look for the "📋 Server Logs" button in the top-right corner or the "📊 Logs Active" indicator at the bottom
+            </div>
+            <div class="step">
+                <strong>Step 5:</strong> Click either button to open the enhanced logs viewer
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🌟 Features Overview</h2>
+            <p>The enhanced logs system provides:</p>
+            <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+                <li>🔄 <strong>Real-time Updates:</strong> Automatically refresh every 2 seconds</li>
+                <li>🎛️ <strong>Log Level Filtering:</strong> Show only specific types of messages</li>
+                <li>📍 <strong>Auto-scroll Control:</strong> Toggle automatic scrolling to latest logs</li>
+                <li>⏸️ <strong>Pause/Resume:</strong> Stop updates to examine logs carefully</li>
+                <li>🗑️ <strong>Clear Function:</strong> Remove all logs from view</li>
+                <li>💾 <strong>Export Feature:</strong> Save logs to a text file</li>
+                <li>🎨 <strong>Visual Indicators:</strong> Color-coded log levels for easy scanning</li>
+                <li>📊 <strong>Statistics:</strong> Real-time count of total and filtered logs</li>
+            </ul>
+        </div>
+
+        <div class="instruction">
+            <h2>🛠️ Technical Details</h2>
+            <p>This enhancement integrates seamlessly with your existing RemoteClaude server without requiring any server modifications. It uses your server's existing <code>/api/logs</code> endpoint and adds a sophisticated client-side interface for better log management and visualization.</p>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const bookmarkletLink = document.querySelector('.bookmarklet-link');
+
+            bookmarkletLink.addEventListener('dragstart', function(e) {
+                // Provide feedback when dragging
+                e.dataTransfer.effectAllowed = 'link';
+                this.style.opacity = '0.5';
+            });
+
+            bookmarkletLink.addEventListener('dragend', function() {
+                this.style.opacity = '1';
+                // Show success message
+                const message = document.createElement('div');
+                message.innerHTML = '✅ Bookmarklet ready! Click it on your RemoteClaude control panel.';
+                message.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #4CAF50;
+                    color: white;
+                    padding: 15px;
+                    border-radius: 10px;
+                    z-index: 1000;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                `;
+                document.body.appendChild(message);
+
+                setTimeout(() => {
+                    if (message.parentNode) {
+                        message.parentNode.removeChild(message);
+                    }
+                }, 5000);
+            });
+
+            // Test button functionality
+            const testBtn = document.createElement('button');
+            testBtn.className = 'demo-button';
+            testBtn.innerHTML = '🧪 Test Enhanced Logs on This Page';
+            testBtn.onclick = function() {
+                // Inject the enhanced logs script for demonstration
+                const script = document.createElement('script');
+                script.src = 'logs-integration-inject.js?v=' + Date.now();
+                document.head.appendChild(script);
+
+                setTimeout(() => {
+                    const testMessage = document.createElement('div');
+                    testMessage.innerHTML = '📋 Enhanced logs functionality loaded! (Demo mode)';
+                    testMessage.style.cssText = `
+                        position: fixed;
+                        bottom: 70px;
+                        right: 20px;
+                        background: #2196F3;
+                        color: white;
+                        padding: 15px;
+                        border-radius: 10px;
+                        z-index: 1000;
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    `;
+                    document.body.appendChild(testMessage);
+
+                    setTimeout(() => {
+                        if (testMessage.parentNode) {
+                            testMessage.parentNode.removeChild(testMessage);
+                        }
+                    }, 3000);
+                }, 1000);
+            };
+
+            document.querySelector('.demo-section').appendChild(testBtn);
+        });
+    </script>
+</body>
+</html>

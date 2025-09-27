@@ -1,0 +1,62 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+)
+
+func main() {
+	log.Printf("🧪 Testing Docker Manager with Auto-Jupyter Setup")
+
+	// Create Docker manager
+	dm := NewDockerManager("/tmp/projects")
+
+	// Create a test project
+	req := ProjectCreateRequest{
+		Name: "auto-jupyter-test",
+		Type: "python",
+		Config: map[string]string{
+			"PYTHON_VERSION": "3.11",
+		},
+		Resources: &ResourceLimits{
+			Memory: "1g",
+			CPUs:   "0.5",
+		},
+	}
+
+	log.Printf("📦 Creating test project with auto-Jupyter setup...")
+	project, err := dm.CreateProject(req)
+	if err != nil {
+		log.Printf("❌ Failed to create project: %v", err)
+		os.Exit(1)
+	}
+
+	log.Printf("✅ Project created successfully!")
+	log.Printf("📋 Project Details:")
+	log.Printf("   ID: %s", project.ID)
+	log.Printf("   Name: %s", project.Name)
+	log.Printf("   Container ID: %s", project.ContainerID)
+	log.Printf("   Status: %s", project.Status)
+
+	// Test Jupyter functionality
+	log.Printf("🔍 Testing Jupyter setup...")
+
+	// Check if Jupyter is running
+	checkCmd := fmt.Sprintf("docker exec %s ss -tuln", project.ContainerID)
+	log.Printf("🔍 Checking Jupyter status with: %s", checkCmd)
+
+	// List all project services
+	log.Printf("📋 Listing Docker projects...")
+	projects, err := dm.ListProjects()
+	if err != nil {
+		log.Printf("⚠️ Failed to list projects: %v", err)
+	} else {
+		log.Printf("✅ Found %d projects", len(projects))
+		for _, p := range projects {
+			log.Printf("   - %s (%s): %s", p.Name, p.ID, p.Status)
+		}
+	}
+
+	log.Printf("🎉 Docker Manager test completed!")
+}

@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemoteClaude Server Control Panel</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        /* Enhanced Logs Section Styles */
+        .logs-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logs-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 12px;
+            border-radius: 15px;
+        }
+
+        .logs-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .logs-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .logs-content {
+            height: 400px;
+            overflow-y: auto;
+            padding: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            display: flex;
+            padding: 8px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background-color 0.2s ease;
+        }
+
+        .log-entry:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .log-timestamp {
+            min-width: 180px;
+            color: #888;
+            margin-right: 15px;
+        }
+
+        .log-level {
+            min-width: 80px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .log-message {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        /* Log level colors */
+        .log-info { color: #2196F3; }
+        .log-success { color: #4CAF50; }
+        .log-warning { color: #FF9800; }
+        .log-error { color: #f44336; }
+        .log-websocket { color: #00BCD4; }
+        .log-claude { color: #FF6B35; }
+
+        .scroll-to-bottom {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scroll-to-bottom:hover {
+            background: #1976D2;
+            transform: scale(1.1);
+        }
+
+        .logs-section .control-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logs-section .control-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .logs-section .control-button.active {
+            background: #4CAF50;
+        }
+
+        .log-activity-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(76, 175, 80, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .log-activity-indicator:hover {
+            background: rgba(76, 175, 80, 1);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 RemoteClaude Server Control Panel</h1>
+            <div class="version">v3.6.0</div>
+            <!-- Enhanced Logs Navigation Button -->
+            <button id="logs-nav-btn" style="
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: rgba(255, 255, 255, 0.2);
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+            ">
+                📋 Server Logs
+            </button>
+        </header>
+
+        <div class="status-section">
+            <div class="status-card">
+                <h2>📊 Server Status</h2>
+                <div class="status-indicator">
+                    <span id="server-status" class="status-dot running">🟢</span>
+                    <span id="status-text">Running</span>
+                </div>
+                <div class="server-info">
+                    <p><strong>Host:</strong> <span id="current-host">Loading...</span></p>
+                    <p><strong>App Port:</strong> <span id="current-port">8090</span></p>
+                    <p id="vpn-port-info" style="display: none;"><strong>VPN Port:</strong> <span id="vpn-port">51820</span></p>
+                    <p><strong>Session Key:</strong> <span id="session-key">Loading...</span></p>
+                </div>
+            </div>
+
+            <div class="clients-card">
+                <h2>📱 Connected Clients</h2>
+                <div id="client-list">
+                    <div class="client-item">
+                        <span>No clients connected</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Logs Summary Card -->
+            <div class="logs-card">
+                <h2>📋 Server Logs</h2>
+                <div class="logs-summary">
+                    <div class="log-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Today's Logs:</span>
+                            <span class="stat-value" id="logs-today">Loading...</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Errors:</span>
+                            <span class="stat-value error" id="errors-today">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">WebSocket:</span>
+                            <span class="stat-value success" id="websocket-msgs">0</span>
+                        </div>
+                    </div>
+                    <button class="logs-view-btn" onclick="toggleLogsSection()">
+                        View Full Logs →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="connection-section">
+            <div class="mode-selector">
+                <div class="mode-header">
+                    <h2>🌐 Connection Mode</h2>
+                    <div class="current-mode-indicator">
+                        <span class="mode-badge" id="current-mode-badge">Local Network</span>
+                        <div class="mode-status" id="mode-status">
+                            <span class="status-indicator-dot" id="mode-status-dot">🟢</span>
+                            <span id="mode-status-text">Ready</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mode-cards">
+                    <div class="mode-card" data-mode="local" id="local-card">
+                        <div class="mode-card-header">
+                            <span class="mode-icon">🏠</span>
+                            <h3>Local Network</h3>
+                            <div class="mode-indicator active" id="local-indicator">✓</div>
+                        </div>
+                        <p class="mode-description">同一WiFi内での接続。設定が簡単で即座に利用可能</p>
+                        <div class="mode-features">
+                            <span class="feature-tag">✓ 簡単設定</span>
+                            <span class="feature-tag">✓ 高速接続</span>
+                        </div>
+                    </div>
+
+                    <div class="mode-card" data-mode="vpn" id="vpn-card">
+                        <div class="mode-card-header">
+                            <span class="mode-icon">🔒</span>
+                            <h3>WireGuard VPN</h3>
+                            <div class="mode-indicator" id="vpn-indicator">○</div>
+                        </div>
+                        <p class="mode-description">外部からの安全な接続。暗号化によるセキュア通信</p>
+                        <div class="mode-features">
+                            <span class="feature-tag">🔒 暗号化</span>
+                            <span class="feature-tag">🌍 外部アクセス</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mode-actions">
+                    <button id="switch-mode-btn" class="primary-button" disabled>
+                        <span class="button-icon">🔄</span>
+                        <span class="button-text">Switch to VPN Mode</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="connection-section-main">
+            <div class="qr-section">
+                <div class="qr-header">
+                    <h2>📱 Mobile App Connection</h2>
+                    <div class="connection-status">
+                        <span class="status-badge ready">Ready to Connect</span>
+                    </div>
+                </div>
+
+                <div class="qr-container-improved">
+                    <div class="qr-code-panel">
+                        <div class="qr-code-wrapper">
+                            <div id="qr-code">
+                                <div class="qr-placeholder">
+                                    <div class="qr-loading">📱</div>
+                                    <p>QR Code Loading...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="qr-instructions">
+                            <p><strong>📷 Scan with RemoteClaude App</strong></p>
+                            <p>1. Open RemoteClaude app</p>
+                            <p>2. Tap scan button</p>
+                            <p>3. Point camera at QR code</p>
+                        </div>
+                    </div>
+
+                    <div class="connection-details">
+                        <div class="connection-url-section">
+                            <h3>🔗 Connection URL</h3>
+                            <div class="url-container">
+                                <div id="connection-url" class="url-display">Loading...</div>
+                                <button id="copy-url-btn" class="icon-button" title="Copy URL">
+                                    <span class="button-icon">📋</span>
+                                </button>
+                            </div>
+                            <p class="url-hint">Tap "Enter URL Manually" in app if QR scan fails</p>
+                        </div>
+
+                        <div class="connection-info">
+                            <div class="info-row">
+                                <span class="info-label">Server IP:</span>
+                                <span class="info-value" id="info-host">Loading...</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">App Port:</span>
+                                <span class="info-value" id="info-port">8090</span>
+                            </div>
+                            <div class="info-row" id="info-vpn-port" style="display: none;">
+                                <span class="info-label">VPN Port:</span>
+                                <span class="info-value" id="info-vpn-port-value">51820</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Session:</span>
+                                <span class="info-value session-key" id="info-session">Loading...</span>
+                            </div>
+                        </div>
+
+                        <div class="qr-actions">
+                            <button id="regenerate-qr-btn" class="secondary-button">
+                                <span class="button-icon">🔄</span>
+                                <span class="button-text">Regenerate QR</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="vpn-setup-section" id="vpn-setup" style="display: none;">
+            <h2>🔐 WireGuard VPN Setup</h2>
+
+            <div class="port-info-panel">
+                <h3>🔧 Required Port Configuration</h3>
+                <div class="port-info-grid">
+                    <div class="port-info-card">
+                        <div class="port-icon">🌐</div>
+                        <div class="port-details">
+                            <div class="port-title">WireGuard VPN</div>
+                            <div class="port-number">UDP 51820</div>
+                            <div class="port-desc">Router port forwarding required</div>
+                        </div>
+                    </div>
+                    <div class="port-info-card">
+                        <div class="port-icon">📱</div>
+                        <div class="port-details">
+                            <div class="port-title">RemoteClaude App</div>
+                            <div class="port-number">TCP 8090</div>
+                            <div class="port-desc">Internal server communication</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nat-config-section">
+                    <h4>🏠 NAT/Port Forwarding Configuration</h4>
+                    <div class="nat-config-info">
+                        <div class="nat-rule">
+                            <span class="nat-label">External Port:</span>
+                            <span class="nat-value">UDP 51820</span>
+                        </div>
+                        <div class="nat-rule">
+                            <span class="nat-label">Internal IP:</span>
+                            <span class="nat-value" id="lan-ip-address">Loading...</span>
+                        </div>
+                        <div class="nat-rule">
+                            <span class="nat-label">Internal Port:</span>
+                            <span class="nat-value">UDP 51820</span>
+                        </div>
+                    </div>
+                    <div class="nat-instruction">
+                        <strong>Router Setup:</strong> Forward external UDP 51820 to <span id="lan-ip-display">this server's LAN IP</span>:51820
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-steps">
+                <div class="step">
+                    <h3>Step 1: iPhone Setup</h3>
+                    <p>1. App StoreからWireGuardアプリ（無料）をダウンロード</p>
+                    <p>2. アプリを開き「+」→「QRコードから作成」を選択</p>
+                    <p>3. 下のQRコードをスキャン</p>
+                    <p class="port-note"><strong>Note:</strong> Router must forward UDP 51820 to this server</p>
+                </div>
+
+                <div class="wireguard-qr">
+                    <div id="wireguard-qr-code">
+                        <div class="qr-placeholder">WireGuard QR Code</div>
+                    </div>
+                    <button id="show-wireguard-qr" class="action-button">
+                        📱 Show WireGuard QR Code
+                    </button>
+                </div>
+
+                <div class="step">
+                    <h3>Step 2: VPN Connection</h3>
+                    <p>1. WireGuardアプリで設定を保存</p>
+                    <p>2. VPN接続をONにする</p>
+                    <p>3. RemoteClaudeアプリで下記のVPN接続QRコードをスキャン</p>
+                </div>
+
+                <div class="vpn-connection-qr">
+                    <h4>VPN接続用QRコード (RemoteClaudeアプリ用)</h4>
+                    <div id="vpn-connection-qr-code">
+                        <div class="qr-placeholder">VPN Connection QR Code</div>
+                    </div>
+                    <button id="show-vpn-connection-qr" class="action-button">
+                        📱 Show VPN Connection QR Code
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Container Management Section -->
+        <div class="container-management-section">
+            <h2>📦 Container Management</h2>
+
+            <div class="container-info-panel">
+                <h3>🐳 Container Information</h3>
+                <div id="container-list">
+                    <div class="container-item">
+                        <span>Loading container information...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container-commands-section">
+                <h3>🔧 Container Access Commands</h3>
+                <div class="command-grid">
+                    <div class="command-item">
+                        <h5>List Containers</h5>
+                        <div class="code-block">
+                            <code>docker ps -a</code>
+                            <button class="copy-btn" onclick="copyToClipboard('docker ps -a')">📋</button>
+                        </div>
+                    </div>
+                    <div class="command-item">
+                        <h5>Access Container</h5>
+                        <div class="code-block">
+                            <code>docker exec -it [CONTAINER_NAME] /bin/bash</code>
+                            <button class="copy-btn" onclick="copyToClipboard('docker exec -it [CONTAINER_NAME] /bin/bash')">📋</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connection-urls-section">
+                    <h3>🔗 Connection URLs</h3>
+                    <div class="url-list">
+                        <div class="url-item">
+                            <strong>Wi-Fi Connection:</strong>
+                            <span id="wifi-connection-url">Loading...</span>
+                            <button class="copy-btn" onclick="copyToClipboard(document.getElementById('wifi-connection-url').textContent)">📋</button>
+                        </div>
+                        <div class="url-item">
+                            <strong>VPN Connection:</strong>
+                            <span id="vpn-connection-url">http://10.0.0.1:8090</span>
+                            <button class="copy-btn" onclick="copyToClipboard(document.getElementById('vpn-connection-url').textContent)">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <h2>🛠️ Server Controls</h2>
+            <div class="control-buttons">
+                <div class="restart-control-group">
+                    <button id="restart-btn" class="control-button restart">
+                        <span class="button-icon">🔄</span>
+                        <span class="button-text">Restart in Local Mode</span>
+                    </button>
+                    <div class="restart-options">
+                        <button id="restart-dropdown-btn" class="dropdown-toggle" title="Restart Options">
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="dropdown-menu" id="restart-dropdown">
+                            <div class="dropdown-item" onclick="window.dashboard.restartServer('local')">
+                                <span class="dropdown-icon">🏠</span>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-title">Local Network</div>
+                                    <div class="dropdown-desc">Same WiFi connection</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item" onclick="window.dashboard.restartServer('vpn')">
+                                <span class="dropdown-icon">🔒</span>
+                                <div class="dropdown-content">
+                                    <div class="dropdown-title">VPN Mode</div>
+                                    <div class="dropdown-desc">WireGuard secure connection</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="logs-btn" class="control-button" onclick="toggleLogsSection()">
+                    📋 View Logs
+                </button>
+                <button id="settings-btn" class="control-button">
+                    ⚙️ Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Enhanced Logs Section -->
+        <div class="logs-section" id="logs-section" style="display: none;">
+            <div class="logs-header">
+                <h2>📋 Real-time Server Logs</h2>
+                <div class="logs-stats">
+                    <div class="stat-item">
+                        <span>Total: </span><span id="total-logs">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Filtered: </span><span id="filtered-logs">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Status: </span><span id="log-status">🟢 Live</span>
+                    </div>
+                </div>
+                <div class="logs-controls">
+                    <select class="filter-select" id="log-filter">
+                        <option value="all">All Logs</option>
+                        <option value="info">Info</option>
+                        <option value="success">Success</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                        <option value="websocket">WebSocket</option>
+                        <option value="claude">Claude</option>
+                    </select>
+                    <button class="control-button" id="auto-scroll-btn">📍 Auto Scroll</button>
+                    <button class="control-button" id="pause-btn">⏸️ Pause</button>
+                    <button class="control-button" id="clear-logs-btn">🗑️ Clear</button>
+                    <button class="control-button" id="export-logs-btn">💾 Export</button>
+                    <button class="control-button" id="close-logs-btn">❌ Close</button>
+                </div>
+            </div>
+            <div class="logs-container">
+                <div class="logs-content" id="logs-content">
+                    <!-- Enhanced log entries will be inserted here -->
+                </div>
+                <button class="scroll-to-bottom" id="scroll-to-bottom">⬇️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Input Modal -->
+    <div id="password-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔐 Sudo Password Required</h2>
+                <span class="close" id="password-modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>WireGuard VPN mode requires sudo privileges to configure the network interface.</p>
+                <p>Please enter your system password:</p>
+
+                <form id="password-form">
+                    <div class="password-input-group">
+                        <input type="password" id="sudo-password" placeholder="Enter sudo password" required>
+                        <div class="password-visibility-toggle" id="password-toggle">
+                            <span class="password-toggle-icon">👁️</span>
+                        </div>
+                    </div>
+                    <div class="password-actions">
+                        <button type="button" id="password-cancel" class="secondary-button">Cancel</button>
+                        <button type="submit" id="password-submit" class="primary-button">
+                            <span class="button-icon">🔐</span>
+                            <span class="button-text">Enable VPN Mode</span>
+                        </button>
+                    </div>
+                </form>
+
+                <div id="password-error" class="error-message" style="display: none;">
+                    Invalid password or permission denied
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Activity Indicator -->
+    <div class="log-activity-indicator" id="log-activity" style="display: none;">
+        📊 Logs Active
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+    <script>
+        // Enhanced Server Logs Integration
+        class EnhancedServerLogs {
+            constructor() {
+                this.logs = [];
+                this.filteredLogs = [];
+                this.currentFilter = 'all';
+                this.autoScroll = true;
+                this.isPaused = false;
+                this.maxLogs = 1000;
+                this.pollInterval = null;
+
+                this.initializeElements();
+                this.setupEventListeners();
+                this.startLogPolling();
+            }
+
+            initializeElements() {
+                this.logsSection = document.getElementById('logs-section');
+                this.logsContent = document.getElementById('logs-content');
+                this.logFilter = document.getElementById('log-filter');
+                this.autoScrollBtn = document.getElementById('auto-scroll-btn');
+                this.pauseBtn = document.getElementById('pause-btn');
+                this.clearBtn = document.getElementById('clear-logs-btn');
+                this.exportBtn = document.getElementById('export-logs-btn');
+                this.closeBtn = document.getElementById('close-logs-btn');
+                this.scrollToBottomBtn = document.getElementById('scroll-to-bottom');
+                this.totalLogsSpan = document.getElementById('total-logs');
+                this.filteredLogsSpan = document.getElementById('filtered-logs');
+                this.logStatus = document.getElementById('log-status');
+                this.logActivity = document.getElementById('log-activity');
+                this.logsNavBtn = document.getElementById('logs-nav-btn');
+            }
+
+            setupEventListeners() {
+                // Filter change
+                this.logFilter.addEventListener('change', (e) => {
+                    this.currentFilter = e.target.value;
+                    this.filterLogs();
+                });
+
+                // Auto scroll toggle
+                this.autoScrollBtn.addEventListener('click', () => {
+                    this.autoScroll = !this.autoScroll;
+                    this.autoScrollBtn.classList.toggle('active', this.autoScroll);
+                    this.autoScrollBtn.innerHTML = this.autoScroll ? '📍 Auto Scroll' : '📍 Manual';
+                });
+
+                // Pause/Resume
+                this.pauseBtn.addEventListener('click', () => {
+                    this.isPaused = !this.isPaused;
+                    this.pauseBtn.classList.toggle('active', this.isPaused);
+                    this.pauseBtn.innerHTML = this.isPaused ? '▶️ Resume' : '⏸️ Pause';
+                    this.logStatus.innerHTML = this.isPaused ? '⏸️ Paused' : '🟢 Live';
+                });
+
+                // Clear logs
+                this.clearBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to clear all logs?')) {
+                        this.clearLogs();
+                    }
+                });
+
+                // Export logs
+                this.exportBtn.addEventListener('click', () => {
+                    this.exportLogs();
+                });
+
+                // Close logs
+                this.closeBtn.addEventListener('click', () => {
+                    this.logsSection.style.display = 'none';
+                });
+
+                // Scroll to bottom
+                this.scrollToBottomBtn.addEventListener('click', () => {
+                    this.scrollToBottom();
+                });
+
+                // Navigation button
+                this.logsNavBtn.addEventListener('click', () => {
+                    this.toggleLogsSection();
+                });
+
+                // Scroll detection
+                this.logsContent.addEventListener('scroll', () => {
+                    const { scrollTop, scrollHeight, clientHeight } = this.logsContent;
+                    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+                    this.scrollToBottomBtn.style.display = isAtBottom ? 'none' : 'block';
+                });
+
+                // Log activity indicator
+                this.logActivity.addEventListener('click', () => {
+                    this.toggleLogsSection();
+                });
+            }
+
+            toggleLogsSection() {
+                const isVisible = this.logsSection.style.display !== 'none';
+                this.logsSection.style.display = isVisible ? 'none' : 'block';
+
+                if (!isVisible) {
+                    this.loadRecentLogs();
+                }
+            }
+
+            async startLogPolling() {
+                // Load initial logs
+                await this.loadRecentLogs();
+
+                // Start polling every 2 seconds
+                this.pollInterval = setInterval(() => {
+                    if (!this.isPaused) {
+                        this.loadRecentLogs();
+                    }
+                }, 2000);
+
+                // Show activity indicator
+                this.logActivity.style.display = 'block';
+                this.animateActivityIndicator();
+            }
+
+            async loadRecentLogs() {
+                try {
+                    const response = await fetch('/api/logs');
+                    const data = await response.json();
+
+                    if (data.success && data.data.logs) {
+                        this.parseLogs(data.data.logs);
+                    }
+                } catch (error) {
+                    console.error('Failed to load logs:', error);
+                    this.logStatus.innerHTML = '❌ Error';
+                }
+            }
+
+            parseLogs(logString) {
+                const lines = logString.split('\n').filter(line => line.trim());
+                const newLogs = [];
+
+                lines.forEach(line => {
+                    const match = line.match(/^\[(.+?)\] (.+)$/);
+                    if (match) {
+                        const timestamp = match[1];
+                        const message = match[2];
+                        const level = this.detectLogLevel(message);
+
+                        newLogs.push({
+                            timestamp: timestamp,
+                            level: level,
+                            message: message,
+                            color: `log-${level}`
+                        });
+                    }
+                });
+
+                // Only add new logs to avoid duplicates
+                const lastLogTime = this.logs.length > 0 ? this.logs[this.logs.length - 1].timestamp : '';
+                const newLogsToAdd = newLogs.filter(log => log.timestamp > lastLogTime);
+
+                this.logs.push(...newLogsToAdd);
+
+                // Limit log count
+                if (this.logs.length > this.maxLogs) {
+                    this.logs.splice(0, this.logs.length - this.maxLogs);
+                }
+
+                this.updateLogSummary();
+                this.filterLogs();
+            }
+
+            detectLogLevel(message) {
+                if (message.includes('🚀') || message.includes('✅') || message.includes('Ready')) return 'success';
+                if (message.includes('❌') || message.includes('Error') || message.includes('Failed')) return 'error';
+                if (message.includes('⚠️') || message.includes('Warning')) return 'warning';
+                if (message.includes('📱') || message.includes('WebSocket')) return 'websocket';
+                if (message.includes('🤖') || message.includes('Claude')) return 'claude';
+                return 'info';
+            }
+
+            filterLogs() {
+                if (this.currentFilter === 'all') {
+                    this.filteredLogs = [...this.logs];
+                } else {
+                    this.filteredLogs = this.logs.filter(log => log.level === this.currentFilter);
+                }
+
+                this.renderLogs();
+                this.updateStats();
+            }
+
+            renderLogs() {
+                const html = this.filteredLogs.map(log => `
+                    <div class="log-entry">
+                        <div class="log-timestamp">${log.timestamp}</div>
+                        <div class="log-level ${log.color}">${log.level.toUpperCase()}</div>
+                        <div class="log-message">${log.message}</div>
+                    </div>
+                `).join('');
+
+                this.logsContent.innerHTML = html;
+
+                if (this.autoScroll) {
+                    setTimeout(() => this.scrollToBottom(), 100);
+                }
+            }
+
+            scrollToBottom() {
+                this.logsContent.scrollTop = this.logsContent.scrollHeight;
+            }
+
+            clearLogs() {
+                this.logs = [];
+                this.filteredLogs = [];
+                this.renderLogs();
+                this.updateStats();
+                this.updateLogSummary();
+            }
+
+            exportLogs() {
+                const logText = this.filteredLogs.map(log =>
+                    `[${log.timestamp}] [${log.level.toUpperCase()}] ${log.message}`
+                ).join('\n');
+
+                const blob = new Blob([logText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `remoteclaude-logs-${new Date().toISOString().slice(0, 10)}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            updateStats() {
+                this.totalLogsSpan.textContent = this.logs.length;
+                this.filteredLogsSpan.textContent = this.filteredLogs.length;
+            }
+
+            updateLogSummary() {
+                const today = new Date().toDateString();
+                const todayLogs = this.logs.filter(log => new Date(log.timestamp).toDateString() === today);
+                const errors = todayLogs.filter(log => log.level === 'error');
+                const websocketLogs = todayLogs.filter(log => log.level === 'websocket');
+
+                document.getElementById('logs-today').textContent = todayLogs.length;
+                document.getElementById('errors-today').textContent = errors.length;
+                document.getElementById('websocket-msgs').textContent = websocketLogs.length;
+            }
+
+            animateActivityIndicator() {
+                setInterval(() => {
+                    this.logActivity.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        this.logActivity.style.transform = 'scale(1)';
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // Global function for logs toggle
+        function toggleLogsSection() {
+            if (window.enhancedLogs) {
+                window.enhancedLogs.toggleLogsSection();
+            }
+        }
+
+        // Initialize enhanced logs when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.enhancedLogs = new EnhancedServerLogs();
+        });
+
+        // Add additional CSS for logs summary card
+        const additionalStyle = document.createElement('style');
+        additionalStyle.textContent = `
+            .logs-card {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                padding: 20px;
+                margin-bottom: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .logs-summary .log-stats {
+                margin-bottom: 15px;
+            }
+            .logs-summary .stat-item {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                padding: 5px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .logs-summary .stat-label {
+                color: rgba(255, 255, 255, 0.8);
+                font-size: 14px;
+            }
+            .logs-summary .stat-value {
+                font-weight: bold;
+                color: #4CAF50;
+            }
+            .logs-summary .stat-value.error {
+                color: #f44336;
+            }
+            .logs-summary .stat-value.success {
+                color: #4CAF50;
+            }
+            .logs-view-btn {
+                background: linear-gradient(45deg, #2196F3, #21CBF3);
+                border: none;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-size: 14px;
+                width: 100%;
+                transition: all 0.3s ease;
+            }
+            .logs-view-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+            }
+        `;
+        document.head.appendChild(additionalStyle);
+    </script>
+</body>
+</html>
