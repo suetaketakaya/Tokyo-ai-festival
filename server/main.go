@@ -75,6 +75,15 @@ func NewServer(port string) *Server {
 	// Initialize Configuration manager
 	configManager := NewConfigManager()
 
+	// Initialize Container Context Manager
+	InitializeContainerContextManager(dockerManager)
+
+	// Initialize Matplotlib Detector
+	InitializeMatplotlibDetector(dockerManager)
+
+	// Initialize Project Management Handler
+	InitializeProjectManagementHandler(dockerManager)
+
 	return &Server{
 		Port:          port,
 		SecretKey:     secretKey,
@@ -426,7 +435,12 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 
 	switch msgType {
 	case "ping":
-		s.sendMessage(conn, "pong", map[string]interface{}{"timestamp": msg["data"]})
+		// Extract timestamp from ping data
+		var timestamp interface{}
+		if data, ok := msg["data"].(map[string]interface{}); ok {
+			timestamp = data["timestamp"]
+		}
+		s.sendMessage(conn, "pong", map[string]interface{}{"timestamp": timestamp})
 
 	case "project_list_request":
 		s.handleDockerProjectList(conn)
@@ -444,7 +458,29 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 		s.handleProjectRemove(conn, msg)
 
 	case "claude_execute":
+		// Enhanced routing with staging support
+		data, ok := msg["data"].(map[string]interface{})
+		if ok {
+			// Check if staging is explicitly requested
+			if useStaging, exists := data["use_staging"].(bool); exists && useStaging {
+				log.Printf("🎯 Explicit staging requested")
+				s.handleDockerClaudeExecuteStaged(conn, msg)
+				return
+			}
+
+			// Auto-detect based on client version
+			if clientVersion, ok := data["client_version"].(string); ok && shouldUseStaging(clientVersion) {
+				log.Printf("🔄 Auto-routing to staged execution")
+				s.handleDockerClaudeExecuteStaged(conn, msg)
+				return
+			}
+		}
+
+		// Fallback to original handler
 		s.handleDockerClaudeExecute(conn, msg)
+
+	case "claude_execute_staged":
+		s.handleDockerClaudeExecuteStaged(conn, msg)
 
 	case "claude_execute_stream":
 		s.handleDockerClaudeExecuteStream(conn, msg)
@@ -486,6 +522,31 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 		s.handlePreviewGetImage(conn, msg)
 	case "preview_get_webapp":
 		s.handlePreviewGetWebApp(conn, msg)
+	case "preview_get_jupyter":
+		s.handlePreviewGetJupyter(conn, msg)
+	case "preview_control":
+		s.handlePreviewControl(conn, msg)
+
+	case "container_info_request":
+		s.handleContainerInfoRequest(conn, msg)
+
+	// Project Management Cases
+	case "project_details_request":
+		s.handleProjectDetailsRequest(conn, msg)
+	case "project_start":
+		s.handleProjectStartRequest(conn, msg)
+	case "project_stop":
+		s.handleProjectStopRequest(conn, msg)
+	case "project_restart":
+		s.handleProjectRestart(conn, msg)
+	case "project_delete":
+		s.handleProjectDelete(conn, msg)
+	case "project_add_port":
+		s.handleProjectAddPort(conn, msg)
+	case "project_remove_port":
+		s.handleProjectRemovePort(conn, msg)
+	case "project_update_environment":
+		s.handleProjectUpdateEnvironment(conn, msg)
 
 	default:
 		s.sendError(conn, fmt.Sprintf("Unknown message type: %s", msgType))
@@ -1945,10 +2006,30 @@ func (s *Server) handlePreviewListRequest(conn *websocket.Conn, msg map[string]i
 func (s *Server) getPreviewItems(projectID string) []map[string]interface{} {
 	var previews []map[string]interface{}
 
-	// Scan for matplotlib images in container
-	matplotlibImages := s.scanMatplotlibImages(projectID)
-	for _, img := range matplotlibImages {
-		previews = append(previews, img)
+	// Use MatplotlibDetector for matplotlib outputs
+	if globalMatplotlibDetector != nil {
+		matplotlibOutputs, err := globalMatplotlibDetector.DetectMatplotlibOutputs(projectID)
+		if err == nil {
+			for _, output := range matplotlibOutputs {
+				previews = append(previews, map[string]interface{}{
+					"id":          output.ID,
+					"type":        "matplotlib",
+					"name":        output.Title,
+					"description": fmt.Sprintf("Matplotlib plot: %s", output.Filename),
+					"filename":    output.Filename,
+					"path":        output.Path,
+					"timestamp":   output.Timestamp.Unix(),
+					"size":        output.Size,
+					"format":      output.Format,
+				})
+			}
+		}
+	} else {
+		// Fallback to old method if detector not available
+		matplotlibImages := s.scanMatplotlibImages(projectID)
+		for _, img := range matplotlibImages {
+			previews = append(previews, img)
+		}
 	}
 
 	// Scan for running web applications
@@ -2219,6 +2300,130 @@ func (s *Server) handlePreviewGetWebApp(conn *websocket.Conn, msg map[string]int
 	})
 
 	log.Printf("✅ Sent webapp info for port %d (status: %s)", portInt, status)
+}
+
+func (s *Server) handlePreviewGetJupyter(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("📓 Handling preview get jupyter request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid preview get jupyter message format")
+		return
+	}
+
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Missing or invalid project ID")
+		return
+	}
+
+	port, ok := data["port"].(float64)
+	if !ok {
+		s.sendError(conn, "Missing or invalid port")
+		return
+	}
+
+	portInt := int(port)
+
+	// Verify Jupyter is actually running
+	cmd := fmt.Sprintf("netstat -tuln 2>/dev/null | grep ':%d ' || ss -tuln 2>/dev/null | grep ':%d '", portInt, portInt)
+	output, err := s.dockerManager.ExecuteCommand(projectID, cmd)
+
+	if err != nil || output == "" {
+		s.sendError(conn, fmt.Sprintf("Jupyter Notebook not running on port %d", portInt))
+		return
+	}
+
+	// Check if it's actually Jupyter by looking for jupyter processes
+	jupyterCmd := "ps aux | grep jupyter | grep -v grep | head -1 | awk '{print $11}' || echo 'unknown'"
+	jupyterProcess, _ := s.dockerManager.ExecuteCommand(projectID, jupyterCmd)
+	processName := strings.TrimSpace(jupyterProcess)
+	if processName == "" || processName == "unknown" {
+		processName = "jupyter-notebook"
+	}
+
+	// Get Jupyter token/authentication info if available
+	tokenCmd := "jupyter notebook list 2>/dev/null | grep 'http://localhost:8888' | awk '{print $1}' || echo 'http://localhost:8888'"
+	tokenOutput, _ := s.dockerManager.ExecuteCommand(projectID, tokenCmd)
+	jupyterURL := strings.TrimSpace(tokenOutput)
+	if jupyterURL == "" {
+		jupyterURL = fmt.Sprintf("http://localhost:%d", portInt)
+	}
+
+	status := "running"
+
+	s.sendMessage(conn, "preview_jupyter_ready", map[string]interface{}{
+		"project_id":    projectID,
+		"port":          portInt,
+		"url":           jupyterURL,
+		"status":        status,
+		"process_name":  processName,
+		"proxy_url":     fmt.Sprintf("/proxy/%s/%d", projectID, portInt),
+		"type":          "jupyter",
+		"description":   "Jupyter Notebook interface",
+	})
+
+	log.Printf("✅ Sent jupyter info for port %d (status: %s)", portInt, status)
+}
+
+// handleContainerInfoRequest handles requests for real-time container context information
+func (s *Server) handleContainerInfoRequest(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("🔍 Handling container info request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid container info request format")
+		return
+	}
+
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Missing or invalid project_id")
+		return
+	}
+
+	infoTypesInterface, ok := data["info_types"]
+	if !ok {
+		s.sendError(conn, "Missing info_types")
+		return
+	}
+
+	// Convert info_types to []string
+	var infoTypes []string
+	switch v := infoTypesInterface.(type) {
+	case []interface{}:
+		for _, item := range v {
+			if str, ok := item.(string); ok {
+				infoTypes = append(infoTypes, str)
+			}
+		}
+	case []string:
+		infoTypes = v
+	default:
+		s.sendError(conn, "Invalid info_types format")
+		return
+	}
+
+	if globalContainerContextManager == nil {
+		s.sendError(conn, "Container context manager not initialized")
+		return
+	}
+
+	// Get container information
+	containerInfo, err := globalContainerContextManager.GetContainerInfo(projectID, infoTypes)
+	if err != nil {
+		s.sendError(conn, fmt.Sprintf("Failed to get container info: %v", err))
+		return
+	}
+
+	// Send response
+	s.sendMessage(conn, "container_info_response", map[string]interface{}{
+		"project_id": projectID,
+		"data":       containerInfo,
+		"timestamp":  time.Now().Unix(),
+	})
+
+	log.Printf("✅ Sent container info for project %s", projectID)
 }
 
 func main() {

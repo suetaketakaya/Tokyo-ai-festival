@@ -15,7 +15,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/Navigation';
-import WebSocketService from '../services/WebSocketService';
+import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
 
 type QuickCommandsScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -78,14 +78,14 @@ export default function QuickCommandsScreen({ navigation, route }: Props) {
     setupMessageHandlers();
 
     return () => {
-      WebSocketService.updateCallbacks({
+      EnhancedWebSocketService.updateCallbacks({
         onMessage: () => {},
       });
     };
   }, []);
 
   const setupMessageHandlers = () => {
-    WebSocketService.updateCallbacks({
+    EnhancedWebSocketService.updateCallbacks({
       onMessage: (message) => {
         handleServerMessage(message);
       },
@@ -197,7 +197,7 @@ export default function QuickCommandsScreen({ navigation, route }: Props) {
   };
 
   const loadQuickCommands = async () => {
-    if (!WebSocketService.isConnected()) {
+    if (!EnhancedWebSocketService.isConnected()) {
       Alert.alert('接続エラー', 'サーバーに接続されていません。', [
         { text: '戻る', onPress: () => navigation.goBack() },
         { text: 'リトライ', onPress: loadQuickCommands }
@@ -206,7 +206,7 @@ export default function QuickCommandsScreen({ navigation, route }: Props) {
     }
 
     try {
-      WebSocketService.send({
+      EnhancedEnhancedWebSocketService.send({
         type: 'config_quick_commands',
         data: {
           action: 'get_defaults',
@@ -219,7 +219,7 @@ export default function QuickCommandsScreen({ navigation, route }: Props) {
   };
 
   const executeQuickCommand = async (command: QuickCommand) => {
-    if (!WebSocketService.isConnected()) {
+    if (!EnhancedWebSocketService.isConnected()) {
       Alert.alert('接続エラー', 'サーバーに接続されていません。', [
         { text: '戻る', onPress: () => navigation.goBack() }
       ]);
@@ -237,7 +237,7 @@ export default function QuickCommandsScreen({ navigation, route }: Props) {
 
   const performExecution = async (command: QuickCommand) => {
     try {
-      WebSocketService.send({
+      EnhancedEnhancedWebSocketService.send({
         type: 'quick_command_execute',
         data: {
           project_id: projectId,

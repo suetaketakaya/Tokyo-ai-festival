@@ -37,4 +37,9 @@ export type RootStackParamList = {
     projectId: string;
     projectName?: string;
   };
+  ProjectManagement: {
+    serverUrl: string;
+    projectId: string;
+    projectName: string;
+  };
 };

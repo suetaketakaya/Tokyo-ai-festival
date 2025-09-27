@@ -9,6 +9,7 @@ import {
   RefreshControl,
   Modal,
   TextInput,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -446,7 +447,7 @@ const styles = StyleSheet.create({
   serverUrl: {
     fontSize: 14,
     color: '#666',
-    fontFamily: 'Courier New',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   statusContainer: {
     flexDirection: 'row',

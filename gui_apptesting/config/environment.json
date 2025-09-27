@@ -1,0 +1,88 @@
+{
+  "environment": "development",
+  "projectName": "RemoteClaude GUI Testing",
+  "version": "3.7.1",
+  "developer": "RemoteClaude Team",
+  "servers": {
+    "go_primary": {
+      "port": 8090,
+      "host": "localhost",
+      "ssl": false,
+      "timeout": 30000
+    },
+    "go_secondary": {
+      "port": 8091,
+      "host": "localhost",
+      "ssl": false,
+      "timeout": 30000
+    },
+    "expo_primary": {
+      "port": 8081,
+      "host": "localhost",
+      "tunnel": false
+    },
+    "expo_secondary": {
+      "port": 8082,
+      "host": "localhost",
+      "tunnel": false
+    },
+    "gui_monitor": {
+      "port": 3002,
+      "host": "localhost",
+      "auto_open": true
+    },
+    "command_tester": {
+      "port": 3005,
+      "host": "localhost",
+      "auto_open": false
+    }
+  },
+  "logging": {
+    "level": "info",
+    "directory": "./logs",
+    "max_file_size": "10MB",
+    "max_files": 5,
+    "console_output": true,
+    "timestamp_format": "ISO",
+    "rotation": true,
+    "request_logging": true,
+    "websocket_logging": false,
+    "performance_logging": true
+  },
+  "testing": {
+    "timeout": 30000,
+    "retries": 3,
+    "parallel_tests": true,
+    "auto_screenshot": true,
+    "performance_monitoring": true,
+    "report_formats": ["json", "html", "markdown"],
+    "report_directory": "./reports"
+  },
+  "performance": {
+    "monitoring_enabled": true,
+    "memory_threshold_mb": 512,
+    "cpu_threshold_percent": 80,
+    "response_time_threshold_ms": 1000,
+    "optimizations": {
+      "compression": true,
+      "caching": true,
+      "connection_pooling": true,
+      "lazy_loading": true
+    }
+  },
+  "security": {
+    "cors_enabled": true,
+    "helmet_enabled": true,
+    "rate_limiting": false,
+    "cors_origins": [
+      "http://localhost:3000",
+      "http://localhost:8080",
+      "http://localhost:8081"
+    ],
+    "headers": {
+      "content_security_policy": true,
+      "x_frame_options": true,
+      "x_content_type_options": true
+    }
+  }
+}

@@ -170,6 +170,12 @@ func (dm *DockerManager) initializeProject(project *Project) error {
 		}
 	}
 
+	// Setup Jupyter environment automatically
+	if err := dm.setupJupyterEnvironment(project); err != nil {
+		log.Printf("⚠️ Jupyter setup failed for %s: %v", project.ID, err)
+		// Continue anyway - project is still functional
+	}
+
 	log.Printf("✅ Project workspace initialized: %s", project.ID)
 	return nil
 }

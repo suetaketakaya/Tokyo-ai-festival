@@ -17,8 +17,12 @@ import {
   Dimensions,
   Linking,
 } from 'react-native';
-// import { WebView } from 'react-native-webview';
-import WebSocketService from '../services/WebSocketService';
+import { WebView } from 'react-native-webview';
+import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
+import ClaudeCodeIntegrationPanel from '../components/ClaudeCodeIntegrationPanel';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from '../types/Navigation';
 
 interface TerminalLine {
   id: string;
@@ -40,17 +44,17 @@ interface PreviewItem {
   type: 'matplotlib' | 'webapp' | 'jupyter';
   path?: string;
   port?: number;
+  url?: string;
+  proxyUrl?: string;
   lastModified: Date;
 }
 
+type DevelopmentScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Development'>;
+type DevelopmentScreenRouteProp = RouteProp<RootStackParamList, 'Development'>;
+
 interface Props {
-  route: {
-    params: {
-      serverUrl: string;
-      projectId: string;
-    };
-  };
-  navigation: any;
+  route: DevelopmentScreenRouteProp;
+  navigation: DevelopmentScreenNavigationProp;
 }
 
 const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
@@ -64,9 +68,17 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState<string[]>([]);
+  const [currentCommandType, setCurrentCommandType] = useState<'linux' | 'python' | 'file' | 'webapp' | 'code'>('linux');
   const [executionProgress, setExecutionProgress] = useState(0);
   const [errorHistory, setErrorHistory] = useState<ErrorEntry[]>([]);
   const [showErrorPanel, setShowErrorPanel] = useState(false);
+  const [executionStartTime, setExecutionStartTime] = useState<number>(0);
+
+  // Staged execution states
+  const [executionStage, setExecutionStage] = useState<string>('');
+  const [stageHistory, setStageHistory] = useState<Array<{stage: string, timestamp: number, message: string}>>([]);
+  const [estimatedTime, setEstimatedTime] = useState<number>(0);
 
   // Tab and Preview States
   const [activeTab, setActiveTab] = useState<'terminal' | 'preview'>('terminal');
@@ -74,6 +86,12 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const [selectedPreviewItem, setSelectedPreviewItem] = useState<PreviewItem | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [previewResponseTimeout, setPreviewResponseTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isWaitingForPreviewResponse, setIsWaitingForPreviewResponse] = useState(false);
+  const isWaitingForPreviewResponseRef = useRef(false);
+
+  // Claude Code Integration
+  const [showClaudeCodePanel, setShowClaudeCodePanel] = useState(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const textInputRef = useRef<TextInput>(null);
@@ -84,6 +102,12 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
       headerRight: () => (
         <View style={styles.headerButtons}>
           <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: '#9C27B0' }]}
+            onPress={() => setShowClaudeCodePanel(true)}
+          >
+            <Text style={styles.headerButtonText}>🤖</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={styles.headerButton}
             onPress={() => navigation.navigate('DetailedSettings')}
           >
@@ -92,7 +116,7 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
           <TouchableOpacity
             style={[styles.headerButton, { backgroundColor: isConnected ? '#4CAF50' : '#f44336' }]}
             onPress={() => {
-              const debugInfo = WebSocketService.getDebugInfo();
+              const debugInfo = EnhancedWebSocketService.getDetailedDebugInfo();
               Alert.alert('Debug Info', JSON.stringify(debugInfo, null, 2));
             }}
           >
@@ -103,13 +127,13 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
       ),
     });
-  }, [navigation, projectId, isConnected]);
+  }, [navigation, projectId, isConnected, showClaudeCodePanel]);
 
   useEffect(() => {
     connectToServer();
 
     return () => {
-      WebSocketService.unregisterScreenCallbacks('development');
+      EnhancedWebSocketService.unregisterScreenCallbacks('development');
     };
   }, []);
 
@@ -123,11 +147,19 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     console.log('🔌 DEVELOPMENT: Connecting to:', connectionUrl);
     addSystemMessage(`Connecting to ${connectionUrl}...`);
 
-    const success = await WebSocketService.connect(connectionUrl, {
+    const success = await EnhancedWebSocketService.connect(connectionUrl, {
       onOpen: () => {
         console.log('✅ DEVELOPMENT: onOpen callback called');
         setIsConnected(true);
         addSystemMessage('サーバーに正常に接続しました！');
+
+        // 再接続後にプレビューリストを更新
+        if (activeTab === 'preview') {
+          setTimeout(() => {
+            console.log('🔄 Auto-refreshing preview list after reconnection');
+            refreshPreviewList();
+          }, 1000);
+        }
       },
       onMessage: handleServerMessage,
       onError: (error) => {
@@ -139,6 +171,26 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
         console.log('🔌 DEVELOPMENT: onClose callback called');
         setIsConnected(false);
         addSystemMessage(`接続が閉じられました: ${event.reason || '不明な理由'}`, 'error');
+
+        // 自動再接続（code 1001は正常終了なので少し待ってから再接続）
+        if (event.code === 1001) {
+          console.log('ℹ️ Normal close detected - will reconnect in 3 seconds');
+          setTimeout(() => {
+            if (!isConnected) {
+              console.log('🔄 Auto-reconnecting after normal close...');
+              addSystemMessage('自動的に再接続しています...', 'system');
+              connectToServer().then(() => {
+                // 再接続成功後にプレビューリストを更新
+                if (activeTab === 'preview') {
+                  setTimeout(() => {
+                    console.log('🔄 Refreshing preview list after auto-reconnection');
+                    refreshPreviewList();
+                  }, 2000);
+                }
+              });
+            }
+          }, 3000);
+        }
       },
     }, 'development');
 
@@ -160,8 +212,102 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
         setExecutionProgress(25);
         if (message.data && message.data.thinking) {
           setThinkingText(message.data.thinking);
-          addSystemMessage('🤔 Claudeが思考中...', 'system');
+
+          // ターミナルに思考プロセスを詳細表示
+          const thinkingContent = message.data.thinking;
+          addTerminalLine('', 'system'); // 空行で区切り
+          addTerminalLine('🧠💭 === Claude AI 思考プロセス ===', 'system');
+
+          // 思考内容を行ごとに分割してリアルタイム表示
+          const thinkingLines = thinkingContent.split('\n').filter(line => line.trim());
+          thinkingLines.forEach((line, index) => {
+            setTimeout(() => {
+              addTerminalLine(`💭 ${line.trim()}`, 'system');
+            }, index * 200); // 200ms間隔で順次表示
+          });
+
+          // 思考完了の区切り
+          setTimeout(() => {
+            addTerminalLine('🧠✨ === 思考完了、実装開始 ===', 'system');
+            addTerminalLine('', 'system'); // 空行で区切り
+          }, thinkingLines.length * 200 + 500);
         }
+        break;
+
+      case 'claude_progress':
+        // Enhanced staged execution progress
+        if (message.data && message.data.progress) {
+          const progressData = message.data;
+          setExecutionStage(progressData.stage || '');
+          setExecutionProgress(progressData.progress);
+          setEstimatedTime(progressData.estimated_time || 0);
+
+          // Add to terminal with enhanced formatting
+          const stageEmoji = getStageEmoji(progressData.stage);
+          const progressBar = generateProgressBar(progressData.progress);
+          addTerminalLine(`${stageEmoji} [${progressData.progress}%] ${progressData.message || progressData.stage}`, 'system');
+          addTerminalLine(`${progressBar}`, 'system');
+
+          // Update stage history
+          setStageHistory(prev => [...prev, {
+            stage: progressData.stage || 'processing',
+            timestamp: progressData.timestamp || Date.now(),
+            message: progressData.message || progressData.stage || 'Processing...'
+          }]);
+
+          // Legacy partial output support
+          if (progressData.partial_output) {
+            addTerminalLine(`📝 部分結果: ${progressData.partial_output}`, 'output');
+          }
+        }
+        break;
+
+      case 'stage_completed':
+        const stageData = message.data;
+        const completedEmoji = stageData.success ? '✅' : '❌';
+        const duration = `${stageData.duration}ms`;
+        addTerminalLine(`${completedEmoji} ${stageData.stage.toUpperCase()} completed (${duration})`, 'system');
+
+        if (stageData.success) {
+          addTerminalLine(`📊 Stage data: ${JSON.stringify(stageData.data, null, 2)}`, 'system');
+        } else {
+          addTerminalLine(`⚠️ Error: ${stageData.error}`, 'error');
+        }
+        break;
+
+      case 'execution_progress':
+        // Real-time execution progress
+        const execData = message.data;
+        addTerminalLine(`⚙️ ${execData.message} (${execData.progress}%)`, 'system');
+        break;
+
+      case 'preview_ready':
+        // Preview generation completion
+        const previewReadyData = message.data;
+        addTerminalLine(`🖼️ プレビュー生成完了: ${previewReadyData.previews.length}個のアイテム`, 'system');
+
+        // Trigger preview list refresh
+        setTimeout(() => {
+          refreshPreviewList();
+        }, 1000);
+        break;
+
+      case 'preview_jupyter_ready':
+        // Jupyter preview ready
+        console.log('📓 DEVELOPMENT: Jupyter preview ready');
+        setIsLoadingPreview(false);
+        const jupyterData = message.data;
+
+        // Store the Jupyter URL for opening
+        if (selectedPreviewItem) {
+          setSelectedPreviewItem({
+            ...selectedPreviewItem,
+            url: jupyterData.url || `http://localhost:${jupyterData.port}`,
+            proxyUrl: jupyterData.proxy_url
+          });
+        }
+
+        addTerminalLine(`📓 Jupyter Notebook準備完了 (Port: ${jupyterData.port})`, 'system');
         break;
 
       case 'claude_output':
@@ -169,12 +315,29 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
         setIsExecuting(false);
         setIsThinking(false);
         setExecutionProgress(100);
+
+        // 思考完了の表示
+        addTerminalLine('', 'system'); // 空行
+        addTerminalLine('🎉 === Claude AI 実装完了 ===', 'system');
+        addTerminalLine('', 'system'); // 空行
+
         if (message.data && message.data.output) {
           console.log('🔥 DEVELOPMENT: Adding terminal output:', message.data.output.substring(0, 100));
           addTerminalOutput(message.data.output, 'output');
+
+          // 自動的にプレビューリストを更新
+          const output = message.data.output.toLowerCase();
+          if (output.includes('matplotlib') || output.includes('.png') || output.includes('plot') || output.includes('chart')) {
+            console.log('📊 DEVELOPMENT: Detected visualization output - refreshing preview list');
+            addTerminalLine('📊 データ可視化が検出されました - プレビューリストを更新中...', 'system');
+            setTimeout(() => {
+              refreshPreviewList();
+            }, 2000); // 2秒後にプレビューリストを更新
+          }
         }
         if (message.data?.status === 'completed') {
-          addSystemMessage('✅ コマンドが正常に完了しました');
+          addTerminalLine('✅ コマンドが正常に完了しました', 'system');
+          addTerminalLine('', 'system'); // 空行で区切り
         }
         setTimeout(() => setExecutionProgress(0), 2000);
         break;
@@ -213,16 +376,35 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
 
       case 'preview_list_response':
         console.log('📋 DEVELOPMENT: Received preview list');
-        if (message.data && message.data.items) {
-          const items: PreviewItem[] = message.data.items.map((item: any) => ({
-            id: item.path || `${item.port}`,
-            name: item.name || `Preview ${item.path || item.port}`,
-            type: item.type,
+
+        // Clear timeout since we received the response
+        if (previewResponseTimeout) {
+          clearTimeout(previewResponseTimeout);
+          setPreviewResponseTimeout(null);
+        }
+        setIsWaitingForPreviewResponse(false);
+        isWaitingForPreviewResponseRef.current = false;
+
+        // Handle both old format (items) and new format (previews)
+        const previewData = message.data?.items || message.data?.previews || [];
+        console.log('📋 DEVELOPMENT: Preview data:', previewData);
+
+        if (previewData && Array.isArray(previewData)) {
+          const items: PreviewItem[] = previewData.map((item: any) => ({
+            id: item.id || item.path || `${item.port}` || `preview_${Date.now()}`,
+            name: item.name || `Preview ${item.path || item.port || item.type}`,
+            type: (item.type === 'notebook' ? 'jupyter' : item.type) as 'matplotlib' | 'webapp' | 'jupyter',
             path: item.path,
             port: item.port,
             lastModified: new Date(item.lastModified || Date.now())
           }));
+          console.log('📋 DEVELOPMENT: Processed preview items:', items);
           setPreviewItems(items);
+          addSystemMessage(`✅ プレビューリストを更新: ${items.length}個のアイテム`, 'system');
+        } else {
+          console.log('📋 DEVELOPMENT: No preview items found');
+          setPreviewItems([]);
+          addSystemMessage('📋 プレビューアイテムが見つかりませんでした', 'system');
         }
         break;
 
@@ -285,6 +467,84 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     });
   };
 
+  // Staged execution helper functions
+  const getStageEmoji = (stage: string): string => {
+    const stageEmojis: {[key: string]: string} = {
+      'analyzing': '🔍',
+      'generating': '💻',
+      'executing': '⚙️',
+      'previewing': '🖼️',
+      'completed': '🎉',
+      'error': '❌'
+    };
+    return stageEmojis[stage] || '📋';
+  };
+
+  const generateProgressBar = (progress: number): string => {
+    const barLength = 20;
+    const filledLength = Math.round((progress / 100) * barLength);
+    const bar = '█'.repeat(filledLength) + '░'.repeat(barLength - filledLength);
+    return `[${bar}] ${progress}%`;
+  };
+
+  const startSimulatedThinking = () => {
+    const thinkingSteps = [
+      '🔍 コマンドの内容を分析しています...',
+      '📚 要求されたライブラリとツールを確認中...',
+      '🏗️ コードの構造とアーキテクチャを計画中...',
+      '🎨 データ可視化の最適な手法を選択中...',
+      '📊 グラフとチャートの種類を決定中...',
+      '💡 効果的な実装アプローチを検討中...',
+      '🔧 コード生成の準備をしています...',
+      '✨ 最終的な実装を作成中...',
+    ];
+
+    let stepIndex = 0;
+    const showNextStep = () => {
+      if (stepIndex < thinkingSteps.length && isExecuting) {
+        addTerminalLine(`💭 ${thinkingSteps[stepIndex]}`, 'system');
+        stepIndex++;
+
+        // 10-20秒間隔でランダムに表示
+        const nextDelay = 10000 + Math.random() * 10000;
+        setTimeout(showNextStep, nextDelay);
+      }
+    };
+
+    // 最初のステップを5秒後に開始
+    setTimeout(showNextStep, 5000);
+  };
+
+  // Command classification helper functions
+  const classifyCommand = (input: string): 'linux' | 'python' | 'file' | 'webapp' | 'code' => {
+    const linuxCommands = ['ls', 'pwd', 'cd', 'mkdir', 'rm', 'cp', 'mv', 'cat', 'head', 'tail', 'grep', 'find', 'ps', 'top', 'df', 'du', 'free', 'clear'];
+    const parts = input.trim().split(' ');
+    const command = parts[0];
+
+    // Priority 1: Linux commands
+    if (linuxCommands.includes(command)) {
+      return 'linux';
+    }
+
+    // Priority 2: Python with GUI libraries
+    if (input.includes('python') && (input.includes('matplotlib') || input.includes('seaborn') || input.includes('plotly') || input.includes('streamlit') || input.includes('gradio'))) {
+      return 'python';
+    }
+
+    // Priority 3: File execution
+    if (input.match(/(python\s+\w+\.py|node\s+\w+\.js|npm\s+run|yarn|\.\/\w+)/)) {
+      return 'file';
+    }
+
+    // Priority 4: Web app execution
+    if (input.includes('streamlit run') || input.includes('gradio') || input.includes('flask run') || input.includes('npm start')) {
+      return 'webapp';
+    }
+
+    // Priority 5: Complex code implementation
+    return 'code';
+  };
+
   const executeCommand = () => {
     if (!command.trim()) {
       Alert.alert('Error', 'Please enter a command');
@@ -302,28 +562,203 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     }
     setHistoryIndex(-1);
 
+    // Classify command to determine execution strategy
+    const commandType = classifyCommand(trimmedCommand);
+    setCurrentCommandType(commandType);
+
     addTerminalLine(`$ ${command}`, 'command');
 
-    const success = WebSocketService.send({
-      type: 'claude_execute',
-      data: {
-        project_id: projectId,
-        command: command,
-        context: {
-          current_dir: '/workspace',
-          git_branch: 'main'
+    let message: any;
+    let executionMessage: string;
+
+    if (commandType === 'linux') {
+      // Direct Linux command execution
+      message = {
+        type: 'intelligent_execute',
+        data: {
+          project_id: projectId,
+          command: command,
+          command_type: 'linux',
+          priority: 1,
+          requires_staging: false
         }
-      }
-    });
+      };
+      executionMessage = `🐧 Linux コマンド実行: ${command}`;
+    } else if (commandType === 'python' || commandType === 'webapp') {
+      // Python/webapp with potential GUI
+      message = {
+        type: 'intelligent_execute',
+        data: {
+          project_id: projectId,
+          command: command,
+          command_type: commandType,
+          priority: 2,
+          requires_staging: true,
+          requires_preview: true
+        }
+      };
+      executionMessage = `🐍 Python GUI実行: ${command}`;
+
+      // Reset stage tracking for GUI commands
+      setExecutionStage('preparing');
+      setExecutionProgress(0);
+      setStageHistory([]);
+    } else if (commandType === 'file') {
+      // File execution
+      message = {
+        type: 'intelligent_execute',
+        data: {
+          project_id: projectId,
+          command: command,
+          command_type: 'file',
+          priority: 3,
+          requires_staging: false
+        }
+      };
+      executionMessage = `📄 ファイル実行: ${command}`;
+    } else {
+      // Complex code implementation - route to Claude Code CLI
+      message = {
+        type: 'claude_execute',
+        data: {
+          project_id: projectId,
+          command: command,
+          context: {
+            current_dir: '/workspace',
+            git_branch: 'main'
+          },
+          client_version: '3.8.0',
+          use_staging: true
+        }
+      };
+      executionMessage = `🤖 Claude Code CLI実行: ${command}`;
+
+      // Reset stage tracking
+      setExecutionStage('preparing');
+      setExecutionProgress(0);
+      setStageHistory([]);
+    }
+
+    addTerminalLine(executionMessage, 'system');
+
+    const success = EnhancedWebSocketService.send(message);
 
     if (success) {
       setIsExecuting(true);
+      setExecutionStartTime(Date.now());
       setExecutionProgress(10);
-      addSystemMessage('コマンドを実行中...');
+      addSystemMessage('📡 コマンドを送信中...');
       setCommand('');
       setShowSuggestions(false);
+
+      // 即座にプログレスを更新してレスポンシブ感を向上
+      setTimeout(() => {
+        if (isExecuting) {
+          setExecutionProgress(15);
+          addTerminalLine('⚡ Claude AIが処理を開始しています...', 'system');
+          startSimulatedThinking();
+        }
+      }, 500);
+
+      setTimeout(() => {
+        if (isExecuting) {
+          setExecutionProgress(25);
+          addTerminalLine('🧠 AIが深く思考中... (通常1-2分程度かかります)', 'system');
+        }
+      }, 2000);
+
+      // タイムアウト警告
+      setTimeout(() => {
+        if (isExecuting) {
+          setExecutionProgress(40);
+          addSystemMessage('⏱️ 処理に時間がかかっています... 少々お待ちください');
+        }
+      }, 60000); // 1分後
+
     } else {
       addSystemMessage('コマンドの送信に失敗しました', 'error');
+    }
+  };
+
+  // Command history navigation
+  const navigateHistory = (direction: 'up' | 'down') => {
+    if (commandHistory.length === 0) return;
+
+    let newIndex = historyIndex;
+
+    if (direction === 'up') {
+      if (historyIndex === -1) {
+        newIndex = commandHistory.length - 1;
+      } else if (historyIndex > 0) {
+        newIndex = historyIndex - 1;
+      }
+    } else {
+      if (historyIndex < commandHistory.length - 1) {
+        newIndex = historyIndex + 1;
+      } else {
+        newIndex = -1;
+      }
+    }
+
+    setHistoryIndex(newIndex);
+    setCommand(newIndex === -1 ? '' : commandHistory[newIndex]);
+  };
+
+  // Autocomplete functionality
+  const generateAutocompleteSuggestions = (input: string) => {
+    const linuxCommands = ['ls', 'pwd', 'cd', 'mkdir', 'rm', 'cp', 'mv', 'cat', 'head', 'tail', 'grep', 'find', 'ps', 'top', 'df', 'du', 'free', 'clear', 'history'];
+    const pythonLibraries = ['matplotlib', 'pandas', 'numpy', 'seaborn', 'plotly', 'streamlit', 'gradio'];
+    const fileCommands = ['python', 'node', 'npm run', 'yarn'];
+
+    let suggestions: string[] = [];
+
+    if (input.trim() === '') {
+      // Show recent commands and common commands
+      suggestions = [...new Set([...commandHistory.slice(-5).reverse(), ...linuxCommands.slice(0, 8)])];
+    } else {
+      const parts = input.split(' ');
+      const lastPart = parts[parts.length - 1];
+
+      // Command completion
+      if (parts.length === 1) {
+        suggestions = [...linuxCommands, ...fileCommands].filter(cmd =>
+          cmd.startsWith(lastPart.toLowerCase())
+        );
+      } else {
+        // Context-aware suggestions
+        const firstCommand = parts[0];
+
+        if (firstCommand === 'python' && lastPart.includes('import')) {
+          suggestions = pythonLibraries.map(lib => `import ${lib}`);
+        } else if (firstCommand === 'cd') {
+          // Directory suggestions (simplified)
+          suggestions = ['/', '/workspace', './src', './data', '../'];
+        } else if (firstCommand === 'cat' || firstCommand === 'python') {
+          // File suggestions (simplified)
+          suggestions = ['main.py', 'app.py', 'data.csv', 'requirements.txt'];
+        }
+      }
+    }
+
+    return suggestions.slice(0, 6); // Limit to 6 suggestions
+  };
+
+  // Handle command input changes
+  const handleCommandChange = (text: string) => {
+    setCommand(text);
+    setHistoryIndex(-1);
+
+    // Generate autocomplete suggestions
+    const suggestions = generateAutocompleteSuggestions(text);
+    setAutocompleteSuggestions(suggestions);
+    setShowSuggestions(suggestions.length > 0 && text.trim() !== '');
+  };
+
+  // Handle TAB key for autocomplete
+  const handleTabCompletion = () => {
+    if (autocompleteSuggestions.length > 0) {
+      setCommand(autocompleteSuggestions[0]);
+      setShowSuggestions(false);
     }
   };
 
@@ -337,17 +772,30 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     if (immediate && isConnected) {
       setCommand(quickCommand);
       setTimeout(() => {
-        const success = WebSocketService.send({
-          type: 'claude_execute',
+        // Reset stage tracking for quick command
+        setExecutionStage('preparing');
+        setExecutionProgress(0);
+        setStageHistory([]);
+
+        const message = {
+          type: 'claude_execute', // Enhanced routing will detect staging capability
           data: {
             project_id: projectId,
             command: quickCommand,
             context: {
               current_dir: '/workspace',
               git_branch: 'main'
-            }
+            },
+            client_version: '3.8.0', // Indicate staging support
+            use_staging: true // Explicitly request staging
           }
-        });
+        };
+
+        // Show preparation message for quick command
+        addTerminalLine(`🚀 クイックコマンド段階的実行: ${quickCommand}`, 'command');
+        addTerminalLine(`📋 4つのステージで処理します: 分析 → 生成 → 実行 → プレビュー`, 'system');
+
+        const success = EnhancedWebSocketService.send(message);
 
         if (success) {
           setIsExecuting(true);
@@ -372,12 +820,61 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     addSystemMessage('エラー履歴をクリアしました');
   };
 
-  const refreshPreviewList = () => {
-    console.log('🔄 DEVELOPMENT: Refreshing preview list');
-    WebSocketService.send({
+  const refreshPreviewList = (retryCount = 0) => {
+    console.log('🔄 DEVELOPMENT: Refreshing preview list (attempt:', retryCount + 1, ')');
+
+    // 接続状態を確認
+    if (!EnhancedWebSocketService.isConnected()) {
+      if (retryCount < 3) {
+        console.log('❌ Not connected, retrying in 2 seconds...');
+        addSystemMessage('接続を確認中... 再試行します', 'system');
+        setTimeout(() => {
+          refreshPreviewList(retryCount + 1);
+        }, 2000);
+        return;
+      } else {
+        console.log('❌ Max retries reached for preview list request');
+        addSystemMessage('プレビューリストの更新に失敗しました（接続エラー）', 'error');
+        return;
+      }
+    }
+
+    const success = EnhancedWebSocketService.send({
       type: 'preview_list_request',
       data: { project_id: projectId }
     });
+
+    if (!success) {
+      console.log('❌ Failed to send preview_list_request');
+      if (retryCount < 2) {
+        addSystemMessage('送信失敗、再試行中...', 'system');
+        setTimeout(() => {
+          refreshPreviewList(retryCount + 1);
+        }, 1000);
+      } else {
+        addSystemMessage('プレビューリストの更新に失敗しました（送信エラー）', 'error');
+      }
+    } else {
+      console.log('✅ Preview list request sent successfully');
+      addSystemMessage('プレビューリストを更新中...', 'system');
+
+      // 応答待機フラグを設定
+      setIsWaitingForPreviewResponse(true);
+      isWaitingForPreviewResponseRef.current = true;
+
+      // タイムアウト処理を追加 (改善版)
+      const timeoutId = setTimeout(() => {
+        if (isWaitingForPreviewResponseRef.current) {
+          console.log('⚠️ Preview list response timeout');
+          addSystemMessage('プレビューリストの応答がありません。再接続を試してください。', 'error');
+          setIsWaitingForPreviewResponse(false);
+          isWaitingForPreviewResponseRef.current = false;
+        }
+      }, 10000); // 10秒に延長
+
+      // 応答受信時にタイムアウトをクリア
+      setPreviewResponseTimeout(timeoutId);
+    }
   };
 
   const openPreviewItem = (item: PreviewItem) => {
@@ -386,13 +883,18 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     setSelectedPreviewItem(item);
 
     if (item.type === 'matplotlib') {
-      WebSocketService.send({
+      EnhancedWebSocketService.send({
         type: 'preview_get_image',
         data: { project_id: projectId, image_path: item.path }
       });
     } else if (item.type === 'webapp') {
-      WebSocketService.send({
+      EnhancedWebSocketService.send({
         type: 'preview_get_webapp',
+        data: { project_id: projectId, port: item.port }
+      });
+    } else if (item.type === 'jupyter') {
+      EnhancedWebSocketService.send({
+        type: 'preview_get_jupyter',
         data: { project_id: projectId, port: item.port }
       });
     }
@@ -441,12 +943,18 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const renderProgressBar = () => {
     if (executionProgress === 0) return null;
 
+    const elapsed = executionStartTime > 0 ? Math.floor((Date.now() - executionStartTime) / 1000) : 0;
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    const timeDisplay = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+
     return (
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
           <View style={[styles.progressFill, { width: `${executionProgress}%` }]} />
         </View>
         <Text style={styles.progressText}>{executionProgress}%</Text>
+        <Text style={styles.timeText}>{timeDisplay}</Text>
       </View>
     );
   };
@@ -596,6 +1104,9 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
                     line.type === 'command' && styles.commandLine,
                     line.type === 'error' && styles.errorLine,
                     line.type === 'system' && styles.systemLine,
+                    line.text.includes('💭') && styles.thinkingLine,
+                    line.text.includes('🧠') && styles.brainLine,
+                    line.text.includes('===') && styles.sectionLine,
                   ]}
                 >
                   {line.text}
@@ -618,32 +1129,118 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
       </View>
 
       <View style={styles.inputContainer}>
-        <TextInput
-          ref={textInputRef}
-          style={styles.commandInput}
-          value={command}
-          onChangeText={setCommand}
-          placeholder="コマンドを入力..."
-          placeholderTextColor="#999"
-          multiline={false}
-          returnKeyType="send"
-          onSubmitEditing={executeCommand}
-          editable={!isExecuting}
-        />
-        <TouchableOpacity
-          style={[styles.executeButton, isExecuting && styles.executeButtonDisabled]}
-          onPress={() => {
-            console.log('🔥 DEVELOPMENT: Execute button pressed, isConnected:', isConnected, 'isExecuting:', isExecuting);
-            executeCommand();
-          }}
-          disabled={isExecuting || !isConnected}
-        >
-          {isExecuting ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
+        {/* Enhanced Command Input with Autocomplete */}
+        <View style={styles.commandInputWrapper}>
+          <TextInput
+            ref={textInputRef}
+            style={[styles.commandInput, { borderColor: currentCommandType === 'linux' ? '#4CAF50' :
+              currentCommandType === 'python' ? '#FF9800' :
+              currentCommandType === 'webapp' ? '#2196F3' : '#9C27B0' }]}
+            value={command}
+            onChangeText={handleCommandChange}
+            placeholder={`コマンドを入力... (${currentCommandType === 'linux' ? 'Linux優先' :
+              currentCommandType === 'python' ? 'Python GUI' :
+              currentCommandType === 'webapp' ? 'WebApp' : 'Code実装'})`}
+            placeholderTextColor="#999"
+            multiline={false}
+            returnKeyType="send"
+            onSubmitEditing={executeCommand}
+            editable={!isExecuting}
+            onKeyPress={(e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+              // Handle key press events for enhanced UX
+              if (Platform.OS === 'ios') {
+                // iOS doesn't have good arrow key support, but we can handle some cases
+                if (e.nativeEvent.key === 'Backspace' && command === '' && commandHistory.length > 0) {
+                  // Show last command on empty backspace
+                  setCommand(commandHistory[commandHistory.length - 1]);
+                  setHistoryIndex(commandHistory.length - 1);
+                }
+              }
+            }}
+          />
+
+          {/* Command Type Indicator */}
+          <View style={[styles.commandTypeIndicator, {
+            backgroundColor: currentCommandType === 'linux' ? '#4CAF50' :
+              currentCommandType === 'python' ? '#FF9800' :
+              currentCommandType === 'webapp' ? '#2196F3' : '#9C27B0'
+          }]}>
+            <Text style={styles.commandTypeText}>
+              {currentCommandType === 'linux' ? '🐧' :
+               currentCommandType === 'python' ? '🐍' :
+               currentCommandType === 'webapp' ? '🌐' : '🤖'}
+            </Text>
+          </View>
+        </View>
+
+        {/* History Navigation Buttons */}
+        <View style={styles.historyButtons}>
+          <TouchableOpacity
+            style={[styles.historyButton, commandHistory.length === 0 && styles.historyButtonDisabled]}
+            onPress={() => navigateHistory('up')}
+            disabled={commandHistory.length === 0}
+          >
+            <Text style={styles.historyButtonText}>↑</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.historyButton, commandHistory.length === 0 && styles.historyButtonDisabled]}
+            onPress={() => navigateHistory('down')}
+            disabled={commandHistory.length === 0}
+          >
+            <Text style={styles.historyButtonText}>↓</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.historyButton, autocompleteSuggestions.length === 0 && styles.historyButtonDisabled]}
+            onPress={handleTabCompletion}
+            disabled={autocompleteSuggestions.length === 0}
+          >
+            <Text style={styles.historyButtonText}>TAB</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Autocomplete Suggestions */}
+        {showSuggestions && (
+          <View style={styles.suggestionsContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {autocompleteSuggestions.map((suggestion, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.suggestionItem}
+                  onPress={() => {
+                    setCommand(suggestion);
+                    setShowSuggestions(false);
+                  }}
+                >
+                  <Text style={styles.suggestionText}>{suggestion}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+        {isExecuting ? (
+          <TouchableOpacity
+            style={[styles.executeButton, styles.cancelButton]}
+            onPress={() => {
+              setIsExecuting(false);
+              setExecutionProgress(0);
+              setIsThinking(false);
+              addSystemMessage('❌ 実行をキャンセルしました', 'error');
+            }}
+          >
+            <Text style={styles.executeButtonText}>⏹</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.executeButton, !isConnected && styles.executeButtonDisabled]}
+            onPress={() => {
+              console.log('🔥 DEVELOPMENT: Execute button pressed, isConnected:', isConnected, 'isExecuting:', isExecuting);
+              executeCommand();
+            }}
+            disabled={!isConnected}
+          >
             <Text style={styles.executeButtonText}>▶</Text>
-          )}
-        </TouchableOpacity>
+          </TouchableOpacity>
+        )}
       </View>
 
       <Modal
@@ -678,6 +1275,129 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+
+      {/* Preview Modal */}
+      <Modal
+        visible={!!selectedPreviewItem}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>
+              {selectedPreviewItem?.name || 'Preview'}
+            </Text>
+            <View style={styles.modalActions}>
+              {selectedPreviewItem?.type === 'jupyter' && selectedPreviewItem?.url && (
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: '#4CAF50' }]}
+                  onPress={() => {
+                    if (selectedPreviewItem?.url) {
+                      Linking.openURL(selectedPreviewItem.url).catch(err => {
+                        console.error('Failed to open URL:', err);
+                        Alert.alert('Error', 'Failed to open Jupyter in browser');
+                      });
+                    }
+                  }}
+                >
+                  <Text style={styles.modalButtonText}>🌐 ブラウザで開く</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setSelectedPreviewItem(null)}
+              >
+                <Text style={styles.modalButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.previewContainer}>
+            {selectedPreviewItem?.type === 'jupyter' ? (
+              <View style={styles.jupyterContainer}>
+                {selectedPreviewItem?.url ? (
+                  <>
+                    <View style={styles.jupyterInfo}>
+                      <Text style={styles.jupyterUrlText}>
+                        Jupyter URL: {selectedPreviewItem.url}
+                      </Text>
+                      <Text style={styles.jupyterStatusText}>
+                        Status: Ready (Port: {selectedPreviewItem.port})
+                      </Text>
+                    </View>
+                    <WebView
+                      source={{ uri: selectedPreviewItem.url }}
+                      style={styles.webView}
+                      startInLoadingState={true}
+                      renderLoading={() => (
+                        <View style={styles.webViewLoading}>
+                          <ActivityIndicator size="large" color="#4CAF50" />
+                          <Text style={styles.loadingText}>Loading Jupyter...</Text>
+                        </View>
+                      )}
+                      onError={(syntheticEvent) => {
+                        const { nativeEvent } = syntheticEvent;
+                        console.error('WebView error:', nativeEvent);
+                        Alert.alert('Jupyter Load Error', `Failed to load Jupyter: ${nativeEvent.description}`);
+                      }}
+                      onHttpError={(syntheticEvent) => {
+                        const { nativeEvent } = syntheticEvent;
+                        console.error('HTTP error:', nativeEvent);
+                        Alert.alert('HTTP Error', `${nativeEvent.statusCode}: ${nativeEvent.description}`);
+                      }}
+                    />
+                  </>
+                ) : isLoadingPreview ? (
+                  <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#4CAF50" />
+                    <Text style={styles.loadingText}>Loading Jupyter preview...</Text>
+                  </View>
+                ) : (
+                  <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>Jupyter URL not available</Text>
+                    <TouchableOpacity
+                      style={styles.retryButton}
+                      onPress={() => {
+                        if (selectedPreviewItem) {
+                          openPreviewItem(selectedPreviewItem);
+                        }
+                      }}
+                    >
+                      <Text style={styles.retryButtonText}>Retry</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            ) : selectedPreviewItem?.type === 'matplotlib' ? (
+              <View style={styles.matplotlibContainer}>
+                <Text style={styles.matplotlibTitle}>Matplotlib Plot</Text>
+                <Text style={styles.matplotlibPath}>{selectedPreviewItem.path}</Text>
+                {/* Matplotlib image would be shown here */}
+              </View>
+            ) : selectedPreviewItem?.type === 'webapp' ? (
+              <View style={styles.webappContainer}>
+                <Text style={styles.webappTitle}>Web Application</Text>
+                <Text style={styles.webappPort}>Port: {selectedPreviewItem.port}</Text>
+                {/* WebApp content would be shown here */}
+              </View>
+            ) : (
+              <View style={styles.unknownContainer}>
+                <Text style={styles.unknownText}>
+                  Unknown preview type: {selectedPreviewItem?.type}
+                </Text>
+              </View>
+            )}
+          </View>
+        </SafeAreaView>
+      </Modal>
+
+      {/* Claude Code Integration Panel */}
+      <ClaudeCodeIntegrationPanel
+        visible={showClaudeCodePanel}
+        onClose={() => setShowClaudeCodePanel(false)}
+        projectId={projectId}
+        projectName={route.params.projectName || projectId}
+      />
     </SafeAreaView>
   );
 };
@@ -782,8 +1502,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  timeText: {
+    color: '#888',
+    fontSize: 10,
+    marginLeft: 8,
+  },
   terminalContainer: {
-    flex: 1,
+    flex: 0.8, // 80% of available screen space
     margin: 10,
     backgroundColor: '#1e1e1e',
     borderRadius: 12,
@@ -855,6 +1580,33 @@ const styles = StyleSheet.create({
     color: '#2196F3',
     fontStyle: 'italic',
   },
+  thinkingLine: {
+    color: '#9C27B0',
+    fontStyle: 'italic',
+    backgroundColor: 'rgba(156, 39, 176, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginVertical: 1,
+  },
+  brainLine: {
+    color: '#FF9800',
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginVertical: 1,
+  },
+  sectionLine: {
+    color: '#4CAF50',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    paddingVertical: 4,
+    marginVertical: 2,
+    borderRadius: 6,
+  },
   thinkingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -896,6 +1648,9 @@ const styles = StyleSheet.create({
   },
   executeButtonDisabled: {
     backgroundColor: '#666',
+  },
+  cancelButton: {
+    backgroundColor: '#f44336',
   },
   executeButtonText: {
     color: '#fff',
@@ -1118,6 +1873,111 @@ const styles = StyleSheet.create({
   previewItemPath: {
     color: '#888',
     fontSize: 12,
+  },
+  // Preview Modal Styles
+  previewContainer: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+  },
+  jupyterContainer: {
+    flex: 1,
+  },
+  jupyterInfo: {
+    backgroundColor: '#2a2a2a',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  jupyterUrlText: {
+    color: '#4CAF50',
+    fontSize: 12,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    marginBottom: 5,
+  },
+  jupyterStatusText: {
+    color: '#888',
+    fontSize: 12,
+  },
+  webView: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+  },
+  webViewLoading: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: '#f44336',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  retryButton: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  matplotlibContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  matplotlibTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  matplotlibPath: {
+    color: '#888',
+    fontSize: 12,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  webappContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  webappTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  webappPort: {
+    color: '#888',
+    fontSize: 14,
+  },
+  unknownContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  unknownText: {
+    color: '#888',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

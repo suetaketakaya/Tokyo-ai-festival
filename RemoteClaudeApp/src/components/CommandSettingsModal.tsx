@@ -10,6 +10,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Switch,
+  Platform,
 } from 'react-native';
 
 interface Command {
@@ -409,7 +410,7 @@ const styles = StyleSheet.create({
   previewCommand: {
     fontSize: 12,
     color: '#888',
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     backgroundColor: '#f8f8f8',
     padding: 8,
     borderRadius: 4,

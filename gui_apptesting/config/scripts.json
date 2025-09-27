@@ -1,0 +1,43 @@
+{
+  "startup_delay": 2,
+  "health_check_timeout": 30,
+  "process_kill_timeout": 10,
+  "cleanup_on_exit": true,
+  "auto_restart": false,
+  "log_rotation": {
+    "enabled": true,
+    "max_size": "10MB",
+    "max_files": 5
+  },
+  "monitoring": {
+    "enabled": true,
+    "interval_ms": 5000,
+    "metrics": [
+      "memory",
+      "cpu",
+      "response_time",
+      "error_rate"
+    ]
+  },
+  "notifications": {
+    "enabled": false,
+    "webhook_url": "",
+    "email": {
+      "enabled": false,
+      "smtp_host": "",
+      "smtp_port": 587,
+      "username": "",
+      "password": ""
+    }
+  },
+  "backup": {
+    "enabled": true,
+    "interval_hours": 24,
+    "retain_days": 7,
+    "directories": [
+      "logs",
+      "reports",
+      "config"
+    ]
+  }
+}

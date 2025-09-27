@@ -1,0 +1,365 @@
+{
+  "timestamp": "2025-09-21T05:19:00.425Z",
+  "environment": "gui_apptesting",
+  "summary": {
+    "total": 25,
+    "passed": 25,
+    "failed": 0,
+    "warnings": 0
+  },
+  "tests": [
+    {
+      "name": "Node.js Environment",
+      "status": "pass",
+      "result": {
+        "version": "v20.17.0",
+        "status": "compatible"
+      },
+      "duration_ms": 0,
+      "timestamp": "2025-09-21T05:19:00.448Z"
+    },
+    {
+      "name": "Directory Structure",
+      "status": "pass",
+      "result": {
+        "files": [
+          "package.json",
+          "fixed-command-tester.js",
+          "reliable-gui-monitor.js",
+          "performance-analyzer.js",
+          "reports"
+        ],
+        "status": "all_present"
+      },
+      "duration_ms": 0,
+      "timestamp": "2025-09-21T05:19:00.448Z"
+    },
+    {
+      "name": "Dependencies Check",
+      "status": "pass",
+      "result": {
+        "dependencies": 17,
+        "devDependencies": 17,
+        "total": 34
+      },
+      "duration_ms": 0,
+      "timestamp": "2025-09-21T05:19:00.449Z"
+    },
+    {
+      "name": "Go Server Status API",
+      "status": "pass",
+      "result": {
+        "host": "192.168.0.135",
+        "port": "8091",
+        "connection_url": "ws://192.168.0.135:8091/ws?key=3648b8f946d71a62c018ac5198ee757c",
+        "mode": "local"
+      },
+      "duration_ms": 35,
+      "timestamp": "2025-09-21T05:19:00.484Z"
+    },
+    {
+      "name": "Go Server Web UI",
+      "status": "pass",
+      "result": {
+        "accessible": true,
+        "content_length": 18415,
+        "has_title": true
+      },
+      "duration_ms": 3,
+      "timestamp": "2025-09-21T05:19:00.487Z"
+    },
+    {
+      "name": "QR Code Generation",
+      "status": "pass",
+      "result": {
+        "content_type": "image/png",
+        "size_bytes": "481",
+        "accessible": true
+      },
+      "duration_ms": 13,
+      "timestamp": "2025-09-21T05:19:00.500Z"
+    },
+    {
+      "name": "WebSocket Connection",
+      "status": "pass",
+      "result": {
+        "connection_time_ms": 5,
+        "status": "connected",
+        "url": "ws://192.168.0.135:8091/ws?key=3648b8f946d71a62c018ac5198ee757c"
+      },
+      "duration_ms": 7,
+      "timestamp": "2025-09-21T05:19:00.507Z"
+    },
+    {
+      "name": "WebSocket Ping/Pong",
+      "status": "pass",
+      "result": {
+        "response_type": "connection_established",
+        "latency_ms": 6,
+        "status": "pong_received"
+      },
+      "duration_ms": 6,
+      "timestamp": "2025-09-21T05:19:00.513Z"
+    },
+    {
+      "name": "Project List Request",
+      "status": "pass",
+      "result": {
+        "projects_count": 1,
+        "response_time_ms": 50,
+        "total": 1
+      },
+      "duration_ms": 51,
+      "timestamp": "2025-09-21T05:19:00.564Z"
+    },
+    {
+      "name": "Expo Dev Server Primary",
+      "status": "pass",
+      "result": {
+        "accessible": true,
+        "status": 200,
+        "expo_detected": true,
+        "content_preview": "{\"id\":\"75d6199a-09f1-40bc-9fa4-1d05b7649a14\",\"createdAt\":\"2025-09-21T05:19:00.614Z\",\"runtimeVersion\":\"exposdk:49.0.0\",\"launchAsset\":{\"key\":\"bundle\",\"contentType\":\"application/javascript\",\"url\":\"http:/"
+      },
+      "duration_ms": 51,
+      "timestamp": "2025-09-21T05:19:00.615Z"
+    },
+    {
+      "name": "Expo Dev Server Secondary",
+      "status": "pass",
+      "result": {
+        "accessible": true,
+        "status": 200,
+        "expo_detected": true,
+        "content_preview": "{\"id\":\"18817144-6377-4334-8ac1-4955c49d84e6\",\"createdAt\":\"2025-09-21T05:19:00.695Z\",\"runtimeVersion\":\"exposdk:49.0.0\",\"launchAsset\":{\"key\":\"bundle\",\"contentType\":\"application/javascript\",\"url\":\"http:/"
+      },
+      "duration_ms": 81,
+      "timestamp": "2025-09-21T05:19:00.696Z"
+    },
+    {
+      "name": "React Native App Structure",
+      "status": "pass",
+      "result": {
+        "app_directory_exists": true,
+        "package_json_exists": true,
+        "name": "remote-claude-app",
+        "version": "2.0.0",
+        "expo_version": "~49.0.10"
+      },
+      "duration_ms": 1,
+      "timestamp": "2025-09-21T05:19:00.697Z"
+    },
+    {
+      "name": "Fixed Command Tester API",
+      "status": "pass",
+      "result": {
+        "timestamp": "2025-09-21T05:19:00.698Z",
+        "server_info": {
+          "status": "running",
+          "host": "192.168.0.135",
+          "port": "8091",
+          "sessionKey": "3648b8f946d71a62c018ac5198ee757c",
+          "mode": "local",
+          "qrCodeUrl": "/qr-code.png?t=1758394906",
+          "connection_url": "ws://192.168.0.135:8091/ws?key=3648b8f946d71a62c018ac5198ee757c",
+          "clients": []
+        },
+        "last_test_results": 5
+      },
+      "duration_ms": 3,
+      "timestamp": "2025-09-21T05:19:00.700Z"
+    },
+    {
+      "name": "Command Execution Test",
+      "status": "pass",
+      "result": {
+        "success": true,
+        "response_time": 152,
+        "response_type": "claude_output",
+        "project_id": "test2-1758332419",
+        "command_sent": "echo \"GUI Test Suite\""
+      },
+      "duration_ms": 156,
+      "timestamp": "2025-09-21T05:19:00.856Z"
+    },
+    {
+      "name": "Ping Command Test",
+      "status": "pass",
+      "result": {
+        "success": true,
+        "response_time": 5,
+        "response_type": "pong"
+      },
+      "duration_ms": 7,
+      "timestamp": "2025-09-21T05:19:00.863Z"
+    },
+    {
+      "name": "Reliable GUI Monitor",
+      "status": "pass",
+      "result": {
+        "accessible": true,
+        "has_dashboard": false,
+        "content_length": 13305,
+        "status": 200
+      },
+      "duration_ms": 4,
+      "timestamp": "2025-09-21T05:19:00.867Z"
+    },
+    {
+      "name": "Performance Analyzer",
+      "status": "pass",
+      "result": {
+        "analyzer_exists": true,
+        "report_exists": true,
+        "last_analysis": "2025-09-21T05:07:31.403Z",
+        "overall_score": 91
+      },
+      "duration_ms": 0,
+      "timestamp": "2025-09-21T05:19:00.867Z"
+    },
+    {
+      "name": "System Resource Usage",
+      "status": "pass",
+      "result": {
+        "memory_mb": 93,
+        "heap_used_mb": 8,
+        "heap_total_mb": 12,
+        "cpu_user_ms": 142,
+        "response_time_ms": 0
+      },
+      "duration_ms": 0,
+      "timestamp": "2025-09-21T05:19:00.867Z"
+    },
+    {
+      "name": "WebSocket Performance",
+      "status": "pass",
+      "result": {
+        "iterations": 5,
+        "avg_latency_ms": 5,
+        "min_latency_ms": 4,
+        "max_latency_ms": 5,
+        "all_latencies": [
+          4,
+          4,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          4,
+          4
+        ]
+      },
+      "duration_ms": 528,
+      "timestamp": "2025-09-21T05:19:01.395Z"
+    },
+    {
+      "name": "Report Generation",
+      "status": "pass",
+      "result": {
+        "reports_directory_exists": true,
+        "report_files_count": 1,
+        "report_files": [
+          "gui-test-report.json"
+        ]
+      },
+      "duration_ms": 0,
+      "timestamp": "2025-09-21T05:19:01.396Z"
+    },
+    {
+      "name": "Test Results Storage",
+      "status": "pass",
+      "result": {
+        "write_success": true,
+        "read_success": true,
+        "data_integrity": true
+      },
+      "duration_ms": 1,
+      "timestamp": "2025-09-21T05:19:01.397Z"
+    },
+    {
+      "name": "WebSocket Authentication",
+      "status": "pass",
+      "result": {
+        "authentication_required": true,
+        "invalid_key_rejected": true,
+        "status": "secure"
+      },
+      "duration_ms": 2,
+      "timestamp": "2025-09-21T05:19:01.399Z"
+    },
+    {
+      "name": "Input Validation",
+      "status": "pass",
+      "result": {
+        "dangerous_commands_tested": 4,
+        "blocked_commands": 0,
+        "security_score": 0,
+        "results": [
+          {
+            "command": "rm -rf /",
+            "response": true
+          },
+          {
+            "command": "sudo shutdown now",
+            "response": true
+          },
+          {
+            "command": "format c:",
+            "response": true
+          },
+          {
+            "command": "../../../../etc/passwd",
+            "response": true
+          }
+        ]
+      },
+      "duration_ms": 15790,
+      "timestamp": "2025-09-21T05:19:17.189Z"
+    },
+    {
+      "name": "Invalid API Requests",
+      "status": "pass",
+      "result": {
+        "invalid_requests_tested": 3,
+        "gracefully_handled": 2,
+        "error_handling_score": 66.66666666666666,
+        "results": [
+          {
+            "url": "http://localhost:3005/api/invalid",
+            "method": "GET",
+            "status": 404,
+            "handled_gracefully": true
+          },
+          {
+            "url": "http://localhost:3005/api/test",
+            "method": "POST",
+            "status": 400,
+            "handled_gracefully": true
+          },
+          {
+            "url": "http://localhost:3005/api/test",
+            "method": "POST",
+            "status": 500,
+            "handled_gracefully": false
+          }
+        ]
+      },
+      "duration_ms": 15009,
+      "timestamp": "2025-09-21T05:19:32.199Z"
+    },
+    {
+      "name": "Connection Recovery",
+      "status": "pass",
+      "result": {
+        "initial_connection": true,
+        "disconnection_handled": true,
+        "reconnection_successful": true,
+        "recovery_status": "excellent"
+      },
+      "duration_ms": 2014,
+      "timestamp": "2025-09-21T05:19:34.213Z"
+    }
+  ]
+}

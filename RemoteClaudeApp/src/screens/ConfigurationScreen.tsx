@@ -16,7 +16,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/Navigation';
-import WebSocketService from '../services/WebSocketService';
+import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
 
 type ConfigurationScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -92,14 +92,14 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
 
     // Cleanup function to prevent memory leaks
     return () => {
-      WebSocketService.updateCallbacks({
+      EnhancedWebSocketService.updateCallbacks({
         onMessage: () => {}, // Clear callbacks
       });
     };
   }, []);
 
   const loadConfiguration = async () => {
-    if (!WebSocketService.isConnected()) {
+    if (!EnhancedWebSocketService.isConnected()) {
       Alert.alert('接続エラー', 'サーバーに接続されていません。サーバーリストから接続を確認してください。', [
         { text: 'サーバーリストへ', onPress: () => navigation.goBack() },
         { text: 'リトライ', onPress: loadConfiguration }
@@ -109,7 +109,7 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
 
     try {
       // Send config load request
-      WebSocketService.send({
+      EnhancedEnhancedWebSocketService.send({
         type: 'config_load',
         data: {
           user_id: 'default',
@@ -117,7 +117,7 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
       });
 
       // Set up message handler
-      WebSocketService.updateCallbacks({
+      EnhancedWebSocketService.updateCallbacks({
         onMessage: (message) => {
           try {
             console.log('📥 Config load message received:', message.type, message.status);
@@ -162,7 +162,7 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
       return;
     }
 
-    if (!WebSocketService.isConnected()) {
+    if (!EnhancedWebSocketService.isConnected()) {
       Alert.alert('接続エラー', 'サーバーに接続されていません。', [
         { text: 'サーバーリストへ', onPress: () => navigation.goBack() },
         { text: 'リトライ', onPress: saveConfiguration }
@@ -174,13 +174,13 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
 
     try {
       // Send config save request
-      WebSocketService.send({
+      EnhancedEnhancedWebSocketService.send({
         type: 'config_save',
         data: config,
       });
 
       // Set up message handler
-      WebSocketService.updateCallbacks({
+      EnhancedWebSocketService.updateCallbacks({
         onMessage: (message) => {
           try {
             console.log('💾 Config save message received:', message.type, message.status);
@@ -255,7 +255,7 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
   };
 
   const syncConfiguration = async (useAdminPrivileges = false) => {
-    if (!WebSocketService.isConnected()) {
+    if (!EnhancedWebSocketService.isConnected()) {
       Alert.alert('接続エラー', 'サーバーに接続されていません。', [
         { text: 'サーバーリストへ', onPress: () => navigation.goBack() },
         { text: 'リトライ', onPress: syncConfiguration }
@@ -267,7 +267,7 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
 
     try {
       // Set up message handler first
-      WebSocketService.updateCallbacks({
+      EnhancedWebSocketService.updateCallbacks({
         onMessage: (message) => {
           try {
             console.log('🔄 Sync message received:', message.type, message.status);
@@ -312,7 +312,7 @@ export default function ConfigurationScreen({ navigation, route }: Props) {
       });
 
       // Send config sync request
-      WebSocketService.send({
+      EnhancedEnhancedWebSocketService.send({
         type: 'config_sync',
         data: {
           user_id: 'default',

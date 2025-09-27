@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import StorageService from '../services/StorageService';
-import WebSocketService from '../services/WebSocketService';
+import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
 
 interface GitConfig {
   username: string;
@@ -103,7 +103,7 @@ const DetailedSettingsScreen: React.FC<Props> = ({ navigation }) => {
 
     setSyncingWithServer(true);
     try {
-      const success = WebSocketService.send({
+      const success = EnhancedEnhancedWebSocketService.send({
         type: 'config_sync',
         data: {
           user_id: 'default',

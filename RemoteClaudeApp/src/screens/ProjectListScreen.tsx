@@ -12,7 +12,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/Navigation';
-import WebSocketService from '../services/WebSocketService';
+import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
 
 type ProjectListScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -47,13 +47,13 @@ export default function ProjectListScreen({ navigation, route }: Props) {
 
     return () => {
       // Cleanup callbacks when component unmounts
-      WebSocketService.unregisterScreenCallbacks('projectlist');
+      EnhancedWebSocketService.unregisterScreenCallbacks('projectlist');
     };
   }, []);
 
   const checkConnection = async () => {
     console.log('🔍 ProjectListScreen - Checking connection...');
-    const wsConnected = WebSocketService.isConnected();
+    const wsConnected = EnhancedWebSocketService.isConnected();
     console.log('🔍 WebSocket connected:', wsConnected);
     
     if (wsConnected) {
@@ -61,7 +61,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
       setIsLoading(false);
       
       // Register callbacks for this screen
-      WebSocketService.registerScreenCallbacks('projectlist', {
+      EnhancedWebSocketService.registerScreenCallbacks('projectlist', {
         onMessage: (message) => {
           handleServerMessage(message);
         },
@@ -83,7 +83,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
     try {
       setIsLoading(true);
       
-      const success = await WebSocketService.connect(connectionUrl, {
+      const success = await EnhancedWebSocketService.connect(connectionUrl, {
         onOpen: () => {
           console.log('✅ Connected to RemoteClaude server');
           setIsConnected(true);
@@ -114,7 +114,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
   };
 
   const requestProjectList = () => {
-    WebSocketService.send({
+    EnhancedWebSocketService.send({
       type: 'project_list_request',
       data: {}
     });
@@ -172,12 +172,28 @@ export default function ProjectListScreen({ navigation, route }: Props) {
         Alert.alert('Server Error', message.data?.message || 'Unknown error occurred.');
         break;
       
+      case 'preview_list_response':
+        // This message is handled by DevelopmentScreen, ignore here
+        console.log('🔄 PROJECTLIST: Forwarding preview_list_response to DevelopmentScreen');
+        return;
+
+      case 'claude_progress':
+      case 'stage_completed':
+      case 'execution_progress':
+      case 'preview_ready':
+      case 'claude_thinking':
       case 'claude_output':
       case 'claude_error':
+      case 'preview_jupyter_ready':
+      case 'preview_webapp_response':
+      case 'matplotlib_generated':
+      case 'code_generated':
+      case 'execution_completed':
+      case 'container_info_response':
         // These messages are handled by DevelopmentScreen, ignore them here
         console.log('🔄 PROJECTLIST: Ignoring development message type:', message.type);
         return;
-        
+
       default:
         console.log('🚨 PROJECTLIST: Unknown message type:', message.type);
     }
@@ -185,7 +201,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    if (WebSocketService.isConnected()) {
+    if (EnhancedWebSocketService.isConnected()) {
       requestProjectList();
     } else {
       await checkConnection();
@@ -232,7 +248,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
   const createProject = (projectName: string) => {
     setIsLoading(true);
     
-    WebSocketService.send({
+    EnhancedWebSocketService.send({
       type: 'project_create_request',
       data: {
         name: projectName,
@@ -247,7 +263,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
   };
 
   const startProject = (projectId: string) => {
-    WebSocketService.send({
+    EnhancedWebSocketService.send({
       type: 'project_start_request',
       data: {
         project_id: projectId
@@ -256,7 +272,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
   };
 
   const stopProject = (projectId: string) => {
-    WebSocketService.send({
+    EnhancedWebSocketService.send({
       type: 'project_stop_request',
       data: {
         project_id: projectId
@@ -274,7 +290,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
           text: 'Delete', 
           style: 'destructive',
           onPress: () => {
-            WebSocketService.send({
+            EnhancedWebSocketService.send({
               type: 'project_remove_request',
               data: {
                 project_id: projectId
@@ -404,7 +420,18 @@ export default function ProjectListScreen({ navigation, route }: Props) {
                     <Text style={styles.actionButtonText}>⏹️ Stop</Text>
                   </TouchableOpacity>
                 ) : null}
-                
+
+                <TouchableOpacity
+                  style={styles.manageButton}
+                  onPress={() => navigation.navigate('ProjectManagement', {
+                    serverUrl: route.params.serverUrl,
+                    projectId: project.id,
+                    projectName: project.name,
+                  })}
+                >
+                  <Text style={styles.actionButtonText}>⚙️ Manage</Text>
+                </TouchableOpacity>
+
                 <TouchableOpacity
                   style={styles.deleteButton}
                   onPress={() => removeProject(project.id)}
@@ -595,6 +622,14 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     backgroundColor: '#6c757d',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  manageButton: {
+    backgroundColor: '#007AFF',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,

@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import WebSocketService from '../services/WebSocketService';
+import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
 
 interface Command {
   id: string;
@@ -62,7 +62,7 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
           <TouchableOpacity
             style={[styles.headerButton, { backgroundColor: isConnected ? '#4CAF50' : '#f44336' }]}
             onPress={() => {
-              const debugInfo = WebSocketService.getDebugInfo();
+              const debugInfo = EnhancedEnhancedWebSocketService.getDetailedDebugInfo();
               Alert.alert('Debug Info', JSON.stringify(debugInfo, null, 2));
             }}
           >
@@ -80,7 +80,7 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
     connectToServer();
 
     return () => {
-      WebSocketService.unregisterScreenCallbacks('quickcommands');
+      EnhancedWebSocketService.unregisterScreenCallbacks('quickcommands');
     };
   }, []);
 
@@ -88,7 +88,7 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
     // serverUrl already includes /ws and key parameter
     const connectionUrl = serverUrl;
 
-    const success = await WebSocketService.connect(connectionUrl, {
+    const success = await EnhancedEnhancedWebSocketService.connect(connectionUrl, {
       onOpen: () => {
         setIsConnected(true);
       },
@@ -321,7 +321,7 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
         : cmd
     ));
 
-    const success = WebSocketService.send({
+    const success = EnhancedEnhancedWebSocketService.send({
       type: 'claude_execute',
       data: {
         project_id: projectId,

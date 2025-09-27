@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Clipboard,
   Alert,
+  Platform,
 } from 'react-native';
 
 interface WebSocketMessage {
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
   messageTimestamp: {
     fontSize: 12,
     color: '#666',
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   },
   copyButton: {
     backgroundColor: '#f0f0f0',
@@ -361,7 +362,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dataText: {
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     fontSize: 12,
     color: '#333',
     backgroundColor: '#f8f8f8',
@@ -386,7 +387,7 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   outputText: {
-    fontFamily: 'Courier',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     fontSize: 12,
     color: '#333',
     lineHeight: 16,

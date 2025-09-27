@@ -16,7 +16,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../types/Navigation';
-import WebSocketService from '../services/WebSocketService';
+import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
 
 type DevelopmentScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -71,11 +71,11 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
     });
 
     console.log('🔥 DEVELOPMENT_INIT: Setting up WebSocket callbacks');
-    if (WebSocketService.isConnected()) {
+    if (EnhancedWebSocketService.isConnected()) {
       console.log('🔥 DEVELOPMENT_INIT: WebSocket already connected, updating callbacks');
       setIsConnected(true);
 
-      WebSocketService.updateCallbacks({
+      EnhancedWebSocketService.updateCallbacks({
         onMessage: handleServerMessage,
       });
 
@@ -93,7 +93,7 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
   const connectToServer = async () => {
     addSystemMessage('🔌 Attempting to connect to server...');
 
-    const success = await WebSocketService.connect(connectionUrl, {
+    const success = await EnhancedEnhancedWebSocketService.connect(connectionUrl, {
       onOpen: () => {
         setIsConnected(true);
         addSystemMessage('✅ Successfully connected to RemoteClaude server');
@@ -266,7 +266,7 @@ export default function DevelopmentScreen({ navigation, route }: Props) {
 
     addTerminalLine(`$ ${command}`, 'command');
 
-    const success = WebSocketService.send({
+    const success = EnhancedEnhancedWebSocketService.send({
       type: 'claude_execute',
       data: {
         project_id: projectId,

@@ -12,9 +12,10 @@ import {
   Modal,
   Dimensions,
   Platform,
+  Linking,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import WebSocketService from '../services/WebSocketService';
+import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
 
 interface PreviewContent {
   id: string;
@@ -48,6 +49,11 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showFullscreen, setShowFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'matplotlib' | 'web' | 'images'>('all');
+  const [errorState, setErrorState] = useState<{
+    hasError: boolean;
+    message: string;
+    type: 'connection' | 'preview' | 'server' | null;
+  }>({ hasError: false, message: '', type: null });
 
   const webViewRef = useRef<WebView>(null);
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -66,7 +72,7 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
           <TouchableOpacity
             style={[styles.headerButton, { backgroundColor: isConnected ? '#4CAF50' : '#f44336' }]}
             onPress={() => {
-              const debugInfo = WebSocketService.getDebugInfo();
+              const debugInfo = EnhancedWebSocketService.getDetailedDebugInfo();
               Alert.alert('Debug Info', JSON.stringify(debugInfo, null, 2));
             }}
           >
@@ -84,31 +90,59 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
     loadInitialPreviews();
 
     return () => {
-      WebSocketService.unregisterScreenCallbacks('preview');
+      EnhancedWebSocketService.unregisterScreenCallbacks('preview');
     };
   }, []);
 
   const connectToServer = async () => {
-    // serverUrl already includes /ws and key parameter
-    const connectionUrl = serverUrl;
+    try {
+      setErrorState({ hasError: false, message: '', type: null });
+      // serverUrl already includes /ws and key parameter
+      const connectionUrl = serverUrl;
 
-    const success = await WebSocketService.connect(connectionUrl, {
-      onOpen: () => {
-        setIsConnected(true);
-        requestPreviewList();
-      },
-      onMessage: handleServerMessage,
-      onError: (error) => {
-        console.error('WebSocket error:', error);
-        setIsConnected(false);
-      },
-      onClose: (event) => {
-        setIsConnected(false);
-      },
-    }, 'preview');
+      const success = await EnhancedWebSocketService.connect(connectionUrl, {
+        onOpen: () => {
+          setIsConnected(true);
+          setErrorState({ hasError: false, message: '', type: null });
+          requestPreviewList();
+        },
+        onMessage: handleServerMessage,
+        onError: (error) => {
+          console.error('WebSocket error:', error);
+          setIsConnected(false);
+          setErrorState({
+            hasError: true,
+            message: `WebSocket connection error: ${error.message || 'Unknown error'}`,
+            type: 'connection'
+          });
+        },
+        onClose: (event) => {
+          setIsConnected(false);
+          if (event.code !== 1000) { // Not a normal closure
+            setErrorState({
+              hasError: true,
+              message: `Connection closed unexpectedly (Code: ${event.code})`,
+              type: 'connection'
+            });
+          }
+        },
+      }, 'preview');
 
-    if (!success) {
-      Alert.alert('Connection Failed', 'Could not connect to the server.');
+      if (!success) {
+        setErrorState({
+          hasError: true,
+          message: 'Failed to establish WebSocket connection to server',
+          type: 'connection'
+        });
+        Alert.alert('Connection Failed', 'Could not connect to the server.');
+      }
+    } catch (error) {
+      console.error('Connection setup error:', error);
+      setErrorState({
+        hasError: true,
+        message: `Connection setup failed: ${error.message || 'Unknown error'}`,
+        type: 'connection'
+      });
     }
   };
 
@@ -133,7 +167,24 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
         break;
 
       case 'preview_error':
-        Alert.alert('Preview Error', message.data?.error || 'Unknown error occurred');
+        const errorMessage = message.data?.error || 'Unknown error occurred';
+        setErrorState({
+          hasError: true,
+          message: errorMessage,
+          type: 'preview'
+        });
+        Alert.alert('Preview Error', errorMessage);
+        setIsLoading(false);
+        break;
+
+      case 'server_error':
+        const serverError = message.data?.error || 'Server error occurred';
+        setErrorState({
+          hasError: true,
+          message: serverError,
+          type: 'server'
+        });
+        Alert.alert('Server Error', serverError);
         setIsLoading(false);
         break;
 
@@ -248,7 +299,7 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const requestPreviewList = () => {
     setIsLoading(true);
-    WebSocketService.send({
+    EnhancedWebSocketService.send({
       type: 'preview_list_request',
       data: {
         project_id: projectId,
@@ -258,9 +309,48 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const refreshPreviews = () => {
     if (isConnected) {
+      setErrorState({ hasError: false, message: '', type: null });
+      setIsLoading(true);
       requestPreviewList();
     } else {
+      setErrorState({
+        hasError: true,
+        message: 'Cannot refresh: not connected to server',
+        type: 'connection'
+      });
       Alert.alert('Error', 'Not connected to server');
+    }
+  };
+
+  const openInBrowser = async (url: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        throw new Error(`Cannot open URL: ${url}`);
+      }
+    } catch (error) {
+      console.error('Browser open error:', error);
+      setErrorState({
+        hasError: true,
+        message: `Failed to open in browser: ${error.message || 'Unknown error'}`,
+        type: 'preview'
+      });
+      Alert.alert(
+        'ブラウザで開けませんでした',
+        `URLを開くことができませんでした: ${error.message || 'Unknown error'}\n\nURL: ${url}`,
+        [
+          { text: 'キャンセル', style: 'cancel' },
+          {
+            text: 'URLをコピー',
+            onPress: () => {
+              // Copy URL to clipboard functionality would go here
+              Alert.alert('URL', url);
+            }
+          }
+        ]
+      );
     }
   };
 
@@ -322,11 +412,25 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
             source={{ uri: item.content.startsWith('data:') ? item.content : `data:image/png;base64,${item.content}` }}
             style={styles.thumbnailImage}
             resizeMode="cover"
+            onError={(error) => {
+              console.error('Image load error:', error);
+              setErrorState({
+                hasError: true,
+                message: `Failed to load image: ${item.title}`,
+                type: 'preview'
+              });
+            }}
           />
         ) : item.type === 'web' ? (
           <View style={styles.webPreview}>
             <Text style={styles.webUrl}>{item.content}</Text>
             <Text style={styles.webPort}>Port: {item.metadata.port}</Text>
+            <TouchableOpacity
+              style={styles.browserButton}
+              onPress={() => openInBrowser(item.content)}
+            >
+              <Text style={styles.browserButtonText}>🌐 ブラウザで開く</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.genericPreview}>
@@ -399,22 +503,48 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
                 />
               </ScrollView>
             ) : selectedItem.type === 'web' ? (
-              <WebView
-                ref={webViewRef}
-                source={{ uri: selectedItem.content }}
-                style={styles.webView}
-                startInLoadingState={true}
-                renderLoading={() => (
-                  <View style={styles.webViewLoading}>
-                    <ActivityIndicator size="large" color="#4CAF50" />
-                    <Text style={styles.loadingText}>Loading web app...</Text>
-                  </View>
-                )}
-                onError={(syntheticEvent) => {
-                  const { nativeEvent } = syntheticEvent;
-                  Alert.alert('WebView Error', `Failed to load: ${nativeEvent.description}`);
-                }}
-              />
+              <View style={styles.webContainer}>
+                <View style={styles.webActions}>
+                  <TouchableOpacity
+                    style={styles.browserOpenButton}
+                    onPress={() => openInBrowser(selectedItem.content)}
+                  >
+                    <Text style={styles.browserOpenButtonText}>🌐 ブラウザで開く</Text>
+                  </TouchableOpacity>
+                </View>
+                <WebView
+                  ref={webViewRef}
+                  source={{ uri: selectedItem.content }}
+                  style={styles.webView}
+                  startInLoadingState={true}
+                  renderLoading={() => (
+                    <View style={styles.webViewLoading}>
+                      <ActivityIndicator size="large" color="#4CAF50" />
+                      <Text style={styles.loadingText}>Loading web app...</Text>
+                    </View>
+                  )}
+                  onError={(syntheticEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    const errorMessage = `WebView failed to load: ${nativeEvent.description}`;
+                    setErrorState({
+                      hasError: true,
+                      message: errorMessage,
+                      type: 'preview'
+                    });
+                    Alert.alert('WebView Error', errorMessage);
+                  }}
+                  onHttpError={(syntheticEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    const errorMessage = `HTTP Error ${nativeEvent.statusCode}: ${nativeEvent.description}`;
+                    setErrorState({
+                      hasError: true,
+                      message: errorMessage,
+                      type: 'preview'
+                    });
+                  }}
+                  onLoadStart={() => setErrorState({ hasError: false, message: '', type: null })}
+                />
+              </View>
             ) : (
               <View style={styles.unsupportedPreview}>
                 <Text style={styles.unsupportedText}>
@@ -442,9 +572,35 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
     );
   };
 
+  const renderErrorBanner = () => {
+    if (!errorState.hasError) return null;
+
+    const getErrorColor = () => {
+      switch (errorState.type) {
+        case 'connection': return '#f44336';
+        case 'server': return '#FF5722';
+        case 'preview': return '#FF9800';
+        default: return '#666';
+      }
+    };
+
+    return (
+      <View style={[styles.errorBanner, { backgroundColor: getErrorColor() }]}>
+        <Text style={styles.errorText}>{errorState.message}</Text>
+        <TouchableOpacity
+          style={styles.errorCloseButton}
+          onPress={() => setErrorState({ hasError: false, message: '', type: null })}
+        >
+          <Text style={styles.errorCloseText}>✕</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {renderTabBar()}
+      {renderErrorBanner()}
 
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         {isLoading && (
@@ -636,6 +792,62 @@ const styles = StyleSheet.create({
   webPort: {
     color: '#888',
     fontSize: 11,
+  },
+  browserButton: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginTop: 8,
+    alignSelf: 'center',
+  },
+  browserButtonText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  webContainer: {
+    flex: 1,
+  },
+  webActions: {
+    backgroundColor: '#2a2a2a',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+    alignItems: 'center',
+  },
+  browserOpenButton: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  browserOpenButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    marginHorizontal: 15,
+    marginVertical: 5,
+    borderRadius: 8,
+  },
+  errorText: {
+    color: '#fff',
+    fontSize: 12,
+    flex: 1,
+    marginRight: 10,
+  },
+  errorCloseButton: {
+    padding: 4,
+  },
+  errorCloseText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   genericPreview: {
     backgroundColor: '#1a1a1a',

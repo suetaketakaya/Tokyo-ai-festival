@@ -20,16 +20,34 @@ class WebSocketService {
   private screenCallbacks: Map<string, ScreenCallbacks> = new Map();
   private currentActiveScreen: string | null = null;
 
-  // Automatic reconnection
-  private reconnectInterval: number = 3000;
-  private maxReconnectAttempts: number = 5;
+  // Enhanced automatic reconnection
+  private reconnectInterval: number = 2000;
+  private maxReconnectAttempts: number = 10;
   private reconnectAttempts: number = 0;
   private reconnectTimer: NodeJS.Timeout | null = null;
+  private exponentialBackoff: boolean = true;
+  private maxReconnectDelay: number = 30000; // 30 seconds max
 
-  // Connection health monitoring
+  // Enhanced connection health monitoring
   private pingInterval: NodeJS.Timeout | null = null;
   private pongTimeout: NodeJS.Timeout | null = null;
-  private heartbeatInterval: number = 30000; // 30 seconds
+  private heartbeatInterval: number = 15000; // 15 seconds (more frequent)
+  private connectionQuality: 'excellent' | 'good' | 'poor' | 'unstable' = 'excellent';
+  private lastPongTime: number = 0;
+  private lastPingTime: number = 0;
+  private connectionMetrics: {
+    totalReconnects: number;
+    lastDisconnectReason: string;
+    avgLatency: number;
+    connectionUptime: number;
+    connectionStartTime: number;
+  } = {
+    totalReconnects: 0,
+    lastDisconnectReason: '',
+    avgLatency: 0,
+    connectionUptime: 0,
+    connectionStartTime: 0,
+  };
 
   // Message queue for offline scenarios
   private messageQueue: any[] = [];
@@ -74,6 +92,11 @@ class WebSocketService {
           console.log('✅ WebSocket connected successfully');
           this.isConnecting = false;
           this.reconnectAttempts = 0;
+          this.connectionQuality = 'excellent';
+
+          // Initialize connection metrics
+          this.connectionMetrics.connectionStartTime = Date.now();
+          this.connectionMetrics.connectionUptime = 0;
 
           // Clear reconnect timer
           if (this.reconnectTimer) {
@@ -81,7 +104,7 @@ class WebSocketService {
             this.reconnectTimer = null;
           }
 
-          // Start health monitoring
+          // Start enhanced health monitoring
           this.startHealthMonitoring();
 
           // Send queued messages
@@ -99,6 +122,8 @@ class WebSocketService {
         this.ws!.onerror = (error) => {
           console.error('❌ WebSocket error occurred:', error);
           this.isConnecting = false;
+          this.connectionQuality = 'unstable';
+          this.connectionMetrics.lastDisconnectReason = `Error: ${error}`;
           this.notifyAllScreens('onError', error);
           resolve(false);
         };
@@ -301,7 +326,9 @@ class WebSocketService {
 
       // Handle pong responses for health monitoring
       if (message.type === 'pong') {
-        this.handlePongResponse();
+        // Handle nested timestamp structure from server
+        const timestamp = message.data?.timestamp?.timestamp || message.data?.timestamp;
+        this.handlePongResponse(timestamp);
         return;
       }
 
@@ -325,6 +352,36 @@ class WebSocketService {
     this.isConnecting = false;
     this.ws = null;
 
+    // Update connection metrics
+    if (this.connectionMetrics.connectionStartTime > 0) {
+      this.connectionMetrics.connectionUptime = Date.now() - this.connectionMetrics.connectionStartTime;
+    }
+
+    // Determine disconnection reason
+    let reasonText = 'Unknown';
+    switch (event.code) {
+      case 1000:
+        reasonText = 'Normal closure';
+        break;
+      case 1001:
+        reasonText = 'Stream end encountered';
+        break;
+      case 1006:
+        reasonText = 'Abnormal closure';
+        break;
+      case 1011:
+        reasonText = 'Server error';
+        break;
+      case 1012:
+        reasonText = 'Service restart';
+        break;
+      default:
+        reasonText = `Code ${event.code}: ${event.reason || 'No reason provided'}`;
+    }
+
+    this.connectionMetrics.lastDisconnectReason = reasonText;
+    console.log(`📊 Disconnect reason: ${reasonText}`);
+
     // Stop health monitoring
     this.stopHealthMonitoring();
 
@@ -332,21 +389,44 @@ class WebSocketService {
     this.notifyAllScreens('onClose', event);
 
     // Auto-reconnect for unexpected closures
+    // Don't reconnect for normal closures (1000) or stream end (1001)
     if (event.code !== 1000 && event.code !== 1001) {
+      console.log(`🔄 Scheduling reconnect due to unexpected closure (${event.code})`);
       this.scheduleReconnect();
+    } else {
+      console.log(`ℹ️ No reconnect scheduled for normal closure (${event.code})`);
     }
   }
 
   private scheduleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.log(`❌ Max reconnection attempts (${this.maxReconnectAttempts}) reached`);
+      this.connectionQuality = 'unstable';
       return;
     }
 
     this.reconnectAttempts++;
-    const delay = Math.min(this.reconnectInterval * Math.pow(2, this.reconnectAttempts - 1), 30000);
+    this.connectionMetrics.totalReconnects++;
 
-    console.log(`🔄 Scheduling reconnection attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${delay}ms`);
+    // Enhanced exponential backoff with jitter
+    let delay = this.reconnectInterval;
+    if (this.exponentialBackoff) {
+      delay = Math.min(
+        this.reconnectInterval * Math.pow(2, this.reconnectAttempts - 1),
+        this.maxReconnectDelay
+      );
+      // Add jitter to prevent thundering herd
+      delay += Math.random() * 1000;
+    }
+
+    // Adjust connection quality based on reconnect attempts
+    if (this.reconnectAttempts > 3) {
+      this.connectionQuality = 'poor';
+    } else if (this.reconnectAttempts > 1) {
+      this.connectionQuality = 'good';
+    }
+
+    console.log(`🔄 Scheduling reconnection attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${Math.round(delay)}ms (Quality: ${this.connectionQuality})`);
 
     this.reconnectTimer = setTimeout(() => {
       console.log(`🔄 Attempting reconnection ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
@@ -395,24 +475,78 @@ class WebSocketService {
 
   private sendPing(): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      console.log('🏓 Sending ping');
+      const pingTime = Date.now();
+      console.log(`🏓 Sending ping (timestamp: ${pingTime})`);
+
+      // Store the ping time for later latency calculation
+      this.lastPingTime = pingTime;
+
       this.send({
         type: 'ping',
-        data: { timestamp: Date.now() }
+        data: { timestamp: pingTime }
       });
 
-      // Set timeout for pong response
+      // Set timeout for pong response (adaptive based on connection quality)
+      const timeoutDuration = this.connectionQuality === 'excellent' ? 5000 :
+                             this.connectionQuality === 'good' ? 8000 :
+                             this.connectionQuality === 'poor' ? 12000 : 15000;
+
       this.pongTimeout = setTimeout(() => {
-        console.log('❌ Pong timeout - connection may be dead');
+        console.log(`❌ Pong timeout after ${timeoutDuration}ms - connection may be dead (Quality: ${this.connectionQuality})`);
+        this.connectionQuality = 'unstable';
+        this.connectionMetrics.lastDisconnectReason = 'Ping timeout';
         if (this.ws) {
           this.ws.close(1006, 'Ping timeout');
         }
-      }, 10000); // 10 second timeout
+      }, timeoutDuration);
     }
   }
 
-  private handlePongResponse(): void {
-    console.log('🏓 Received pong');
+  private handlePongResponse(pingTimestamp?: number): void {
+    const currentTime = Date.now();
+    let latency = 0;
+
+    // Calculate latency with better error handling and fallback
+    if (pingTimestamp && typeof pingTimestamp === 'number' && !isNaN(pingTimestamp)) {
+      latency = currentTime - pingTimestamp;
+      // Ensure latency is positive and reasonable
+      if (latency < 0 || latency > 60000) { // Max 60 seconds
+        latency = 0;
+      }
+    } else if (this.lastPingTime > 0) {
+      // Fallback to last ping time if timestamp is invalid
+      latency = currentTime - this.lastPingTime;
+      if (latency < 0 || latency > 60000) {
+        latency = 0;
+      }
+      console.log(`⚠️ Using fallback ping time for latency calculation`);
+    }
+
+    console.log(`🏓 Received pong (latency: ${latency}ms, pingTimestamp: ${pingTimestamp}, lastPingTime: ${this.lastPingTime})`);
+
+    // Update connection metrics only if latency is valid
+    if (latency > 0 && latency < 30000) { // Max 30 seconds for valid measurements
+      this.connectionMetrics.avgLatency = this.connectionMetrics.avgLatency === 0 ?
+        latency : (this.connectionMetrics.avgLatency + latency) / 2;
+
+      // Update connection quality based on latency
+      if (latency < 100) {
+        this.connectionQuality = 'excellent';
+      } else if (latency < 300) {
+        this.connectionQuality = 'good';
+      } else if (latency < 1000) {
+        this.connectionQuality = 'poor';
+      } else {
+        this.connectionQuality = 'unstable';
+      }
+
+      console.log(`📊 Connection quality: ${this.connectionQuality} (avg: ${Math.round(this.connectionMetrics.avgLatency)}ms)`);
+    } else {
+      console.log(`⚠️ Invalid latency measurement: ${latency}ms - skipping quality update`);
+    }
+
+    this.lastPongTime = currentTime;
+
     if (this.pongTimeout) {
       clearTimeout(this.pongTimeout);
       this.pongTimeout = null;
@@ -502,15 +636,26 @@ class WebSocketService {
 
   // Enhanced debugging methods
   getDebugInfo(): object {
+    const currentTime = Date.now();
+    const uptime = this.connectionMetrics.connectionStartTime > 0 ?
+      currentTime - this.connectionMetrics.connectionStartTime : 0;
+
     return {
       isConnected: this.isConnected(),
       connectionState: this.getConnectionState(),
+      connectionQuality: this.connectionQuality,
       reconnectAttempts: this.reconnectAttempts,
       activeScreen: this.currentActiveScreen,
       registeredScreens: Array.from(this.screenCallbacks.keys()),
       queuedMessages: this.messageQueue.length,
       isReconnecting: this.reconnectTimer !== null,
       healthMonitoring: this.pingInterval !== null,
+      metrics: {
+        ...this.connectionMetrics,
+        connectionUptime: Math.round(uptime / 1000), // seconds
+        avgLatency: Math.round(this.connectionMetrics.avgLatency),
+        lastPongAgo: this.lastPongTime > 0 ? Math.round((currentTime - this.lastPongTime) / 1000) : null,
+      },
     };
   }
 

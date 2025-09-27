@@ -15,7 +15,7 @@ import {
   FlatList,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import WebSocketService from '../services/WebSocketService';
+import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
 
 interface PreviewItem {
   id: string;
@@ -59,7 +59,7 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
   useEffect(() => {
     connectToServer();
     return () => {
-      WebSocketService.unregisterScreenCallbacks('preview');
+      EnhancedWebSocketService.unregisterScreenCallbacks('preview');
     };
   }, []);
 
@@ -67,11 +67,11 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
     try {
       setIsLoading(true);
 
-      const success = await WebSocketService.connect(serverUrl);
+      const success = await EnhancedEnhancedWebSocketService.connect(serverUrl);
       if (success) {
         setIsConnected(true);
 
-        WebSocketService.registerScreenCallbacks('preview', {
+        EnhancedWebSocketService.registerScreenCallbacks('preview', {
           onMessage: handleServerMessage,
           onConnect: () => {
             setIsConnected(true);
@@ -99,7 +99,7 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
   const requestPreviewList = () => {
     if (!isConnected) return;
 
-    WebSocketService.send({
+    EnhancedEnhancedWebSocketService.send({
       type: 'preview_list_request',
       data: {
         project_id: projectId,
@@ -148,7 +148,7 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
 
     if (item.type === 'matplotlib') {
       // Request image data
-      WebSocketService.send({
+      EnhancedEnhancedWebSocketService.send({
         type: 'preview_get_image',
         data: {
           project_id: projectId,
@@ -157,7 +157,7 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
       });
     } else if (item.type === 'webapp') {
       // Request webapp info
-      WebSocketService.send({
+      EnhancedEnhancedWebSocketService.send({
         type: 'preview_get_webapp',
         data: {
           project_id: projectId,
