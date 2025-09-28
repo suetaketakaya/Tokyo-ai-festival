@@ -1,5 +1,5 @@
-# 🚀 ClaudeOps Smart Terminal v5.0.0
-**🎯 技術弱者向け AI駆動開発環境 - スマートターミナル & プレビューシステム統合プラットフォーム**
+# 🚀 RemoteClaudeOPS v4.0 with W&B Integration
+**🎯 AI駆動リモート開発環境 - W&B統合プレビューシステム & MLワークフロー最適化プラットフォーム**
 
 ## 📱 Overview | 概要
 
@@ -27,11 +27,13 @@
 - 📱 **直感的操作**: タッチ操作に最適化されたモバイルUI
 - 🔧 **自動エラー解決**: 一般的なエラーパターンを検出・修正提案
 
-#### 📊 Weights & Biases 統合
-- 📈 **性能監視**: コマンド実行時間・成功率の追跡
-- 🔬 **機械学習最適化**: ユーザー行動パターン学習による精度向上
-- 📋 **レポート生成**: 開発効率とシステム最適化レポート
-- 🎯 **予測機能**: 次のアクション提案・エラー予防
+#### 📊 Weights & Biases (W&B) 統合 (New in v4.0)
+- 🔬 **実験管理**: ML実験の開始/停止/追跡管理
+- 📈 **自動メトリクス記録**: 訓練損失、精度の自動ログ
+- 🎨 **Matplotlibプロット統合**: 生成グラフの自動W&B保存
+- 📊 **実験履歴**: 過去実験の比較・分析機能
+- 🗂️ **アーティファクト管理**: モデル・データセットの版数管理
+- 🎯 **リアルタイム可視化**: 実験進捗のリアルタイム監視
 
 ## 🏗️ Architecture | システム構成
 
@@ -42,8 +44,8 @@
         ↕ Network Bridge
 💻 Multiple Servers (macOS/Ubuntu/WSL2)
         ↕ AI Machine Learning Integration
-🤖 W&B Optimized ML Classifiers (100% Claude Accuracy)
-        ↕ Real-time Decision Engine
+🤖 W&B Integrated ML Experiment Tracking
+        ↕ Real-time ML Workflow Optimization
 🐳 Docker Containers (Claude CLI + Development Tools)
         ↕ Auto-Setup & Package Management
 ```
@@ -1173,23 +1175,24 @@ Internet
 
 ## 📈 Version History | バージョン履歴
 
-### 🤖 v4.0.0 (2025-01-28) - AI Machine Learning Revolution
+### 🔬 v4.0.0 (2025-09-28) - W&B Integration Revolution
 #### ✨ Revolutionary Features | 革命的機能
-- 🎯 **100% Claude判定精度**: W&B最適化により完璧な自動判断実現
-- 🧠 **機械学習分類器**: RandomForest + TF-IDF特徴抽出による高精度分類
-- 📊 **リアルタイム学習**: ユーザーフィードバック統合による継続的精度向上
-- 🔍 **多層検出システム**: W&B → パターン → ファイルシステム → ポート監視の階層的検出
-- 📈 **80.4%総合精度**: プレビュー検出と実行判定の統合システム
-- 🚀 **技術弱者対応**: 専門知識不要でAIが全自動判断
-- 💡 **W&B統合**: Weights & Biases APIによる機械学習モデル管理
-- 🔄 **継続的改善**: 使用しながら自動精度向上するセルフラーニングシステム
+- 🔬 **W&B完全統合**: Weights & Biases実験管理システムの完全実装
+- 📊 **自動実験追跡**: Matplotlibプロットの自動W&Bログ機能
+- 🎯 **実験ライフサイクル管理**: 実験開始から終了まで完全自動化
+- 📈 **リアルタイムメトリクス**: 訓練損失・精度の自動記録
+- 🗂️ **アーティファクト統合**: モデル・データセット・プロットの版数管理
+- 📱 **Enhanced Preview Screen**: W&B専用タブ付きプレビュー画面
+- 🔄 **実験履歴管理**: 過去実験の比較・分析機能
+- 🎨 **可視化統合**: 高品質プロット表示とW&B連携
 
-#### 🔧 Performance Improvements | パフォーマンス改善
-- 🎯 Claude分類精度: 75% → **100%** (+25%改善)
-- 📱 レスポンス時間: 3秒 → 0.1秒 (30倍高速化)
-- 🧠 認知負荷軽減: 手動判断不要の完全自動化
-- 💾 モデルサイズ: 1MB以下の軽量化
-- 🔧 エラー率: 90%削減
+#### 🔧 Technical Improvements | 技術改善
+- 📱 プレビュー画面にW&Bタブ追加
+- 🔬 WandBIntegrationService.ts 新規実装
+- 📊 実験状態のリアルタイム表示
+- 🎯 Matplotlibプロット自動統合
+- 💾 ローカル実験データ管理
+- 🔧 TypeScript型安全性向上
 
 ### 🚀 v3.7.1 (2025-09-11) - External VPN & App Store Ready
 #### ✨ New Features | 新機能

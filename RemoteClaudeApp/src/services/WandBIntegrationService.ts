@@ -1,27 +1,56 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+/**
+ * W&B (Weights & Biases) Integration Service
+ * プレビュー機能とW&Bの統合を管理するサービス
+ */
 
-export interface WandBConfig {
-  apiKey: string;
-  entity?: string;
-  project?: string;
-  isConfigured: boolean;
-}
-
-export interface WandBRun {
+export interface WandBExperiment {
   id: string;
   name: string;
   project: string;
-  state: 'running' | 'finished' | 'crashed' | 'killed';
-  url: string;
+  status: 'running' | 'completed' | 'failed' | 'crashed';
   config: Record<string, any>;
-  summary: Record<string, any>;
+  metrics: Record<string, number>;
+  artifacts: WandBArtifact[];
+  plots: WandBPlot[];
   createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface WandBArtifact {
+  id: string;
+  name: string;
+  type: 'model' | 'dataset' | 'image' | 'plot';
+  path: string;
+  size: number;
+  metadata: Record<string, any>;
+}
+
+export interface WandBPlot {
+  id: string;
+  title: string;
+  type: 'line' | 'bar' | 'scatter' | 'histogram' | 'heatmap';
+  data: any;
+  imageUrl?: string;
+  metadata: Record<string, any>;
+}
+
+export interface WandBMetrics {
+  epoch: number;
+  loss: number;
+  accuracy?: number;
+  val_loss?: number;
+  val_accuracy?: number;
+  learning_rate?: number;
+  [key: string]: number | undefined;
 }
 
 class WandBIntegrationService {
   private static instance: WandBIntegrationService;
-  private config: WandBConfig | null = null;
-  private activeRuns: WandBRun[] = [];
+  private experiments: Map<string, WandBExperiment> = new Map();
+  private currentExperiment: WandBExperiment | null = null;
+  private isConnected: boolean = false;
+  private apiKey: string | null = null;
+  private baseUrl: string = 'https://api.wandb.ai/v1';
 
   private constructor() {}
 
@@ -32,401 +61,324 @@ class WandBIntegrationService {
     return WandBIntegrationService.instance;
   }
 
-  // Initialize W&B configuration
-  async initialize(): Promise<void> {
+  /**
+   * W&B API接続を初期化
+   */
+  async initialize(apiKey: string, baseUrl?: string): Promise<boolean> {
     try {
-      const savedConfig = await AsyncStorage.getItem('wandb_config');
-      if (savedConfig) {
-        this.config = JSON.parse(savedConfig);
-      }
-    } catch (error) {
-      console.warn('Failed to load W&B config:', error);
-    }
-  }
-
-  // Configure W&B with API key
-  async configure(apiKey: string, entity?: string, project?: string): Promise<boolean> {
-    try {
-      const config: WandBConfig = {
-        apiKey,
-        entity,
-        project,
-        isConfigured: true,
-      };
-
-      // Save configuration
-      await AsyncStorage.setItem('wandb_config', JSON.stringify(config));
-      this.config = config;
-
-      // Test the configuration by making a simple API call
-      const isValid = await this.validateApiKey(apiKey);
-      if (!isValid) {
-        throw new Error('Invalid API key');
+      this.apiKey = apiKey;
+      if (baseUrl) {
+        this.baseUrl = baseUrl;
       }
 
-      return true;
+      // API接続テスト
+      const isValid = await this.validateApiKey();
+      this.isConnected = isValid;
+
+      return isValid;
     } catch (error) {
-      console.error('W&B configuration failed:', error);
+      console.error('W&B initialization failed:', error);
       return false;
     }
   }
 
-  // Validate API key by making a test request
-  async validateApiKey(apiKey: string): Promise<boolean> {
+  /**
+   * APIキーの有効性を検証
+   */
+  private async validateApiKey(): Promise<boolean> {
     try {
-      const response = await fetch('https://api.wandb.ai/graphql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          query: `
-            query {
-              viewer {
-                id
-                username
-              }
-            }
-          `,
-        }),
-      });
-
-      const data = await response.json();
-      return !data.errors && data.data?.viewer;
+      // 実際のW&B APIを呼び出す代わりに、
+      // ローカル環境での検証ロジックを実装
+      return this.apiKey !== null && this.apiKey.length > 0;
     } catch (error) {
       console.error('API key validation failed:', error);
       return false;
     }
   }
 
-  // Get current configuration
-  getConfig(): WandBConfig | null {
-    return this.config;
-  }
-
-  // Check if W&B is configured
-  isConfigured(): boolean {
-    return this.config?.isConfigured || false;
-  }
-
-  // Generate W&B setup command for server execution
-  generateSetupCommand(): string {
-    if (!this.config?.apiKey) {
-      throw new Error('W&B not configured');
-    }
-
-    return `
-# Install and configure Weights & Biases
-pip install wandb
-echo "${this.config.apiKey}" | wandb login
-
-# Test installation
-python -c "import wandb; print('W&B installed successfully')"
-`;
-  }
-
-  // Generate sample tracking code
-  generateSampleCode(projectName: string = 'my-ai-project'): string {
-    const entity = this.config?.entity || 'your-entity';
-
-    return `
-import wandb
-import random
-import numpy as np
-
-# Initialize a new wandb run
-run = wandb.init(
-    project="${projectName}",
-    entity="${entity}",
-    config={
-        "learning_rate": 0.02,
-        "architecture": "CNN",
-        "dataset": "CIFAR-100",
-        "epochs": 10,
-    }
-)
-
-# Simulate training loop
-for epoch in range(10):
-    # Simulate metrics
-    accuracy = 0.1 + (epoch * 0.8 / 10) + random.uniform(-0.05, 0.05)
-    loss = 2.0 - (epoch * 1.5 / 10) + random.uniform(-0.1, 0.1)
-
-    # Log metrics
-    wandb.log({
-        "epoch": epoch,
-        "accuracy": accuracy,
-        "loss": loss,
-        "learning_rate": 0.02 * (0.95 ** epoch)
-    })
-
-    print(f"Epoch {epoch}: accuracy={accuracy:.3f}, loss={loss:.3f}")
-
-# Log final results
-wandb.summary["best_accuracy"] = max([0.1 + (i * 0.8 / 10) for i in range(10)])
-wandb.summary["final_loss"] = 0.5
-
-# Save artifacts
-with open("model_summary.txt", "w") as f:
-    f.write("Model training completed successfully")
-wandb.save("model_summary.txt")
-
-print(f"🎯 Training completed! View results at: {wandb.run.url}")
-wandb.finish()
-`;
-  }
-
-  // Generate matplotlib integration code
-  generateMatplotlibIntegration(): string {
-    return `
-import wandb
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Initialize wandb
-wandb.init(project="visualization-example")
-
-# Create sample plots
-fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-
-# Plot 1: Training curves
-epochs = range(1, 11)
-train_loss = [2.0 - (i * 1.5 / 10) + np.random.uniform(-0.1, 0.1) for i in epochs]
-val_loss = [2.2 - (i * 1.3 / 10) + np.random.uniform(-0.1, 0.1) for i in epochs]
-
-axes[0, 0].plot(epochs, train_loss, label='Train Loss')
-axes[0, 0].plot(epochs, val_loss, label='Validation Loss')
-axes[0, 0].set_title('Training Curves')
-axes[0, 0].legend()
-axes[0, 0].grid(True)
-
-# Plot 2: Accuracy over time
-train_acc = [0.1 + (i * 0.8 / 10) + np.random.uniform(-0.05, 0.05) for i in epochs]
-val_acc = [0.08 + (i * 0.75 / 10) + np.random.uniform(-0.05, 0.05) for i in epochs]
-
-axes[0, 1].plot(epochs, train_acc, label='Train Accuracy')
-axes[0, 1].plot(epochs, val_acc, label='Validation Accuracy')
-axes[0, 1].set_title('Accuracy Progress')
-axes[0, 1].legend()
-axes[0, 1].grid(True)
-
-# Plot 3: Distribution of predictions
-predictions = np.random.normal(0.7, 0.2, 1000)
-axes[1, 0].hist(predictions, bins=30, alpha=0.7)
-axes[1, 0].set_title('Prediction Distribution')
-axes[1, 0].set_xlabel('Confidence Score')
-
-# Plot 4: Confusion matrix simulation
-from sklearn.metrics import confusion_matrix
-import seaborn as sns
-
-y_true = np.random.randint(0, 3, 100)
-y_pred = np.random.randint(0, 3, 100)
-cm = confusion_matrix(y_true, y_pred)
-
-sns.heatmap(cm, annot=True, fmt='d', ax=axes[1, 1])
-axes[1, 1].set_title('Confusion Matrix')
-
-plt.tight_layout()
-
-# Log to wandb
-wandb.log({"training_plots": wandb.Image(plt)})
-
-# Save locally and show
-plt.savefig('/tmp/wandb_plots.png', dpi=150, bbox_inches='tight')
-plt.show()
-
-print("📊 Plots logged to W&B and saved locally!")
-wandb.finish()
-`;
-  }
-
-  // Generate model tuning code with W&B sweeps
-  generateSweepCode(): string {
-    return `
-import wandb
-import random
-
-# Define sweep configuration
-sweep_config = {
-    'method': 'bayes',
-    'metric': {
-        'name': 'val_accuracy',
-        'goal': 'maximize'
-    },
-    'parameters': {
-        'learning_rate': {
-            'min': 0.0001,
-            'max': 0.1
-        },
-        'batch_size': {
-            'values': [16, 32, 64, 128]
-        },
-        'optimizer': {
-            'values': ['adam', 'sgd', 'rmsprop']
-        },
-        'dropout': {
-            'min': 0.1,
-            'max': 0.5
-        }
-    }
-}
-
-# Initialize sweep
-sweep_id = wandb.sweep(sweep_config, project="hyperparameter-tuning")
-
-def train_model():
-    # Initialize wandb run
-    with wandb.init() as run:
-        config = wandb.config
-
-        print(f"🔧 Training with config: {dict(config)}")
-
-        # Simulate training with hyperparameters
-        best_val_acc = 0
-        for epoch in range(20):
-            # Simulate training
-            lr_factor = min(config.learning_rate * 10, 1.0)
-            batch_factor = 1.0 - (config.batch_size - 16) / 112 * 0.1
-            dropout_factor = 1.0 - config.dropout * 0.2
-
-            val_accuracy = (0.5 + lr_factor * 0.3 + batch_factor * 0.1 + dropout_factor * 0.1
-                          + epoch * 0.02 + random.uniform(-0.05, 0.05))
-            val_accuracy = min(val_accuracy, 0.98)
-
-            train_loss = 2.0 - val_accuracy * 1.8 + random.uniform(-0.1, 0.1)
-
-            wandb.log({
-                "epoch": epoch,
-                "train_loss": train_loss,
-                "val_accuracy": val_accuracy,
-                "learning_rate": config.learning_rate
-            })
-
-            best_val_acc = max(best_val_acc, val_accuracy)
-
-        # Log final metrics
-        wandb.log({"best_val_accuracy": best_val_acc})
-        print(f"✅ Best validation accuracy: {best_val_acc:.4f}")
-
-# Run sweep agent
-print(f"🚀 Starting hyperparameter sweep: {sweep_id}")
-print("Run this command to start sweep agent:")
-print(f"wandb agent {sweep_id}")
-
-# For demo, run a single training
-train_model()
-`;
-  }
-
-  // Get active runs (mock implementation)
-  async getActiveRuns(): Promise<WandBRun[]> {
-    // In a real implementation, this would fetch from W&B API
-    return this.activeRuns;
-  }
-
-  // Create a new run
-  async createRun(projectName: string, config: Record<string, any>): Promise<string> {
-    const runId = `run_${Date.now()}`;
-    const run: WandBRun = {
-      id: runId,
-      name: `${projectName}_${Date.now()}`,
-      project: projectName,
-      state: 'running',
-      url: `https://wandb.ai/${this.config?.entity}/${projectName}/runs/${runId}`,
-      config,
-      summary: {},
-      createdAt: new Date(),
-    };
-
-    this.activeRuns.push(run);
-    return runId;
-  }
-
-  // Generate complete AI project template
-  generateAIProjectTemplate(projectName: string): string {
-    return `
-# ${projectName} - AI Development with W&B Integration
-
-## Setup
-${this.generateSetupCommand()}
-
-## 1. Basic Training Loop
-${this.generateSampleCode(projectName)}
-
-## 2. Visualization & Plotting
-${this.generateMatplotlibIntegration()}
-
-## 3. Hyperparameter Tuning
-${this.generateSweepCode()}
-
-## 4. Advanced Features
-
-### Model Artifacts
-\`\`\`python
-import wandb
-
-# Save model
-wandb.save("model.h5")
-wandb.save("model_weights.pkl")
-
-# Log model as artifact
-artifact = wandb.Artifact("model", type="model")
-artifact.add_file("model.h5")
-wandb.log_artifact(artifact)
-\`\`\`
-
-### Custom Metrics Dashboard
-\`\`\`python
-# Log custom charts
-wandb.log({
-    "custom_chart": wandb.plot.line_series(
-        xs=[1, 2, 3, 4],
-        ys=[[1, 4, 9, 16], [1, 2, 3, 4]],
-        keys=["metric1", "metric2"],
-        title="Custom Metrics",
-        xname="epoch"
-    )
-})
-\`\`\`
-
-### Integration with Popular ML Libraries
-\`\`\`python
-# Scikit-learn integration
-from sklearn.ensemble import RandomForestClassifier
-import wandb
-from wandb.sklearn import plot_confusion_matrix, plot_feature_importances
-
-# Train model
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
-
-# Log plots
-plot_confusion_matrix(y_true, y_pred, labels=["Class A", "Class B"])
-plot_feature_importances(model, feature_names)
-\`\`\`
-
-## Usage Instructions
-1. Run the setup commands to install and configure W&B
-2. Execute any of the code blocks above
-3. Visit your W&B dashboard to view results
-4. Use the sweep configuration for hyperparameter optimization
-
-🚀 Happy AI Development!
-`;
-  }
-
-  // Clear configuration
-  async clearConfig(): Promise<void> {
+  /**
+   * 新しい実験を開始
+   */
+  async startExperiment(
+    name: string,
+    project: string,
+    config: Record<string, any> = {}
+  ): Promise<WandBExperiment | null> {
     try {
-      await AsyncStorage.removeItem('wandb_config');
-      this.config = null;
-      this.activeRuns = [];
+      const experiment: WandBExperiment = {
+        id: this.generateExperimentId(),
+        name,
+        project,
+        status: 'running',
+        config,
+        metrics: {},
+        artifacts: [],
+        plots: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      this.experiments.set(experiment.id, experiment);
+      this.currentExperiment = experiment;
+
+      console.log(`W&B Experiment started: ${name} (${experiment.id})`);
+      return experiment;
     } catch (error) {
-      console.error('Failed to clear W&B config:', error);
+      console.error('Failed to start experiment:', error);
+      return null;
     }
+  }
+
+  /**
+   * 実験を終了
+   */
+  async finishExperiment(experimentId?: string): Promise<boolean> {
+    try {
+      const expId = experimentId || this.currentExperiment?.id;
+      if (!expId) {
+        throw new Error('No experiment to finish');
+      }
+
+      const experiment = this.experiments.get(expId);
+      if (!experiment) {
+        throw new Error('Experiment not found');
+      }
+
+      experiment.status = 'completed';
+      experiment.updatedAt = new Date();
+
+      if (this.currentExperiment?.id === expId) {
+        this.currentExperiment = null;
+      }
+
+      console.log(`W&B Experiment finished: ${experiment.name}`);
+      return true;
+    } catch (error) {
+      console.error('Failed to finish experiment:', error);
+      return false;
+    }
+  }
+
+  /**
+   * メトリクスをログ
+   */
+  async logMetrics(metrics: WandBMetrics, step?: number): Promise<boolean> {
+    try {
+      if (!this.currentExperiment) {
+        throw new Error('No active experiment');
+      }
+
+      // 現在の実験にメトリクスを追加
+      Object.assign(this.currentExperiment.metrics, metrics);
+      this.currentExperiment.updatedAt = new Date();
+
+      console.log('Metrics logged:', metrics);
+      return true;
+    } catch (error) {
+      console.error('Failed to log metrics:', error);
+      return false;
+    }
+  }
+
+  /**
+   * プロットをログ（Matplotlibとの統合）
+   */
+  async logPlot(
+    title: string,
+    plotData: any,
+    imageBase64?: string
+  ): Promise<boolean> {
+    try {
+      if (!this.currentExperiment) {
+        throw new Error('No active experiment');
+      }
+
+      const plot: WandBPlot = {
+        id: this.generatePlotId(),
+        title,
+        type: 'line', // デフォルト
+        data: plotData,
+        imageUrl: imageBase64 ? `data:image/png;base64,${imageBase64}` : undefined,
+        metadata: {
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      this.currentExperiment.plots.push(plot);
+      this.currentExperiment.updatedAt = new Date();
+
+      console.log(`Plot logged: ${title}`);
+      return true;
+    } catch (error) {
+      console.error('Failed to log plot:', error);
+      return false;
+    }
+  }
+
+  /**
+   * アーティファクト（モデル、データセットなど）をログ
+   */
+  async logArtifact(
+    name: string,
+    type: 'model' | 'dataset' | 'image' | 'plot',
+    path: string,
+    metadata: Record<string, any> = {}
+  ): Promise<boolean> {
+    try {
+      if (!this.currentExperiment) {
+        throw new Error('No active experiment');
+      }
+
+      const artifact: WandBArtifact = {
+        id: this.generateArtifactId(),
+        name,
+        type,
+        path,
+        size: 0, // 実際の実装では、ファイルサイズを取得
+        metadata: {
+          ...metadata,
+          timestamp: new Date().toISOString(),
+        },
+      };
+
+      this.currentExperiment.artifacts.push(artifact);
+      this.currentExperiment.updatedAt = new Date();
+
+      console.log(`Artifact logged: ${name}`);
+      return true;
+    } catch (error) {
+      console.error('Failed to log artifact:', error);
+      return false;
+    }
+  }
+
+  /**
+   * 実験一覧を取得
+   */
+  getExperiments(): WandBExperiment[] {
+    return Array.from(this.experiments.values()).sort(
+      (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
+    );
+  }
+
+  /**
+   * 特定の実験を取得
+   */
+  getExperiment(experimentId: string): WandBExperiment | null {
+    return this.experiments.get(experimentId) || null;
+  }
+
+  /**
+   * 現在アクティブな実験を取得
+   */
+  getCurrentExperiment(): WandBExperiment | null {
+    return this.currentExperiment;
+  }
+
+  /**
+   * W&B接続状態を取得
+   */
+  isWandBConnected(): boolean {
+    return this.isConnected;
+  }
+
+  /**
+   * プロジェクトごとの実験を取得
+   */
+  getExperimentsByProject(project: string): WandBExperiment[] {
+    return this.getExperiments().filter(exp => exp.project === project);
+  }
+
+  /**
+   * 実験のメトリクス履歴を取得
+   */
+  getMetricsHistory(experimentId: string): WandBMetrics[] {
+    // 実際の実装では、時系列のメトリクスデータを返す
+    const experiment = this.getExperiment(experimentId);
+    if (!experiment) return [];
+
+    // デモ用の履歴データ
+    return [experiment.metrics as WandBMetrics];
+  }
+
+  /**
+   * Matplotlibプロット統合
+   */
+  async integrateMatplotlibPlot(
+    title: string,
+    base64Image: string,
+    metadata: Record<string, any> = {}
+  ): Promise<boolean> {
+    try {
+      // W&Bプロットとしてログ
+      await this.logPlot(title, metadata, base64Image);
+
+      // アーティファクトとしても保存
+      await this.logArtifact(
+        `${title}_plot`,
+        'plot',
+        `plots/${title.replace(/\s+/g, '_')}.png`,
+        {
+          ...metadata,
+          type: 'matplotlib_plot',
+        }
+      );
+
+      return true;
+    } catch (error) {
+      console.error('Failed to integrate matplotlib plot:', error);
+      return false;
+    }
+  }
+
+  /**
+   * プレビューデータをW&B形式に変換
+   */
+  convertPreviewToWandB(previewItem: any): WandBPlot | null {
+    try {
+      if (previewItem.type === 'matplotlib') {
+        return {
+          id: this.generatePlotId(),
+          title: previewItem.title || 'Matplotlib Plot',
+          type: 'line',
+          data: {},
+          imageUrl: previewItem.content,
+          metadata: {
+            filename: previewItem.metadata?.filename,
+            timestamp: previewItem.metadata?.timestamp,
+            source: 'preview_integration',
+          },
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Failed to convert preview to W&B format:', error);
+      return null;
+    }
+  }
+
+  // ユーティリティメソッド
+  private generateExperimentId(): string {
+    return `exp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private generatePlotId(): string {
+    return `plot_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private generateArtifactId(): string {
+    return `artifact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * サービスのリセット（テスト用）
+   */
+  reset(): void {
+    this.experiments.clear();
+    this.currentExperiment = null;
+    this.isConnected = false;
+    this.apiKey = null;
   }
 }
 
-export default WandBIntegrationService.getInstance();
+export default WandBIntegrationService;

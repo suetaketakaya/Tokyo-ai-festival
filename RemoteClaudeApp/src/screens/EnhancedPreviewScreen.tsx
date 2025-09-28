@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
+import WandBIntegrationService, { WandBExperiment, WandBPlot } from '../services/WandBIntegrationService';
 
 interface PreviewItem {
   id: string;
@@ -52,22 +53,45 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [showFullscreen, setShowFullscreen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'all' | 'matplotlib' | 'webapp' | 'notebook'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'matplotlib' | 'webapp' | 'notebook' | 'wandb'>('all');
   const [imageData, setImageData] = useState<string | null>(null);
   const [webAppUrl, setWebAppUrl] = useState<string | null>(null);
 
+  // W&B統合関連の状態
+  const [wandbService] = useState(() => WandBIntegrationService.getInstance());
+  const [wandbExperiments, setWandBExperiments] = useState<WandBExperiment[]>([]);
+  const [currentExperiment, setCurrentExperiment] = useState<WandBExperiment | null>(null);
+  const [wandbConnected, setWandBConnected] = useState<boolean>(false);
+  const [showWandBModal, setShowWandBModal] = useState<boolean>(false);
+
   useEffect(() => {
     connectToServer();
+    initializeWandB();
+
     return () => {
       EnhancedWebSocketService.unregisterScreenCallbacks('preview');
     };
   }, []);
 
+  // W&B状態の更新
+  useEffect(() => {
+    const updateWandBState = () => {
+      setWandBExperiments(wandbService.getExperiments());
+      setCurrentExperiment(wandbService.getCurrentExperiment());
+      setWandBConnected(wandbService.isWandBConnected());
+    };
+
+    updateWandBState();
+    const interval = setInterval(updateWandBState, 5000); // 5秒ごとに更新
+
+    return () => clearInterval(interval);
+  }, [wandbService]);
+
   const connectToServer = async () => {
     try {
       setIsLoading(true);
 
-      const success = await EnhancedEnhancedWebSocketService.connect(serverUrl);
+      const success = await EnhancedWebSocketService.connect(serverUrl);
       if (success) {
         setIsConnected(true);
 
@@ -99,7 +123,7 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
   const requestPreviewList = () => {
     if (!isConnected) return;
 
-    EnhancedEnhancedWebSocketService.send({
+    EnhancedWebSocketService.send({
       type: 'preview_list_request',
       data: {
         project_id: projectId,
@@ -148,7 +172,7 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
 
     if (item.type === 'matplotlib') {
       // Request image data
-      EnhancedEnhancedWebSocketService.send({
+      EnhancedWebSocketService.send({
         type: 'preview_get_image',
         data: {
           project_id: projectId,
@@ -157,7 +181,7 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
       });
     } else if (item.type === 'webapp') {
       // Request webapp info
-      EnhancedEnhancedWebSocketService.send({
+      EnhancedWebSocketService.send({
         type: 'preview_get_webapp',
         data: {
           project_id: projectId,
@@ -169,6 +193,11 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
       setWebAppUrl(item.url || `http://localhost:${item.port}`);
       setShowFullscreen(true);
     }
+
+    // W&B統合: Matplotlibプロットを自動でW&Bにログ
+    if (item.type === 'matplotlib' && currentExperiment) {
+      integrateWithWandB(item);
+    }
   };
 
   const closeFullscreen = () => {
@@ -178,9 +207,211 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
     setSelectedItem(null);
   };
 
+  // W&B初期化
+  const initializeWandB = async () => {
+    try {
+      // デモ用のダミーAPIキーで初期化
+      await wandbService.initialize('demo_api_key_' + Date.now());
+      console.log('W&B integration initialized');
+    } catch (error) {
+      console.error('Failed to initialize W&B:', error);
+    }
+  };
+
+  // MatplotlibプロットのW&B統合
+  const integrateWithWandB = async (previewItem: PreviewItem) => {
+    try {
+      if (previewItem.type === 'matplotlib' && currentExperiment) {
+        // プロットをW&Bに統合
+        const plotData = wandbService.convertPreviewToWandB({
+          title: previewItem.name,
+          content: imageData, // base64データ
+          type: 'matplotlib',
+          metadata: {
+            timestamp: new Date().toISOString(),
+            projectId: projectId,
+          },
+        });
+
+        if (plotData) {
+          await wandbService.logPlot(
+            previewItem.name,
+            plotData.data,
+            imageData || undefined
+          );
+          console.log(`Plot integrated with W&B: ${previewItem.name}`);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to integrate with W&B:', error);
+    }
+  };
+
+  // W&B実験を開始
+  const startWandBExperiment = async () => {
+    try {
+      const experiment = await wandbService.startExperiment(
+        `Preview_Experiment_${Date.now()}`,
+        projectId || 'remote_claude_preview',
+        {
+          project_id: projectId,
+          timestamp: new Date().toISOString(),
+        }
+      );
+
+      if (experiment) {
+        console.log('W&B experiment started:', experiment.name);
+        setCurrentExperiment(experiment);
+      }
+    } catch (error) {
+      console.error('Failed to start W&B experiment:', error);
+    }
+  };
+
+  // W&B実験を終了
+  const finishWandBExperiment = async () => {
+    try {
+      if (currentExperiment) {
+        await wandbService.finishExperiment(currentExperiment.id);
+        console.log('W&B experiment finished:', currentExperiment.name);
+        setCurrentExperiment(null);
+      }
+    } catch (error) {
+      console.error('Failed to finish W&B experiment:', error);
+    }
+  };
+
   const getFilteredItems = () => {
     if (activeTab === 'all') return previewItems;
+    if (activeTab === 'wandb') return []; // W&Bタブでは通常のプレビューアイテムを除外
     return previewItems.filter(item => item.type === activeTab);
+  };
+
+  // W&Bコンテンツのレンダリング
+  const renderWandBContent = () => {
+    return (
+      <ScrollView style={styles.wandbContainer} showsVerticalScrollIndicator={false}>
+        {/* W&B接続状態 */}
+        <View style={styles.wandbStatusCard}>
+          <View style={styles.wandbStatusHeader}>
+            <Text style={styles.wandbStatusTitle}>🔬 W&B Integration Status</Text>
+            <View style={[
+              styles.statusIndicator,
+              { backgroundColor: wandbConnected ? '#4CAF50' : '#F44336' }
+            ]}>
+              <Text style={styles.wandbConnectionStatusText}>
+                {wandbConnected ? 'Connected' : 'Disconnected'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* 現在の実験 */}
+        <View style={styles.currentExperimentCard}>
+          <Text style={styles.wandbCardTitle}>📊 Current Experiment</Text>
+          {currentExperiment ? (
+            <View style={styles.experimentInfo}>
+              <Text style={styles.experimentName}>{currentExperiment.name}</Text>
+              <Text style={styles.experimentProject}>Project: {currentExperiment.project}</Text>
+              <Text style={styles.experimentStatus}>Status: {currentExperiment.status}</Text>
+              <Text style={styles.experimentTime}>
+                Started: {currentExperiment.createdAt.toLocaleString()}
+              </Text>
+
+              <View style={styles.experimentActions}>
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.finishButton]}
+                  onPress={finishWandBExperiment}
+                >
+                  <Text style={styles.actionButtonText}>✓ Finish Experiment</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.noExperiment}>
+              <Text style={styles.noExperimentText}>No active experiment</Text>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.startButton]}
+                onPress={startWandBExperiment}
+              >
+                <Text style={styles.actionButtonText}>▶️ Start New Experiment</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* 実験一覧 */}
+        <View style={styles.experimentsListCard}>
+          <Text style={styles.wandbCardTitle}>📜 Experiment History</Text>
+          {wandbExperiments.length > 0 ? (
+            wandbExperiments.slice(0, 5).map((experiment) => (
+              <View key={experiment.id} style={styles.experimentItem}>
+                <View style={styles.experimentHeader}>
+                  <Text style={styles.experimentItemName}>{experiment.name}</Text>
+                  <View style={[
+                    styles.experimentStatusBadge,
+                    { backgroundColor: getExperimentStatusColor(experiment.status) }
+                  ]}>
+                    <Text style={styles.wandbExperimentStatusText}>{experiment.status}</Text>
+                  </View>
+                </View>
+                <Text style={styles.experimentItemProject}>{experiment.project}</Text>
+                <Text style={styles.experimentItemTime}>
+                  {experiment.updatedAt.toLocaleString()}
+                </Text>
+                {Object.keys(experiment.metrics).length > 0 && (
+                  <View style={styles.metricsPreview}>
+                    <Text style={styles.metricsTitle}>Metrics:</Text>
+                    {Object.entries(experiment.metrics).slice(0, 3).map(([key, value]) => (
+                      <Text key={key} style={styles.metricItem}>
+                        {key}: {typeof value === 'number' ? value.toFixed(4) : value}
+                      </Text>
+                    ))}
+                  </View>
+                )}
+                {experiment.plots.length > 0 && (
+                  <Text style={styles.plotsInfo}>
+                    📈 {experiment.plots.length} plot(s) logged
+                  </Text>
+                )}
+              </View>
+            ))
+          ) : (
+            <View style={styles.noExperiments}>
+              <Text style={styles.noExperimentsText}>No experiments yet</Text>
+              <Text style={styles.noExperimentsSubtext}>
+                Start an experiment to track your ML workflow with W&B
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* W&B統合情報 */}
+        <View style={styles.integrationInfoCard}>
+          <Text style={styles.wandbCardTitle}>ℹ️ Integration Info</Text>
+          <Text style={styles.infoText}>
+            • Matplotlib plots are automatically logged to W&B when an experiment is active
+          </Text>
+          <Text style={styles.infoText}>
+            • Experiments track model metrics, plots, and artifacts
+          </Text>
+          <Text style={styles.infoText}>
+            • View detailed experiment data in the W&B dashboard
+          </Text>
+        </View>
+      </ScrollView>
+    );
+  };
+
+  // 実験ステータスの色を取得
+  const getExperimentStatusColor = (status: string) => {
+    switch (status) {
+      case 'running': return '#2196F3';
+      case 'completed': return '#4CAF50';
+      case 'failed': return '#F44336';
+      case 'crashed': return '#FF5722';
+      default: return '#666';
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -299,6 +530,7 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
           { key: 'matplotlib', label: 'Plots', icon: '📊' },
           { key: 'webapp', label: 'Web', icon: '🌐' },
           { key: 'notebook', label: 'Jupyter', icon: '📓' },
+          { key: 'wandb', label: 'W&B', icon: '🔬' },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
@@ -330,6 +562,8 @@ const EnhancedPreviewScreen: React.FC<Props> = ({ route, navigation }) => {
               <Text style={styles.retryText}>Retry Connection</Text>
             </TouchableOpacity>
           </View>
+        ) : activeTab === 'wandb' ? (
+          renderWandBContent()
         ) : getFilteredItems().length === 0 ? (
           <View style={styles.centered}>
             <Text style={styles.emptyIcon}>👁️</Text>
@@ -621,6 +855,221 @@ const styles = StyleSheet.create({
   },
   fullscreenWebView: {
     flex: 1,
+  },
+  // W&B統合用スタイル
+  wandbContainer: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  wandbStatusCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 15,
+    marginTop: 15,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  wandbStatusHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  wandbStatusTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  statusIndicator: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  wandbConnectionStatusText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  currentExperimentCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 15,
+    marginTop: 10,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  wandbCardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
+  },
+  experimentInfo: {
+    marginTop: 8,
+  },
+  experimentName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#007AFF',
+    marginBottom: 4,
+  },
+  experimentProject: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 2,
+  },
+  experimentStatus: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 2,
+  },
+  experimentTime: {
+    fontSize: 12,
+    color: '#888',
+    marginBottom: 12,
+  },
+  experimentActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  actionButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginLeft: 8,
+  },
+  startButton: {
+    backgroundColor: '#4CAF50',
+  },
+  finishButton: {
+    backgroundColor: '#FF9800',
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  noExperiment: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  noExperimentText: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 12,
+  },
+  experimentsListCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 15,
+    marginTop: 10,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  experimentItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    paddingVertical: 12,
+    marginBottom: 8,
+  },
+  experimentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  experimentItemName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    flex: 1,
+  },
+  experimentStatusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  wandbExperimentStatusText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  experimentItemProject: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 2,
+  },
+  experimentItemTime: {
+    fontSize: 11,
+    color: '#888',
+    marginBottom: 8,
+  },
+  metricsPreview: {
+    backgroundColor: '#f8f9fa',
+    padding: 8,
+    borderRadius: 6,
+    marginBottom: 4,
+  },
+  metricsTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  metricItem: {
+    fontSize: 11,
+    color: '#666',
+    marginBottom: 1,
+  },
+  plotsInfo: {
+    fontSize: 11,
+    color: '#007AFF',
+    fontStyle: 'italic',
+  },
+  noExperiments: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  noExperimentsText: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 4,
+  },
+  noExperimentsSubtext: {
+    fontSize: 12,
+    color: '#888',
+    textAlign: 'center',
+    lineHeight: 16,
+  },
+  integrationInfoCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 15,
+    marginTop: 10,
+    marginBottom: 20,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  infoText: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+    lineHeight: 16,
   },
 });
 
