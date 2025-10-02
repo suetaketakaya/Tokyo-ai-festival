@@ -1,0 +1,152 @@
+[
+  {
+    "id": "web_app_demo",
+    "type": "web_app",
+    "title": "🌐 AI生成Webアプリケーション",
+    "description": "Claude Code CLIで生成したWebアプリケーションの動作確認",
+    "estimated_time": "30-60秒",
+    "difficulty": "beginner",
+    "features": [
+      "レスポンシブデザイン自動生成",
+      "リアルタイムプレビュー",
+      "一時的なコンテナ実行",
+      "自動クリーンアップ機能"
+    ],
+    "preview_config": {
+      "base_image": "nginx:alpine",
+      "duration": 10,
+      "port": 80,
+      "requirements": [
+        "レスポンシブデザイン自動生成",
+        "リアルタイムプレビュー",
+        "一時的なコンテナ実行",
+        "自動クリーンアップ機能"
+      ],
+      "tags": [
+        "Web",
+        "Frontend",
+        "Demo"
+      ]
+    }
+  },
+  {
+    "id": "matplotlib_demo",
+    "type": "matplotlib",
+    "title": "📊 W&B統合データ可視化",
+    "description": "W&Bローカルモデルによる高度なデータプロット生成",
+    "estimated_time": "15-30秒",
+    "difficulty": "intermediate",
+    "features": [
+      "CNN分類モデル自動解析",
+      "プロット種別自動判定",
+      "インタラクティブビューアー",
+      "メタデータ自動付与"
+    ],
+    "preview_config": {
+      "base_image": "python:3.9-slim",
+      "duration": 5,
+      "port": 8000,
+      "requirements": [
+        "CNN分類モデル自動解析",
+        "プロット種別自動判定",
+        "インタラクティブビューアー",
+        "メタデータ自動付与"
+      ],
+      "tags": [
+        "DataViz",
+        "Python",
+        "W&B"
+      ]
+    }
+  },
+  {
+    "id": "jupyter_demo",
+    "type": "jupyter",
+    "title": "📔 AI駆動データサイエンス環境",
+    "description": "Jupyter Notebook + Claude Code CLI統合環境",
+    "estimated_time": "45-90秒",
+    "difficulty": "advanced",
+    "features": [
+      "自動コード生成",
+      "ライブラリ自動インストール",
+      "データ分析支援",
+      "結果の自動可視化"
+    ],
+    "preview_config": {
+      "base_image": "jupyter/datascience-notebook:latest",
+      "duration": 15,
+      "port": 8888,
+      "requirements": [
+        "自動コード生成",
+        "ライブラリ自動インストール",
+        "データ分析支援",
+        "結果の自動可視化"
+      ],
+      "tags": [
+        "Jupyter",
+        "DataScience",
+        "Interactive"
+      ]
+    }
+  },
+  {
+    "id": "gui_demo",
+    "type": "gui_app",
+    "title": "🖥️ AI生成GUIアプリケーション",
+    "description": "デスクトップアプリケーションのリモート実行",
+    "estimated_time": "60-120秒",
+    "difficulty": "advanced",
+    "features": [
+      "VNCベースリモートデスクトップ",
+      "GUI要素自動配置",
+      "ユーザーインタラクション記録",
+      "スクリーンショット自動保存"
+    ],
+    "preview_config": {
+      "base_image": "dorowu/ubuntu-desktop-lxde-vnc:latest",
+      "duration": 8,
+      "port": 6080,
+      "requirements": [
+        "VNCベースリモートデスクトップ",
+        "GUI要素自動配置",
+        "ユーザーインタラクション記録",
+        "スクリーンショット自動保存"
+      ],
+      "tags": [
+        "GUI",
+        "Desktop",
+        "VNC"
+      ]
+    }
+  },
+  {
+    "id": "data_analysis_demo",
+    "type": "data_analysis",
+    "title": "📈 総合データ分析ワークスペース",
+    "description": "機械学習・統計解析用統合環境",
+    "estimated_time": "30-60秒",
+    "difficulty": "intermediate",
+    "features": [
+      "JupyterLab完全統合",
+      "機械学習ライブラリ完備",
+      "データ前処理自動化",
+      "モデル評価可視化"
+    ],
+    "preview_config": {
+      "base_image": "jupyter/scipy-notebook:latest",
+      "duration": 12,
+      "port": 8888,
+      "requirements": [
+        "JupyterLab完全統合",
+        "機械学習ライブラリ完備",
+        "データ前処理自動化",
+        "モデル評価可視化"
+      ],
+      "tags": [
+        "ML",
+        "Statistics",
+        "Analysis"
+      ]
+    }
+  }
+]

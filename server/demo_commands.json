@@ -1,0 +1,57 @@
+[
+  {
+    "id": "python_hello",
+    "name": "🐍 Python Hello World",
+    "description": "シンプルなPython Hello Worldプログラムを実行",
+    "command": "python3 -c \"print('Hello from RemoteClaudeOPS v4.0!')\"",
+    "type": "python",
+    "category": "basic",
+    "expected_output": "Hello from RemoteClaudeOPS v4.0!",
+    "execution_time": "1-2秒",
+    "difficulty": "beginner"
+  },
+  {
+    "id": "matplotlib_demo",
+    "name": "📊 W&B統合データ可視化",
+    "description": "CNN分析結果をmatplotlibでプロット生成",
+    "command": "python3 -c \"import matplotlib.pyplot as plt; import numpy as np; x=np.linspace(0,10,100); y=np.sin(x); plt.plot(x,y); plt.title('W&B CNN Analysis Demo'); plt.savefig('/tmp/demo_plot.png'); print('Plot saved to /tmp/demo_plot.png')\"",
+    "type": "matplotlib",
+    "category": "visualization",
+    "expected_output": "Plot saved to /tmp/demo_plot.png",
+    "execution_time": "3-5秒",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "web_server",
+    "name": "🌐 Webサーバー起動",
+    "description": "簡単なHTTPサーバーを起動してWebアプリケーションをテスト",
+    "command": "python3 -m http.server 8000 --directory /tmp &",
+    "type": "web_server",
+    "category": "server",
+    "expected_output": "Serving HTTP on 0.0.0.0 port 8000",
+    "execution_time": "即座",
+    "difficulty": "beginner"
+  },
+  {
+    "id": "docker_status",
+    "name": "🐳 Docker状態確認",
+    "description": "現在のDockerコンテナとイメージの状態を確認",
+    "command": "docker ps -a && echo '--- Images ---' && docker images",
+    "type": "docker",
+    "category": "system",
+    "expected_output": "Container and image listings",
+    "execution_time": "2-3秒",
+    "difficulty": "intermediate"
+  },
+  {
+    "id": "jupyter_launch",
+    "name": "📔 Jupyter Notebook起動",
+    "description": "Jupyter Notebookサーバーを起動してインタラクティブ環境を提供",
+    "command": "jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root &",
+    "type": "jupyter",
+    "category": "interactive",
+    "expected_output": "Jupyter server running on http://0.0.0.0:8888",
+    "execution_time": "5-10秒",
+    "difficulty": "advanced"
+  }
+]

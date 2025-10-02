@@ -44,7 +44,11 @@
       "Bash(python:*)",
       "Bash(./remoteclaude-server-matplotlib-mgmt --port=8090 --help)",
       "Bash(./remoteclaude-server-matplotlib-mgmt --port=8090)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Read(//Users/**)",
+      "Bash(npx expo run:ios:*)",
+      "Bash(./remoteclaude-server-matplotlib --port=8090)",
+      "Bash(./remoteclaude-server-matplotlib-mgmt --port=8094)"
     ],
     "deny": [],
     "ask": []

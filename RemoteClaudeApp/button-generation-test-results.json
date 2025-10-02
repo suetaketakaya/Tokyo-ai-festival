@@ -1,0 +1,99 @@
+{
+  "timestamp": "2025-10-01T13:11:46.420Z",
+  "environment": "production",
+  "totalTests": 4,
+  "passedTests": 4,
+  "failedTests": 0,
+  "results": [
+    {
+      "testCase": "Primary Flask test case (original problem case)",
+      "input": "シンプルなFlaskアプリケーションを作成してください。ホームページに'Hello World'を表示し、/aboutページに会社情報を表示する機能を含めてください。",
+      "expected": {
+        "buttonCount": 5,
+        "titles": [
+          "Flask依存関係インストール",
+          "Flaskアプリ作成",
+          "Flaskサーバー起動",
+          "ホームページ確認",
+          "会社情報ページ確認"
+        ]
+      },
+      "actual": {
+        "buttonCount": 5,
+        "titles": [
+          "🐍 Flask依存関係インストール",
+          "📝 Flaskアプリ作成",
+          "🚀 Flaskサーバー起動",
+          "🌐 ホームページ確認",
+          "🏢 会社情報ページ確認"
+        ]
+      },
+      "passed": true,
+      "errors": []
+    },
+    {
+      "testCase": "Ambiguous web app request (should default to Flask)",
+      "input": "何か簡単なWebサイトを作りたい",
+      "expected": {
+        "buttonCount": 3,
+        "titles": [
+          "Flask依存関係インストール",
+          "Flaskアプリ作成",
+          "Flaskサーバー起動"
+        ]
+      },
+      "actual": {
+        "buttonCount": 3,
+        "titles": [
+          "🐍 Flask依存関係インストール",
+          "📝 Flaskアプリ作成",
+          "🚀 Flaskサーバー起動"
+        ]
+      },
+      "passed": true,
+      "errors": []
+    },
+    {
+      "testCase": "React SPA creation",
+      "input": "Reactアプリケーションを立ち上げてください。モダンなSPAを作成したいです。",
+      "expected": {
+        "buttonCount": 2,
+        "titles": [
+          "Reactアプリ作成",
+          "React開発サーバー起動"
+        ]
+      },
+      "actual": {
+        "buttonCount": 2,
+        "titles": [
+          "⚛️ Reactアプリ作成",
+          "🚀 React開発サーバー起動"
+        ]
+      },
+      "passed": true,
+      "errors": []
+    },
+    {
+      "testCase": "Python data visualization",
+      "input": "Pythonでデータの可視化をしたいです。グラフを生成してください。",
+      "expected": {
+        "buttonCount": 3,
+        "titles": [
+          "データ可視化ライブラリインストール",
+          "サンプルプロット生成",
+          "Jupyter起動"
+        ]
+      },
+      "actual": {
+        "buttonCount": 3,
+        "titles": [
+          "📊 データ可視化ライブラリインストール",
+          "📈 サンプルプロット生成",
+          "📓 Jupyter起動"
+        ]
+      },
+      "passed": true,
+      "errors": []
+    }
+  ]
+}

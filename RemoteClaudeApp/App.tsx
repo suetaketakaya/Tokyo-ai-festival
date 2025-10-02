@@ -20,6 +20,7 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import ConfigurationScreen from './src/screens/ConfigurationScreen';
 import QuickCommandsScreen from './src/screens/QuickCommandsScreen';
 import DetailedSettingsScreen from './src/screens/DetailedSettingsScreen';
+import PreviewScreen from './src/screens/PreviewScreen';
 import ProjectManagementScreen from './src/screens/ProjectManagementScreen';
 
 // Types
@@ -165,6 +166,16 @@ export default function App() {
             component={DetailedSettingsScreen}
             options={{
               title: '🔧 詳細設定',
+              headerStyle: { backgroundColor: '#007AFF' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+            }}
+          />
+          <Stack.Screen
+            name="Preview"
+            component={PreviewScreen}
+            options={{
+              title: '👁️ Preview',
               headerStyle: { backgroundColor: '#007AFF' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },

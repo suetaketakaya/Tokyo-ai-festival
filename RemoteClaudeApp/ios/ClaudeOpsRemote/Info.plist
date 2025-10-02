@@ -52,6 +52,20 @@
     <string>QRコードの読み取りのためにカメラへのアクセスを許可してください。</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>音声機能のためにマイクへのアクセスを許可してください。</string>
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>ファイルの読み書きのためにドキュメントフォルダへのアクセスを許可してください。</string>
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>ファイルの読み書きのためにデスクトップフォルダへのアクセスを許可してください。</string>
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>ファイルの読み書きのためにダウンロードフォルダへのアクセスを許可してください。</string>
+    <key>NSFileProviderDomainUsageDescription</key>
+    <string>ファイルの読み書きのためにファイルシステムへのアクセスを許可してください。</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>ローカルネットワーク上のサーバーと通信するために許可してください。</string>
+    <key>com.apple.developer.networking.networkextension</key>
+    <array>
+        <string>packet-tunnel-provider</string>
+    </array>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>

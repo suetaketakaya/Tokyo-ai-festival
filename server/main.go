@@ -81,8 +81,21 @@ func NewServer(port string) *Server {
 	// Initialize Matplotlib Detector
 	InitializeMatplotlibDetector(dockerManager)
 
+	// Initialize Enhanced Matplotlib Detector with W&B integration
+	workingDir, _ := os.Getwd()
+	InitializeEnhancedMatplotlibDetector(dockerManager, workingDir)
+
+	// Initialize Claude Code CLI Response Analyzer
+	InitializeClaudeCodeCLIAnalyzer()
+
 	// Initialize Project Management Handler
 	InitializeProjectManagementHandler(dockerManager)
+
+	// Initialize Button Database System
+	buttonDBDir := filepath.Join("./", "button_database")
+	if err := InitializeButtonDatabase(buttonDBDir); err != nil {
+		log.Printf("❌ Failed to initialize button database: %v", err)
+	}
 
 	return &Server{
 		Port:          port,
@@ -445,6 +458,9 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 	case "project_list_request":
 		s.handleDockerProjectList(conn)
 
+	case "preview_list_request":
+		s.handlePreviewListRequest(conn, msg)
+
 	case "project_create_request":
 		s.handleProjectCreate(conn, msg)
 
@@ -516,6 +532,12 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 	case "quick_command_execute":
 		s.handleQuickCommandExecute(conn, msg)
 
+	case "claude_cli_analyze":
+		s.handleClaudeCodeCLIAnalyze(conn, msg)
+
+	case "auto_button_execute":
+		s.handleAutoButtonExecute(conn, msg)
+
 	case "preview_list_request":
 		s.handlePreviewListRequest(conn, msg)
 	case "preview_get_image":
@@ -547,6 +569,9 @@ func (s *Server) handleMessage(conn *websocket.Conn, msg map[string]interface{})
 		s.handleProjectRemovePort(conn, msg)
 	case "project_update_environment":
 		s.handleProjectUpdateEnvironment(conn, msg)
+
+	case "execute_command":
+		s.handleExecuteCommand(conn, msg)
 
 	default:
 		s.sendError(conn, fmt.Sprintf("Unknown message type: %s", msgType))
@@ -1994,7 +2019,7 @@ func (s *Server) handlePreviewListRequest(conn *websocket.Conn, msg map[string]i
 	// Get preview items for the project
 	previews := s.getPreviewItems(projectID)
 
-	s.sendMessage(conn, "preview_list_response", map[string]interface{}{
+	s.sendMessage(conn, "preview_list", map[string]interface{}{
 		"project_id": projectID,
 		"previews":   previews,
 		"status":     "success",
@@ -2006,8 +2031,57 @@ func (s *Server) handlePreviewListRequest(conn *websocket.Conn, msg map[string]i
 func (s *Server) getPreviewItems(projectID string) []map[string]interface{} {
 	var previews []map[string]interface{}
 
-	// Use MatplotlibDetector for matplotlib outputs
-	if globalMatplotlibDetector != nil {
+	// Use Enhanced MatplotlibDetector with W&B integration first
+	if enhancedMatplotlibDetector != nil {
+		wandbOutputs, err := enhancedMatplotlibDetector.DetectEnhancedMatplotlibOutputs(projectID)
+		if err == nil {
+			for _, output := range wandbOutputs {
+				previewItem := map[string]interface{}{
+					"id":          output.ID,
+					"type":        "matplotlib_enhanced",
+					"name":        output.Title,
+					"description": fmt.Sprintf("W&B Enhanced Plot: %s", output.Filename),
+					"filename":    output.Filename,
+					"path":        output.Path,
+					"timestamp":   output.Timestamp.Unix(),
+					"size":        output.Size,
+					"format":      output.Format,
+					"base64_image": output.Base64Image,
+				}
+
+				// Add W&B metadata if available
+				if output.WandBMetadata != nil {
+					previewItem["wandb"] = map[string]interface{}{
+						"experiment_id": output.WandBMetadata.ExperimentID,
+						"run_id":        output.WandBMetadata.RunID,
+						"project_name":  output.WandBMetadata.ProjectName,
+						"run_name":      output.WandBMetadata.RunName,
+						"tags":          output.WandBMetadata.Tags,
+						"metrics":       output.WandBMetadata.Metrics,
+						"step":          output.WandBMetadata.Step,
+					}
+				}
+
+				// Add CNN classification if available
+				if output.CNNPrediction != nil {
+					previewItem["cnn_classification"] = map[string]interface{}{
+						"plot_type":        output.CNNPrediction.PlotType,
+						"confidence":       output.CNNPrediction.Confidence,
+						"categories":       output.CNNPrediction.Categories,
+						"model_version":    output.CNNPrediction.ModelVersion,
+						"processing_time":  output.CNNPrediction.ProcessingTime,
+					}
+				}
+
+				previews = append(previews, previewItem)
+			}
+		} else {
+			log.Printf("⚠️ Enhanced detector failed: %v, falling back to standard detection", err)
+		}
+	}
+
+	// Fallback: Use standard MatplotlibDetector if enhanced detection failed or returned no results
+	if len(previews) == 0 && globalMatplotlibDetector != nil {
 		matplotlibOutputs, err := globalMatplotlibDetector.DetectMatplotlibOutputs(projectID)
 		if err == nil {
 			for _, output := range matplotlibOutputs {
@@ -2024,8 +2098,10 @@ func (s *Server) getPreviewItems(projectID string) []map[string]interface{} {
 				})
 			}
 		}
-	} else {
-		// Fallback to old method if detector not available
+	}
+
+	// Final fallback: Legacy scan method
+	if len(previews) == 0 {
 		matplotlibImages := s.scanMatplotlibImages(projectID)
 		for _, img := range matplotlibImages {
 			previews = append(previews, img)
@@ -2051,6 +2127,113 @@ func (s *Server) getPreviewItems(projectID string) []map[string]interface{} {
 		})
 	}
 
+	// Add sample preview configurations for demo purposes
+	samplePreviews := []map[string]interface{}{
+		{
+			"id":          "web_app_demo",
+			"type":        "web_app",
+			"name":        "🌐 AI生成Webアプリケーション",
+			"description": "Claude Code CLIで生成したWebアプリケーションの動作確認",
+			"estimated_time": "30-60秒",
+			"difficulty":   "beginner",
+			"features": []string{
+				"レスポンシブデザイン自動生成",
+				"リアルタイムプレビュー",
+				"一時的なコンテナ実行",
+				"自動クリーンアップ機能",
+			},
+			"preview_config": map[string]interface{}{
+				"base_image": "nginx:alpine",
+				"duration":   10,
+				"port":       80,
+				"tags":       []string{"Web", "Frontend", "Demo"},
+			},
+		},
+		{
+			"id":          "matplotlib_demo",
+			"type":        "matplotlib",
+			"name":        "📊 W&B統合データ可視化",
+			"description": "W&Bローカルモデルによる高度なデータプロット生成",
+			"estimated_time": "15-30秒",
+			"difficulty":   "intermediate",
+			"features": []string{
+				"CNN分類モデル自動解析",
+				"プロット種別自動判定",
+				"インタラクティブビューアー",
+				"メタデータ自動付与",
+			},
+			"preview_config": map[string]interface{}{
+				"base_image": "python:3.9-slim",
+				"duration":   5,
+				"port":       8000,
+				"tags":       []string{"DataViz", "Python", "W&B"},
+			},
+		},
+		{
+			"id":          "jupyter_demo",
+			"type":        "jupyter",
+			"name":        "📔 AI駆動データサイエンス環境",
+			"description": "Jupyter Notebook + Claude Code CLI統合環境",
+			"estimated_time": "45-90秒",
+			"difficulty":   "advanced",
+			"features": []string{
+				"自動コード生成",
+				"ライブラリ自動インストール",
+				"データ分析支援",
+				"結果の自動可視化",
+			},
+			"preview_config": map[string]interface{}{
+				"base_image": "jupyter/datascience-notebook:latest",
+				"duration":   15,
+				"port":       8888,
+				"tags":       []string{"Jupyter", "DataScience", "Interactive"},
+			},
+		},
+		{
+			"id":          "gui_demo",
+			"type":        "gui_app",
+			"name":        "🖥️ AI生成GUIアプリケーション",
+			"description": "デスクトップアプリケーションのリモート実行",
+			"estimated_time": "60-120秒",
+			"difficulty":   "advanced",
+			"features": []string{
+				"VNCベースリモートデスクトップ",
+				"GUI要素自動配置",
+				"ユーザーインタラクション記録",
+				"スクリーンショット自動保存",
+			},
+			"preview_config": map[string]interface{}{
+				"base_image": "dorowu/ubuntu-desktop-lxde-vnc:latest",
+				"duration":   8,
+				"port":       6080,
+				"tags":       []string{"GUI", "Desktop", "VNC"},
+			},
+		},
+		{
+			"id":          "data_analysis_demo",
+			"type":        "data_analysis",
+			"name":        "📈 総合データ分析ワークスペース",
+			"description": "機械学習・統計解析用統合環境",
+			"estimated_time": "30-60秒",
+			"difficulty":   "intermediate",
+			"features": []string{
+				"JupyterLab完全統合",
+				"機械学習ライブラリ完備",
+				"データ前処理自動化",
+				"モデル評価可視化",
+			},
+			"preview_config": map[string]interface{}{
+				"base_image": "jupyter/scipy-notebook:latest",
+				"duration":   12,
+				"port":       8888,
+				"tags":       []string{"ML", "Statistics", "Analysis"},
+			},
+		},
+	}
+
+	// Add sample previews to the result
+	previews = append(previews, samplePreviews...)
+
 	return previews
 }
 
@@ -2059,6 +2242,7 @@ func (s *Server) scanMatplotlibImages(projectID string) []map[string]interface{}
 
 	// Common matplotlib output directories
 	searchPaths := []string{
+		".", // Current directory
 		"/workspace/plots",
 		"/workspace/images",
 		"/workspace/figures",
@@ -2068,7 +2252,7 @@ func (s *Server) scanMatplotlibImages(projectID string) []map[string]interface{}
 
 	for _, path := range searchPaths {
 		// Execute command to find matplotlib images
-		cmd := fmt.Sprintf("find %s -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.svg' -newer /tmp/matplotlib_start 2>/dev/null | head -10", path)
+		cmd := fmt.Sprintf("find %s -maxdepth 1 -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.svg' 2>/dev/null | head -10", path)
 		output, err := s.dockerManager.ExecuteCommand(projectID, cmd)
 
 		if err == nil && output != "" {
@@ -2426,6 +2610,126 @@ func (s *Server) handleContainerInfoRequest(conn *websocket.Conn, msg map[string
 	log.Printf("✅ Sent container info for project %s", projectID)
 }
 
+// Command execution handler for mobile app command buttons
+func (s *Server) handleExecuteCommand(conn *websocket.Conn, msg map[string]interface{}) {
+	log.Printf("⚡ Handling command execution request")
+
+	data, ok := msg["data"].(map[string]interface{})
+	if !ok {
+		s.sendError(conn, "Invalid command execution message format")
+		return
+	}
+
+	projectID, ok := data["project_id"].(string)
+	if !ok || projectID == "" {
+		s.sendError(conn, "Project ID is required for command execution")
+		return
+	}
+
+	command, ok := data["command"].(string)
+	if !ok || command == "" {
+		s.sendError(conn, "Command is required for execution")
+		return
+	}
+
+	commandType, _ := data["command_type"].(string)
+	commandID, _ := data["command_id"].(string)
+	commandName, _ := data["command_name"].(string)
+
+	log.Printf("🚀 Executing command in project %s: %s", projectID, command)
+
+	// Execute the command in the Docker container
+	output, err := s.dockerManager.ExecuteCommand(projectID, command)
+
+	responseData := map[string]interface{}{
+		"command_id":   commandID,
+		"command_name": commandName,
+		"project_id":   projectID,
+		"command":      command,
+		"command_type": commandType,
+	}
+
+	if err != nil {
+		log.Printf("❌ Command execution failed: %v", err)
+
+		responseData["success"] = false
+		responseData["error"] = err.Error()
+		responseData["output"] = output // may contain partial output
+
+		s.sendMessage(conn, "command_execution_result", responseData)
+		return
+	}
+
+	log.Printf("✅ Command executed successfully")
+
+	responseData["success"] = true
+	responseData["output"] = output
+
+	// Check if this is a matplotlib command and try to capture plot
+	if commandType == "matplotlib" && strings.Contains(command, "matplotlib") {
+		// Try to extract plot data using enhanced matplotlib detector
+		if plotData := s.tryExtractMatplotlibPlot(projectID, command, output); plotData != nil {
+			responseData["type"] = "matplotlib"
+			responseData["image_data"] = plotData["base64_image"]
+			responseData["title"] = plotData["title"]
+			responseData["filename"] = plotData["filename"]
+
+			// Also send matplotlib_generated message for preview system
+			s.sendMessage(conn, "matplotlib_generated", plotData)
+		}
+	}
+
+	s.sendMessage(conn, "command_execution_result", responseData)
+
+	log.Printf("✅ Command execution completed for project %s", projectID)
+}
+
+// Helper function to try to extract matplotlib plot data
+func (s *Server) tryExtractMatplotlibPlot(projectID, command, output string) map[string]interface{} {
+	// Check if the output mentions a saved file
+	if strings.Contains(output, ".png") || strings.Contains(output, "saved") {
+		// Try to find the saved plot file
+		plotPaths := []string{
+			"/tmp/demo_plot.png",
+			"/tmp/plot.png",
+			"/tmp/figure.png",
+		}
+
+		for _, plotPath := range plotPaths {
+			if plotData := s.readPlotFromContainer(projectID, plotPath); plotData != nil {
+				return map[string]interface{}{
+					"base64_image": plotData,
+					"title":        "Generated Plot",
+					"filename":     plotPath,
+					"timestamp":    fmt.Sprintf("%d", time.Now().Unix()),
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// Helper function to read plot file from container
+func (s *Server) readPlotFromContainer(projectID, plotPath string) string {
+	// Execute cat command to read the plot file as base64
+	readCmd := fmt.Sprintf("if [ -f %s ]; then base64 %s; else echo 'FILE_NOT_FOUND'; fi", plotPath, plotPath)
+	output, err := s.dockerManager.ExecuteCommand(projectID, readCmd)
+
+	if err != nil || strings.Contains(output, "FILE_NOT_FOUND") {
+		return ""
+	}
+
+	// Clean up the base64 output (remove newlines)
+	base64Data := strings.ReplaceAll(strings.TrimSpace(output), "\n", "")
+
+	if len(base64Data) > 100 { // Basic validation that we got actual data
+		return base64Data
+	}
+
+	return ""
+}
+
 func main() {
 	// Get port from command line or environment
 	port := getPortFromArgs()
@@ -2463,7 +2767,10 @@ func main() {
 	http.HandleFunc("/qr", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./qr-code.png")
 	})
-	
+
+	// Setup test button endpoint
+	server.setupTestButtonEndpoint()
+
 	// Note: static files are now served by the web interface on port 8080
 	
 	// Legacy web interface (fallback)

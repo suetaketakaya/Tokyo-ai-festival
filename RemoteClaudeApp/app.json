@@ -14,10 +14,15 @@
       "bundleIdentifier": "com.remoteclaude.app",
       "icon": "./assets/icon.png",
       "deploymentTarget": "13.0",
-      "buildNumber": "6",
+      "buildNumber": "7",
       "infoPlist": {
         "NSCameraUsageDescription": "QRコードの読み取りのためにカメラへのアクセスを許可してください。",
-        "NSMicrophoneUsageDescription": "音声機能のためにマイクへのアクセスを許可してください。"
+        "NSMicrophoneUsageDescription": "音声機能のためにマイクへのアクセスを許可してください。",
+        "NSDocumentsFolderUsageDescription": "ファイルの読み書きのためにドキュメントフォルダへのアクセスを許可してください。",
+        "NSDesktopFolderUsageDescription": "ファイルの読み書きのためにデスクトップフォルダへのアクセスを許可してください。",
+        "NSDownloadsFolderUsageDescription": "ファイルの読み書きのためにダウンロードフォルダへのアクセスを許可してください。",
+        "NSFileProviderDomainUsageDescription": "ファイルの読み書きのためにファイルシステムへのアクセスを許可してください。",
+        "NSLocalNetworkUsageDescription": "ローカルネットワーク上のサーバーと通信するために許可してください。"
       }
     },
     "android": {

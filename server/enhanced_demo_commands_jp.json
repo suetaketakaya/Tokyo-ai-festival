@@ -1,0 +1,93 @@
+[
+  {
+    "id": "japanese_text_processing",
+    "name": "📝 日本語テキスト処理",
+    "description": "MeCab形態素解析を使用した日本語テキスト分析",
+    "command": "python3 -c \"import MeCab; mecab = MeCab.Tagger(); text='今日は良い天気ですね'; result = mecab.parse(text); print('日本語解析結果:'); print(result)\"",
+    "type": "python",
+    "category": "nlp",
+    "expected_output": "形態素解析された日本語テキスト",
+    "execution_time": "2-3秒",
+    "difficulty": "intermediate",
+    "locale": "ja_JP",
+    "tags": ["NLP", "日本語", "形態素解析"]
+  },
+  {
+    "id": "japanese_chart_visualization",
+    "name": "📊 日本語グラフ可視化",
+    "description": "日本語ラベル付きのグラフを生成",
+    "command": "python3 -c \"import matplotlib.pyplot as plt; import matplotlib.font_manager as fm; plt.rcParams['font.family'] = 'DejaVu Sans'; import numpy as np; categories = ['売上', '利益', '費用', '投資']; values = [100, 80, 60, 40]; plt.figure(figsize=(10, 6)); plt.bar(categories, values, color=['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']); plt.title('2024年度 財務データ分析', fontsize=16); plt.xlabel('項目'); plt.ylabel('金額 (百万円)'); plt.grid(True, alpha=0.3); plt.tight_layout(); plt.savefig('/tmp/japanese_chart.png', dpi=300, bbox_inches='tight'); print('日本語チャートを保存しました: /tmp/japanese_chart.png')\"",
+    "type": "matplotlib",
+    "category": "visualization",
+    "expected_output": "日本語ラベル付きグラフ画像",
+    "execution_time": "3-5秒",
+    "difficulty": "intermediate",
+    "locale": "ja_JP",
+    "tags": ["可視化", "日本語", "財務分析"]
+  },
+  {
+    "id": "web_app_japanese",
+    "name": "🌐 日本語Webアプリ",
+    "description": "日本語対応のWebアプリケーションを作成・起動",
+    "command": "python3 -c \"import os; content='''<!DOCTYPE html><html lang=\\\"ja\\\"><head><meta charset=\\\"UTF-8\\\"><meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1.0\\\"><title>RemoteClaudeOPS - 日本語デモ</title><style>body{font-family: 'Hiragino Sans', 'Meiryo', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding: 20px; color: white;} .container{max-width: 800px; margin: 0 auto; text-align: center;} .card{background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 30px; margin: 20px 0; box-shadow: 0 8px 32px rgba(0,0,0,0.1);} h1{font-size: 2.5em; margin-bottom: 20px;} .feature{margin: 15px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;} .emoji{font-size: 2em; margin-right: 10px;}</style></head><body><div class=\\\"container\\\"><div class=\\\"card\\\"><h1>🚀 RemoteClaudeOPS v4.0</h1><p>AI駆動開発環境へようこそ</p></div><div class=\\\"card\\\"><h2>🔧 主要機能</h2><div class=\\\"feature\\\"><span class=\\\"emoji\\\">📱</span>モバイル統合開発環境</div><div class=\\\"feature\\\"><span class=\\\"emoji\\\">🐳</span>Docker コンテナ管理</div><div class=\\\"feature\\\"><span class=\\\"emoji\\\">📊</span>リアルタイム データ可視化</div><div class=\\\"feature\\\"><span class=\\\"emoji\\\">🤖</span>Claude AI 統合</div></div><div class=\\\"card\\\"><h2>📈 パフォーマンス</h2><p>実行時間: <strong id=\\\"time\\\">0</strong>秒</p><script>let time=0; setInterval(()=>{document.getElementById('time').textContent=++time;}, 1000);</script></div></div></body></html>'''; os.makedirs('/tmp/webapp', exist_ok=True); open('/tmp/webapp/index.html', 'w', encoding='utf-8').write(content); print('日本語Webアプリを作成しました'); import http.server; import socketserver; import threading; import time; PORT = 8080; class Handler(http.server.SimpleHTTPRequestHandler): def __init__(self, *args, **kwargs): super().__init__(*args, directory='/tmp/webapp', **kwargs); def start_server(): with socketserver.TCPServer(('', PORT), Handler) as httpd: httpd.serve_forever(); server_thread = threading.Thread(target=start_server, daemon=True); server_thread.start(); print(f'日本語Webアプリが起動しました: http://localhost:{PORT}'); time.sleep(2)\"",
+    "type": "web_server",
+    "category": "frontend",
+    "expected_output": "日本語Webアプリケーション起動",
+    "execution_time": "3-5秒",
+    "difficulty": "intermediate",
+    "locale": "ja_JP",
+    "tags": ["Web", "日本語", "フロントエンド"]
+  },
+  {
+    "id": "terminal_ui_japanese",
+    "name": "💻 日本語ターミナルUI",
+    "description": "Rich libを使用した美しい日本語ターミナルインターフェース",
+    "command": "python3 -c \"from rich.console import Console; from rich.table import Table; from rich.panel import Panel; from rich.text import Text; from rich.align import Align; import time; console = Console(); console.print(Panel.fit('🎌 RemoteClaudeOPS 日本語ターミナル', style='bold magenta')); table = Table(title='📊 システム状況'); table.add_column('項目', style='cyan', no_wrap=True); table.add_column('状態', style='green'); table.add_column('詳細', style='yellow'); table.add_row('CPU使用率', '✅ 正常', '15.2%'); table.add_row('メモリ', '✅ 正常', '2.1GB / 8GB'); table.add_row('ディスク容量', '⚠️  注意', '85% 使用中'); table.add_row('ネットワーク', '✅ 正常', '150 Mbps'); console.print(table); console.print(Panel('🚀 システムは正常に動作しています', style='bold green')); for i in range(3): console.print(f'⏱️  処理中... {i+1}/3'); time.sleep(1); console.print(Panel('✅ 日本語ターミナルUIの表示が完了しました', style='bold blue'))\"",
+    "type": "python",
+    "category": "ui",
+    "expected_output": "Rich日本語ターミナルUI表示",
+    "execution_time": "4-6秒",
+    "difficulty": "intermediate",
+    "locale": "ja_JP",
+    "tags": ["UI", "日本語", "Rich", "ターミナル"]
+  },
+  {
+    "id": "multiagent_worker_api",
+    "name": "🤖 マルチエージェントWorker API",
+    "description": "複数のAIエージェントが協調動作するWorker APIシステム",
+    "command": "python3 -c \"import json; import time; import threading; from datetime import datetime; class WorkerAPI: def __init__(self): self.agents = {'analyzer': {'status': 'ready', 'tasks': 0}, 'processor': {'status': 'ready', 'tasks': 0}, 'reporter': {'status': 'ready', 'tasks': 0}}; self.results = []; def process_task(self, agent_id, task_data): self.agents[agent_id]['status'] = 'working'; self.agents[agent_id]['tasks'] += 1; time.sleep(2); result = {'agent': agent_id, 'task': task_data, 'result': f'{agent_id}による処理完了', 'timestamp': datetime.now().isoformat()}; self.results.append(result); self.agents[agent_id]['status'] = 'ready'; return result; def get_status(self): return {'agents': self.agents, 'completed_tasks': len(self.results)}; api = WorkerAPI(); print('🤖 マルチエージェントWorker API起動'); print('📋 初期状態:', json.dumps(api.get_status(), indent=2, ensure_ascii=False)); tasks = [('analyzer', 'データ分析タスク'), ('processor', '画像処理タスク'), ('reporter', 'レポート生成タスク')]; threads = []; for agent_id, task in tasks: t = threading.Thread(target=api.process_task, args=(agent_id, task)); threads.append(t); t.start(); print(f'🚀 {agent_id}エージェントにタスク割当: {task}'); for t in threads: t.join(); print('✅ 全タスク完了'); print('📊 最終状態:', json.dumps(api.get_status(), indent=2, ensure_ascii=False)); print('📝 結果一覧:'); for result in api.results: print(f'  - {result[\\\"agent\\\"]}: {result[\\\"result\\\"]}')\"",
+    "type": "python",
+    "category": "multiagent",
+    "expected_output": "マルチエージェント協調処理結果",
+    "execution_time": "6-8秒",
+    "difficulty": "advanced",
+    "locale": "ja_JP",
+    "tags": ["AI", "マルチエージェント", "API", "並行処理"]
+  },
+  {
+    "id": "data_science_pipeline",
+    "name": "📈 データサイエンスパイプライン",
+    "description": "機械学習パイプライン全体を実行（データ前処理→学習→評価→可視化）",
+    "command": "python3 -c \"import numpy as np; import matplotlib.pyplot as plt; from sklearn.datasets import make_classification; from sklearn.model_selection import train_test_split; from sklearn.ensemble import RandomForestClassifier; from sklearn.metrics import accuracy_score, classification_report; import pandas as pd; print('📊 データサイエンスパイプライン開始'); print('1️⃣ データ生成中...'); X, y = make_classification(n_samples=1000, n_features=10, n_informative=5, n_redundant=2, random_state=42); X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42); print(f'🔢 訓練データ: {X_train.shape}, テストデータ: {X_test.shape}'); print('2️⃣ モデル学習中...'); model = RandomForestClassifier(n_estimators=100, random_state=42); model.fit(X_train, y_train); print('3️⃣ 予測・評価中...'); y_pred = model.predict(X_test); accuracy = accuracy_score(y_test, y_pred); print(f'🎯 精度: {accuracy:.3f}'); print('4️⃣ 可視化中...'); feature_importance = model.feature_importances_; plt.figure(figsize=(12, 8)); plt.subplot(2, 2, 1); plt.bar(range(len(feature_importance)), feature_importance); plt.title('特徴量重要度'); plt.xlabel('特徴量'); plt.ylabel('重要度'); plt.subplot(2, 2, 2); plt.hist(X_train[:, 0], alpha=0.7, label='特徴量1', bins=30); plt.hist(X_train[:, 1], alpha=0.7, label='特徴量2', bins=30); plt.legend(); plt.title('特徴量分布'); plt.subplot(2, 2, 3); confusion_matrix = pd.crosstab(y_test, y_pred, rownames=['実際'], colnames=['予測']); plt.imshow(confusion_matrix, cmap='Blues'); plt.title('混同行列'); plt.colorbar(); plt.subplot(2, 2, 4); plt.plot([0, 1], [0, 1], 'k--'); fpr = np.linspace(0, 1, 100); tpr = np.random.random(100).cumsum(); tpr = tpr / tpr.max(); plt.plot(fpr, tpr); plt.title('ROC曲線 (模擬)'); plt.xlabel('偽陽性率'); plt.ylabel('真陽性率'); plt.tight_layout(); plt.savefig('/tmp/ml_pipeline_results.png', dpi=300, bbox_inches='tight'); print('✅ パイプライン完了: /tmp/ml_pipeline_results.png'); print(f'📋 最終結果: 精度 {accuracy:.1%}, 特徴量数 {len(feature_importance)}')\"",
+    "type": "matplotlib",
+    "category": "machine_learning",
+    "expected_output": "機械学習パイプライン結果と可視化",
+    "execution_time": "8-12秒",
+    "difficulty": "advanced",
+    "locale": "ja_JP",
+    "tags": ["ML", "データサイエンス", "可視化", "パイプライン"]
+  },
+  {
+    "id": "realtime_dashboard",
+    "name": "📊 リアルタイムダッシュボード",
+    "description": "WebSocketを使用したリアルタイムデータダッシュボード",
+    "command": "python3 -c \"import asyncio; import websockets; import json; import time; import threading; import random; from datetime import datetime; dashboard_html = '''<!DOCTYPE html><html><head><meta charset=\\\"UTF-8\\\"><title>📊 リアルタイムダッシュボード</title><script src=\\\"https://cdn.jsdelivr.net/npm/chart.js\\\"></script><style>body{font-family:Arial,sans-serif;background:#1a1a1a;color:white;margin:0;padding:20px}h1{text-align:center;color:#00ff88}.dashboard{display:grid;grid-template-columns:1fr 1fr;gap:20px}.card{background:#2a2a2a;border-radius:10px;padding:20px;box-shadow:0 4px 8px rgba(0,0,0,0.3)}.metric{font-size:2em;font-weight:bold;text-align:center;margin:10px 0}#chart{max-width:100%;height:300px}</style></head><body><h1>🚀 RemoteClaudeOPS リアルタイム監視</h1><div class=\\\"dashboard\\\"><div class=\\\"card\\\"><h3>💻 CPU使用率</h3><div id=\\\"cpu\\\" class=\\\"metric\\\">--%</div></div><div class=\\\"card\\\"><h3>💾 メモリ使用量</h3><div id=\\\"memory\\\" class=\\\"metric\\\">-- GB</div></div><div class=\\\"card\\\"><h3>🌐 ネットワーク</h3><div id=\\\"network\\\" class=\\\"metric\\\">-- Mbps</div></div><div class=\\\"card\\\"><h3>📈 パフォーマンス履歴</h3><canvas id=\\\"chart\\\"></canvas></div></div><script>const ws = new WebSocket('ws://localhost:8765'); const ctx = document.getElementById('chart').getContext('2d'); const chart = new Chart(ctx, {type:'line',data:{labels:[],datasets:[{label:'CPU使用率',data:[],borderColor:'#00ff88',tension:0.1}]},options:{responsive:true,scales:{y:{beginAtZero:true,max:100}}}}); ws.onmessage = function(event) { const data = JSON.parse(event.data); document.getElementById('cpu').textContent = data.cpu + '%'; document.getElementById('memory').textContent = data.memory + ' GB'; document.getElementById('network').textContent = data.network + ' Mbps'; chart.data.labels.push(new Date().toLocaleTimeString()); chart.data.datasets[0].data.push(data.cpu); if(chart.data.labels.length > 20) { chart.data.labels.shift(); chart.data.datasets[0].data.shift(); } chart.update(); };</script></body></html>'''; open('/tmp/dashboard.html', 'w', encoding='utf-8').write(dashboard_html); print('📊 リアルタイムダッシュボード作成完了'); print('🌐 ファイル: /tmp/dashboard.html'); def generate_data(): while True: data = {'cpu': random.randint(10, 90), 'memory': round(random.uniform(1.5, 7.8), 1), 'network': random.randint(50, 300), 'timestamp': datetime.now().isoformat()}; print(f'📡 データ送信: CPU {data[\\\"cpu\\\"]}%, メモリ {data[\\\"memory\\\"]}GB'); time.sleep(3); data_thread = threading.Thread(target=generate_data, daemon=True); data_thread.start(); print('✅ リアルタイムダッシュボードシステム起動完了')\"",
+    "type": "web_server",
+    "category": "realtime",
+    "expected_output": "リアルタイムダッシュボード起動",
+    "execution_time": "5-7秒",
+    "difficulty": "advanced",
+    "locale": "ja_JP",
+    "tags": ["ダッシュボード", "リアルタイム", "WebSocket", "監視"]
+  }
+]

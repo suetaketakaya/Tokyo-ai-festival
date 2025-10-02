@@ -13,6 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
+import { DynamicCommandGenerator } from '../services/DynamicCommandGenerator';
 
 interface Command {
   id: string;
@@ -47,12 +48,21 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'category' | 'recent' | 'frequent'>('category');
   const [quickExecuteMode, setQuickExecuteMode] = useState(false);
+  const [dynamicCommands, setDynamicCommands] = useState<Command[]>([]);
+  const [inputText, setInputText] = useState('');
+  const [showDynamicMode, setShowDynamicMode] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
       title: `Quick Commands - ${projectId}`,
       headerRight: () => (
         <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: showDynamicMode ? '#FF9800' : '#666' }]}
+            onPress={() => setShowDynamicMode(!showDynamicMode)}
+          >
+            <Text style={styles.headerButtonText}>🇯🇵</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={[styles.headerButton, { backgroundColor: quickExecuteMode ? '#4CAF50' : '#666' }]}
             onPress={() => setQuickExecuteMode(!quickExecuteMode)}
@@ -62,7 +72,7 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
           <TouchableOpacity
             style={[styles.headerButton, { backgroundColor: isConnected ? '#4CAF50' : '#f44336' }]}
             onPress={() => {
-              const debugInfo = EnhancedEnhancedWebSocketService.getDetailedDebugInfo();
+              const debugInfo = EnhancedWebSocketService.getDetailedDebugInfo();
               Alert.alert('Debug Info', JSON.stringify(debugInfo, null, 2));
             }}
           >
@@ -73,7 +83,7 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
         </View>
       ),
     });
-  }, [navigation, projectId, isConnected, quickExecuteMode]);
+  }, [navigation, projectId, isConnected, quickExecuteMode, showDynamicMode]);
 
   useEffect(() => {
     initializeCommands();
@@ -88,7 +98,7 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
     // serverUrl already includes /ws and key parameter
     const connectionUrl = serverUrl;
 
-    const success = await EnhancedEnhancedWebSocketService.connect(connectionUrl, {
+    const success = await EnhancedWebSocketService.connect(connectionUrl, {
       onOpen: () => {
         setIsConnected(true);
       },
@@ -222,7 +232,7 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
       {
         id: '10',
         name: 'Python Version',
-        command: 'python --version',
+        command: 'python3.11 --version',
         description: 'Check Python version',
         category: 'Development',
                 color: '#3F51B5',
@@ -291,6 +301,38 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
     setCommands(defaultCommands);
   };
 
+  // 🔥 Japanese Pattern Detection Integration
+  const generateDynamicCommands = (inputText: string) => {
+    if (!inputText || inputText.trim().length === 0) {
+      setDynamicCommands([]);
+      return;
+    }
+
+    try {
+      console.log('🔄 日本語パターン検出開始:', inputText);
+      const dynamicButtons = DynamicCommandGenerator.generateCommandsFromInput(inputText);
+
+      // Convert DynamicCommandGenerator buttons to Command format
+      const convertedCommands: Command[] = dynamicButtons.map((btn, index) => ({
+        id: `dynamic_${Date.now()}_${index}`,
+        name: btn.title || btn.name || `Command ${index + 1}`,
+        command: btn.command || btn.action || '',
+        description: btn.description || `Generated from: ${inputText.substring(0, 50)}...`,
+        category: 'Dynamic',
+        icon: btn.icon || '⚡',
+        color: btn.color || '#4CAF50',
+        usageCount: 0,
+      }));
+
+      console.log('✅ Flask専用ボタン生成完了:', convertedCommands.length, 'ボタン');
+      console.log('📋 生成されたボタン:', convertedCommands.map(cmd => cmd.name));
+      setDynamicCommands(convertedCommands);
+    } catch (error) {
+      console.error('❌ 日本語パターン検出エラー:', error);
+      setDynamicCommands([]);
+    }
+  };
+
   const executeCommand = (command: Command) => {
     if (!isConnected) {
       Alert.alert('Error', 'Not connected to server');
@@ -346,7 +388,10 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   const getSortedCommands = () => {
-    let filteredCommands = commands.filter(cmd =>
+    // Use dynamic commands when in dynamic mode, otherwise use default commands
+    const activeCommands = showDynamicMode ? dynamicCommands : commands;
+
+    let filteredCommands = activeCommands.filter(cmd =>
       cmd.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       cmd.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       cmd.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -455,6 +500,32 @@ const QuickCommandsScreen: React.FC<Props> = ({ route, navigation }) => {
           onChangeText={setSearchQuery}
         />
       </View>
+
+      {showDynamicMode && (
+        <View style={styles.dynamicModeContainer}>
+          <View style={styles.japaneseInputContainer}>
+            <TextInput
+              style={styles.japaneseInput}
+              placeholder="シンプルなFlaskアプリケーションを作成してください..."
+              placeholderTextColor="#888"
+              value={inputText}
+              onChangeText={setInputText}
+              multiline={true}
+              numberOfLines={3}
+            />
+            <TouchableOpacity
+              style={styles.generateButton}
+              onPress={() => generateDynamicCommands(inputText)}
+              disabled={!inputText.trim()}
+            >
+              <Text style={styles.generateButtonText}>🚀 生成</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.dynamicModeHint}>
+            日本語で要求を入力すると、適切なコマンドが自動生成されます
+          </Text>
+        </View>
+      )}
 
       {renderSortButtons()}
 
@@ -764,6 +835,51 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  // 🔥 Dynamic Mode Styles
+  dynamicModeContainer: {
+    backgroundColor: '#fff3cd',
+    padding: 15,
+    marginHorizontal: 15,
+    marginBottom: 10,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF9800',
+  },
+  japaneseInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 8,
+  },
+  japaneseInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+    color: '#333',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginRight: 10,
+    maxHeight: 80,
+  },
+  generateButton: {
+    backgroundColor: '#FF9800',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  generateButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  dynamicModeHint: {
+    fontSize: 12,
+    color: '#856404',
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
 });
 

@@ -574,26 +574,34 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     if (commandType === 'linux') {
       // Direct Linux command execution
       message = {
-        type: 'intelligent_execute',
+        type: 'claude_execute',
         data: {
           project_id: projectId,
           command: command,
           command_type: 'linux',
-          priority: 1,
-          requires_staging: false
+          context: {
+            current_dir: '/workspace',
+            git_branch: 'main'
+          },
+          client_version: '3.8.0',
+          use_staging: false
         }
       };
       executionMessage = `🐧 Linux コマンド実行: ${command}`;
     } else if (commandType === 'python' || commandType === 'webapp') {
       // Python/webapp with potential GUI
       message = {
-        type: 'intelligent_execute',
+        type: 'claude_execute',
         data: {
           project_id: projectId,
           command: command,
           command_type: commandType,
-          priority: 2,
-          requires_staging: true,
+          context: {
+            current_dir: '/workspace',
+            git_branch: 'main'
+          },
+          client_version: '3.8.0',
+          use_staging: true,
           requires_preview: true
         }
       };
@@ -606,13 +614,17 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     } else if (commandType === 'file') {
       // File execution
       message = {
-        type: 'intelligent_execute',
+        type: 'claude_execute',
         data: {
           project_id: projectId,
           command: command,
           command_type: 'file',
-          priority: 3,
-          requires_staging: false
+          context: {
+            current_dir: '/workspace',
+            git_branch: 'main'
+          },
+          client_version: '3.8.0',
+          use_staging: false
         }
       };
       executionMessage = `📄 ファイル実行: ${command}`;
@@ -778,7 +790,7 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
         setStageHistory([]);
 
         const message = {
-          type: 'claude_execute', // Enhanced routing will detect staging capability
+          type: 'claude_execute',
           data: {
             project_id: projectId,
             command: quickCommand,
@@ -786,8 +798,8 @@ const DevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
               current_dir: '/workspace',
               git_branch: 'main'
             },
-            client_version: '3.8.0', // Indicate staging support
-            use_staging: true // Explicitly request staging
+            client_version: '3.8.0',
+            use_staging: true
           }
         };
 

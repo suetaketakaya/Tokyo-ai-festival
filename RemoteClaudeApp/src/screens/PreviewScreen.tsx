@@ -19,7 +19,7 @@ import EnhancedWebSocketService from '../services/EnhancedWebSocketService';
 
 interface PreviewContent {
   id: string;
-  type: 'matplotlib' | 'web' | 'image' | 'pdf' | 'html';
+  type: 'matplotlib' | 'web' | 'image' | 'pdf' | 'html' | 'button';
   title: string;
   content: string;
   metadata: {
@@ -28,7 +28,21 @@ interface PreviewContent {
     timestamp: Date;
     size?: number;
     mimeType?: string;
+    command?: string;
+    category?: string;
+    framework?: string;
+    color?: string;
   };
+}
+
+interface TestButton {
+  id: string;
+  title: string;
+  command: string;
+  category: string;
+  framework: string;
+  color: string;
+  priority: number;
 }
 
 interface Props {
@@ -57,6 +71,72 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const webViewRef = useRef<WebView>(null);
   const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
+  // テストボタンデータ（preview_test_buttons.jsからの移植）
+  const testButtons: TestButton[] = [
+    {
+      id: `flask_1_${Date.now()}`,
+      title: '🐍 Flask依存関係インストール',
+      command: 'pip install flask',
+      category: 'setup',
+      framework: 'flask',
+      color: '#2196F3',
+      priority: 1,
+    },
+    {
+      id: `flask_2_${Date.now()}`,
+      title: '📝 Flaskアプリ作成',
+      command: 'touch app.py',
+      category: 'create',
+      framework: 'flask',
+      color: '#4CAF50',
+      priority: 2,
+    },
+    {
+      id: `flask_3_${Date.now()}`,
+      title: '🚀 Flaskサーバー起動',
+      command: 'python app.py',
+      category: 'run',
+      framework: 'flask',
+      color: '#FF9800',
+      priority: 3,
+    },
+    {
+      id: `flask_4_${Date.now()}`,
+      title: '🌐 ホームページ確認',
+      command: 'curl http://localhost:5000/',
+      category: 'test',
+      framework: 'flask',
+      color: '#9C27B0',
+      priority: 4,
+    },
+    {
+      id: `flask_5_${Date.now()}`,
+      title: '🏢 会社情報ページ確認',
+      command: 'curl http://localhost:5000/about',
+      category: 'test',
+      framework: 'flask',
+      color: '#9C27B0',
+      priority: 5,
+    },
+  ];
+
+  // テストボタンをPreviewContentに変換
+  const convertButtonsToPreviewItems = (): PreviewContent[] => {
+    return testButtons.map(button => ({
+      id: button.id,
+      type: 'button' as const,
+      title: button.title,
+      content: button.command,
+      metadata: {
+        timestamp: new Date(),
+        command: button.command,
+        category: button.category,
+        framework: button.framework,
+        color: button.color,
+      },
+    }));
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -93,6 +173,53 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
       EnhancedWebSocketService.unregisterScreenCallbacks('preview');
     };
   }, []);
+
+  // テストボタンを初期表示
+  useEffect(() => {
+    if (previewItems.length === 0) {
+      console.log('🔥 Loading test buttons for Preview screen');
+      const buttonItems = convertButtonsToPreviewItems();
+      setPreviewItems(buttonItems);
+    }
+  }, []);
+
+  // ボタン実行機能
+  const executeCommand = async (command: string, buttonTitle: string) => {
+    try {
+      setIsLoading(true);
+
+      if (!isConnected) {
+        Alert.alert('エラー', 'サーバーに接続されていません');
+        return;
+      }
+
+      console.log(`🚀 Executing command: ${command}`);
+
+      const commandMessage = {
+        type: 'command',
+        data: command,
+        source: 'preview_button',
+        button_title: buttonTitle,
+        project_id: projectId,
+        timestamp: new Date().toISOString(),
+      };
+
+      const success = await EnhancedWebSocketService.sendMessage(commandMessage);
+
+      if (success) {
+        Alert.alert('実行中', `コマンド「${buttonTitle}」を実行中です`, [
+          { text: 'OK', style: 'default' }
+        ]);
+      } else {
+        Alert.alert('エラー', 'コマンドの送信に失敗しました');
+      }
+    } catch (error) {
+      console.error('Command execution error:', error);
+      Alert.alert('エラー', `コマンド実行エラー: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const connectToServer = async () => {
     try {
@@ -355,15 +482,57 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   const getFilteredItems = () => {
+    // テストボタンをPreviewContentに変換 (FlaskはWebアプリなのでtypeを'web'に設定)
+    const buttonItems: PreviewContent[] = testButtons.map(button => ({
+      id: button.id,
+      type: 'web' as const,
+      title: button.title,
+      content: button.command,
+      metadata: {
+        timestamp: new Date(),
+        command: button.command,
+        category: button.category,
+        framework: button.framework,
+        color: button.color,
+      }
+    }));
+
+    console.log('🎯 PREVIEW: testButtons count:', testButtons.length);
+    console.log('🎯 PREVIEW: buttonItems count:', buttonItems.length);
+    console.log('🎯 PREVIEW: previewItems count:', previewItems.length);
+    console.log('🎯 PREVIEW: activeTab:', activeTab);
+
+    // デバッグ: previewItemsの内容をログ出力
+    if (previewItems.length > 0) {
+      console.log('🎯 PREVIEW: previewItems titles:', previewItems.map(item => item.title));
+    }
+
+    // 重複を避けるため、サーバーから受信したボタンとテストボタンを分離管理
+    const serverItems = previewItems.filter(item =>
+      // サーバーから来たボタンは一意のコマンドまたはタイトルを持つ
+      !testButtons.some(testBtn =>
+        testBtn.command === item.content ||
+        testBtn.title === item.title
+      )
+    );
+
+    // サーバーアイテムが存在する場合はそれを優先、なければテストボタンを表示
+    const allItems = serverItems.length > 0 ? serverItems : buttonItems;
+    console.log('🎯 PREVIEW: serverItems count:', serverItems.length);
+    console.log('🎯 PREVIEW: allItems count:', allItems.length);
+    console.log('🎯 PREVIEW: displaying', serverItems.length > 0 ? 'server items' : 'test buttons');
+
     switch (activeTab) {
       case 'matplotlib':
-        return previewItems.filter(item => item.type === 'matplotlib');
+        return allItems.filter(item => item.type === 'matplotlib');
       case 'web':
-        return previewItems.filter(item => item.type === 'web');
+        return allItems.filter(item => item.type === 'web');
       case 'images':
-        return previewItems.filter(item => ['image', 'matplotlib'].includes(item.type));
+        return allItems.filter(item => ['image', 'matplotlib'].includes(item.type));
       default:
-        return previewItems;
+        const result = allItems;
+        console.log('🎯 PREVIEW: returning items count:', result.length);
+        return result;
     }
   };
 
@@ -395,20 +564,48 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
     </View>
   );
 
-  const renderPreviewItem = (item: PreviewContent) => (
-    <TouchableOpacity
-      key={item.id}
-      style={styles.previewItem}
-      onPress={() => setSelectedItem(item)}
-    >
-      <View style={styles.itemHeader}>
-        <Text style={styles.itemTitle}>{item.title}</Text>
-        <Text style={styles.itemType}>{item.type.toUpperCase()}</Text>
-      </View>
+  const renderPreviewItem = (item: PreviewContent) => {
+    // テストボタンかどうかを判定（コマンドメタデータの存在で判定）
+    const isButton = item.metadata.command && item.metadata.category && item.metadata.framework;
 
-      <View style={styles.itemContent}>
-        {item.type === 'matplotlib' || item.type === 'image' ? (
-          <Image
+    return (
+      <TouchableOpacity
+        key={item.id}
+        style={[
+          styles.previewItem,
+          isButton && {
+            backgroundColor: item.metadata.color || '#2196F3',
+            borderColor: item.metadata.color || '#2196F3',
+          }
+        ]}
+        onPress={isButton
+          ? () => executeCommand(item.content, item.title)
+          : () => setSelectedItem(item)
+        }
+      >
+        <View style={styles.itemHeader}>
+          <Text style={[
+            styles.itemTitle,
+            isButton && { color: '#fff', fontWeight: 'bold' }
+          ]}>
+            {item.title}
+          </Text>
+          <Text style={[
+            styles.itemType,
+            isButton && { color: '#fff', backgroundColor: 'rgba(255,255,255,0.2)' }
+          ]}>
+            {isButton ? item.metadata.category?.toUpperCase() : item.type.toUpperCase()}
+          </Text>
+        </View>
+
+        <View style={styles.itemContent}>
+          {isButton ? (
+            <View style={styles.buttonContent}>
+              <Text style={styles.buttonCommand}>{item.content}</Text>
+              <Text style={styles.buttonFramework}>Framework: {item.metadata.framework}</Text>
+            </View>
+          ) : item.type === 'matplotlib' || item.type === 'image' ? (
+            <Image
             source={{ uri: item.content.startsWith('data:') ? item.content : `data:image/png;base64,${item.content}` }}
             style={styles.thumbnailImage}
             resizeMode="cover"
@@ -421,7 +618,7 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
               });
             }}
           />
-        ) : item.type === 'web' ? (
+        ) : item.type === 'web' && !isButton ? (
           <View style={styles.webPreview}>
             <Text style={styles.webUrl}>{item.content}</Text>
             <Text style={styles.webPort}>Port: {item.metadata.port}</Text>
@@ -449,8 +646,9 @@ const PreviewScreen: React.FC<Props> = ({ route, navigation }) => {
       </View>
     </TouchableOpacity>
   );
+};
 
-  const renderFullPreview = () => {
+const renderFullPreview = () => {
     if (!selectedItem) return null;
 
     return (
@@ -949,6 +1147,21 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 12,
     marginBottom: 2,
+  },
+  // ボタン専用スタイル
+  buttonContent: {
+    padding: 10,
+  },
+  buttonCommand: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+    marginBottom: 5,
+  },
+  buttonFramework: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    fontStyle: 'italic',
   },
 });
 

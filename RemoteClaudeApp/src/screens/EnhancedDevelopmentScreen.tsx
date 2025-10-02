@@ -85,6 +85,12 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [currentClassification, setCurrentClassification] = useState<CommandClassification | null>(null);
 
+  // Enhanced keyboard states
+  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState<string[]>([]);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
+
   // UI states for better UX
   const [activeMode, setActiveMode] = useState<'terminal' | 'preview'>('terminal');
   const [previewItems, setPreviewItems] = useState<PreviewItem[]>([]);
@@ -92,13 +98,150 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
   const [terminalHeight, setTerminalHeight] = useState(screenHeight * 0.8); // 80% for terminal
   const [isInputFocused, setIsInputFocused] = useState(false);
 
-  // W&B Integration states
-  const [wandbIntegrated, setWandbIntegrated] = useState(false);
-  const [wandbApiKey, setWandbApiKey] = useState('');
-  const [showWandbSetup, setShowWandbSetup] = useState(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
   const textInputRef = useRef<TextInput>(null);
+
+  // Enhanced keyboard functionality
+  const commonCommands = [
+    'ls', 'ls -la', 'ls -l', 'pwd', 'cd', 'mkdir', 'rmdir', 'rm', 'cp', 'mv',
+    'cat', 'head', 'tail', 'grep', 'find', 'which', 'whoami', 'ps', 'top', 'df', 'du',
+    'python3', 'python3.11', 'pip', 'pip3', 'node', 'npm', 'git', 'docker',
+    'python3 -m http.server 8080 --bind 0.0.0.0',
+    'echo', 'touch', 'chmod', 'chown', 'wget', 'curl', 'ssh', 'scp', 'tar', 'zip', 'unzip'
+  ];
+
+  const fileExtensions = ['.html', '.css', '.js', '.ts', '.tsx', '.py', '.json', '.md', '.txt', '.sh'];
+  const directories = ['/tmp', '/workspace', '/home', '/usr', '/var', '/etc'];
+
+  // Generate autocomplete suggestions based on current input
+  const generateAutocompleteSuggestions = useCallback((input: string): string[] => {
+    if (!input.trim()) return [];
+
+    const inputLower = input.toLowerCase();
+    const words = input.split(' ');
+    const lastWord = words[words.length - 1];
+
+    // Command completion
+    if (words.length === 1) {
+      return commonCommands.filter(cmd =>
+        cmd.toLowerCase().startsWith(inputLower)
+      ).slice(0, 8);
+    }
+
+    // Path completion
+    if (lastWord.includes('/')) {
+      return directories.filter(dir =>
+        dir.toLowerCase().includes(lastWord.toLowerCase())
+      ).slice(0, 5);
+    }
+
+    // File extension completion
+    if (lastWord.includes('.')) {
+      return fileExtensions.filter(ext =>
+        ext.toLowerCase().includes(lastWord.toLowerCase())
+      ).map(ext => words.slice(0, -1).join(' ') + ' ' + lastWord + ext);
+    }
+
+    // Common flag completion
+    const flags = ['-l', '-la', '-h', '--help', '-v', '--version', '-r', '-f'];
+    return flags.filter(flag =>
+      flag.toLowerCase().startsWith(lastWord.toLowerCase())
+    ).map(flag => words.slice(0, -1).join(' ') + ' ' + flag);
+  }, []);
+
+  // Handle TAB key for autocomplete
+  const handleTabCompletion = useCallback(() => {
+    if (showAutocomplete && autocompleteSuggestions.length > 0) {
+      const suggestion = autocompleteSuggestions[selectedSuggestionIndex];
+      setCommand(suggestion);
+      setShowAutocomplete(false);
+      setSelectedSuggestionIndex(0);
+    } else {
+      const suggestions = generateAutocompleteSuggestions(command);
+      if (suggestions.length > 0) {
+        setAutocompleteSuggestions(suggestions);
+        setShowAutocomplete(true);
+        setSelectedSuggestionIndex(0);
+      }
+    }
+  }, [command, showAutocomplete, autocompleteSuggestions, selectedSuggestionIndex, generateAutocompleteSuggestions]);
+
+  // Handle arrow keys for history navigation and autocomplete navigation
+  const handleArrowKey = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
+    if (showAutocomplete) {
+      // Navigate autocomplete suggestions
+      if (direction === 'up') {
+        setSelectedSuggestionIndex(prev =>
+          prev > 0 ? prev - 1 : autocompleteSuggestions.length - 1
+        );
+      } else if (direction === 'down') {
+        setSelectedSuggestionIndex(prev =>
+          prev < autocompleteSuggestions.length - 1 ? prev + 1 : 0
+        );
+      } else if (direction === 'left' || direction === 'right') {
+        setShowAutocomplete(false);
+      }
+    } else {
+      // Navigate command history
+      if (direction === 'up') {
+        if (historyIndex < commandHistory.length - 1) {
+          const newIndex = historyIndex + 1;
+          setHistoryIndex(newIndex);
+          setCommand(commandHistory[commandHistory.length - 1 - newIndex]);
+        }
+      } else if (direction === 'down') {
+        if (historyIndex > 0) {
+          const newIndex = historyIndex - 1;
+          setHistoryIndex(newIndex);
+          setCommand(commandHistory[commandHistory.length - 1 - newIndex]);
+        } else if (historyIndex === 0) {
+          setHistoryIndex(-1);
+          setCommand('');
+        }
+      }
+    }
+  }, [showAutocomplete, autocompleteSuggestions.length, selectedSuggestionIndex, historyIndex, commandHistory]);
+
+  // Enhanced key press handler
+  const handleEnhancedKeyPress = useCallback((event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+    const { key } = event.nativeEvent;
+
+    switch (key) {
+      case 'Tab':
+        event.preventDefault();
+        handleTabCompletion();
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        handleArrowKey('up');
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        handleArrowKey('down');
+        break;
+      case 'ArrowLeft':
+        handleArrowKey('left');
+        break;
+      case 'ArrowRight':
+        handleArrowKey('right');
+        break;
+      case 'Escape':
+        setShowAutocomplete(false);
+        setShowSuggestions(false);
+        break;
+      case 'Enter':
+        if (showAutocomplete && autocompleteSuggestions.length > 0) {
+          event.preventDefault();
+          const suggestion = autocompleteSuggestions[selectedSuggestionIndex];
+          setCommand(suggestion);
+          setShowAutocomplete(false);
+        } else {
+          executeCommand(command);
+        }
+        break;
+    }
+  }, [handleTabCompletion, handleArrowKey, showAutocomplete, autocompleteSuggestions, selectedSuggestionIndex, command]);
 
   // Smart command classification engine
   const classifyCommand = useCallback((input: string): CommandClassification => {
@@ -169,7 +312,7 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
       suggestions.push(
         { command: 'ls -la', description: 'List all files with details', category: 'common' },
         { command: 'pwd', description: 'Show current directory', category: 'common' },
-        { command: 'python --version', description: 'Check Python version', category: 'python' },
+        { command: 'python3.11 --version', description: 'Check Python version', category: 'python' },
         { command: 'pip list', description: 'Show installed packages', category: 'python' }
       );
     } else {
@@ -193,6 +336,14 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
   // Enhanced execution with priority handling
   const executeCommand = useCallback(async (cmd: string) => {
     if (!cmd.trim()) return;
+
+    // Add to command history (avoid duplicates)
+    if (cmd.trim() && (commandHistory.length === 0 || commandHistory[commandHistory.length - 1] !== cmd.trim())) {
+      setCommandHistory(prev => [...prev, cmd.trim()]);
+    }
+    setHistoryIndex(-1);
+    setShowAutocomplete(false);
+    setShowSuggestions(false);
 
     const classification = classifyCommand(cmd);
     setCurrentClassification(classification);
@@ -230,34 +381,44 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
 
   const executeImmediate = async (cmd: string, classification: CommandClassification) => {
     try {
-      const response = await EnhancedWebSocketService.sendCommand({
-        type: 'execute',
-        command: cmd,
-        projectId,
-        priority: 'high'
-      });
+      // For simple Linux commands, use direct execution format
+      const message = {
+        type: 'claude_execute',
+        data: {
+          project_id: 'demo_project', // Use existing project for command execution
+          command: cmd,
+          command_type: 'linux',
+          context: {
+            current_dir: '/workspace',
+            git_branch: 'main'
+          },
+          client_version: '2.0.0', // Use older version to avoid staging
+          use_staging: false // Explicitly disable staging
+        }
+      };
 
-      if (response?.output) {
+      const success = EnhancedWebSocketService.send(message);
+
+      if (success) {
         const outputLine: TerminalLine = {
           id: (Date.now() + 1).toString(),
-          text: response.output,
-          type: response.error ? 'error' : 'output',
+          text: `📤 実行中: ${cmd}`,
+          type: 'system',
           timestamp: new Date(),
-          previewAvailable: classification.type === 'python' && response.output.includes('matplotlib')
+          previewAvailable: false
         };
 
         setTerminalLines(prev => [...prev, outputLine]);
-
-        // Check for preview opportunities
-        if (classification.type === 'python' && response.previewUrl) {
-          addPreviewItem({
-            id: Date.now().toString(),
-            name: `Python Output - ${new Date().toLocaleTimeString()}`,
-            type: 'matplotlib',
-            url: response.previewUrl,
-            lastModified: new Date()
-          });
-        }
+        setIsExecuting(true);
+      } else {
+        const errorLine: TerminalLine = {
+          id: Date.now().toString(),
+          text: `❌ 送信エラー: ${cmd}`,
+          type: 'error',
+          timestamp: new Date(),
+          previewAvailable: false
+        };
+        setTerminalLines(prev => [...prev, errorLine]);
       }
     } catch (error) {
       const errorLine: TerminalLine = {
@@ -357,14 +518,6 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   };
 
-  const handleTabCompletion = () => {
-    const suggestions = generateSmartSuggestions(command);
-    if (suggestions.length > 0) {
-      setSmartSuggestions(suggestions);
-      setShowSuggestions(true);
-    }
-  };
-
   const navigateHistory = (direction: 'up' | 'down') => {
     if (commandHistory.length === 0) return;
 
@@ -385,42 +538,117 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     textInputRef.current?.focus();
   };
 
-  // W&B Integration setup
-  const setupWandB = async () => {
-    if (!wandbApiKey.trim()) {
-      Alert.alert('Error', 'Please enter your W&B API key');
-      return;
+  // Message handler for WebSocket responses
+  const handleServerMessage = (message: any) => {
+    console.log('🔥 ENHANCED_DEV: Processing message:', message.type);
+    console.log('🔥 ENHANCED_DEV: Message data:', message.data);
+
+    const messageType = message.type ? message.type.toString().trim() : '';
+
+    switch (messageType) {
+      case 'claude_output':
+        console.log('🔥 ENHANCED_DEV: Successfully handling claude_output message');
+        setIsExecuting(false);
+
+        if (message.data && message.data.output) {
+          console.log('🔥 ENHANCED_DEV: Adding terminal output:', message.data.output.substring(0, 100));
+
+          const outputLine: TerminalLine = {
+            id: Date.now().toString(),
+            text: message.data.output,
+            type: 'output',
+            timestamp: new Date(),
+            previewAvailable: false
+          };
+
+          setTerminalLines(prev => [...prev, outputLine]);
+        }
+
+        if (message.data?.status === 'completed') {
+          const completedLine: TerminalLine = {
+            id: (Date.now() + 1).toString(),
+            text: '✅ コマンドが正常に完了しました',
+            type: 'system',
+            timestamp: new Date(),
+            previewAvailable: false
+          };
+          setTerminalLines(prev => [...prev, completedLine]);
+        }
+        break;
+
+      case 'execution_progress':
+        if (message.data) {
+          const progressLine: TerminalLine = {
+            id: Date.now().toString(),
+            text: `🔄 [${message.data.progress || 0}%] ${message.data.message || message.data.stage || 'Processing...'}`,
+            type: 'system',
+            timestamp: new Date(),
+            previewAvailable: false
+          };
+          setTerminalLines(prev => [...prev, progressLine]);
+        }
+        break;
+
+      case 'code_generated':
+        if (message.data?.code) {
+          const codeLine: TerminalLine = {
+            id: Date.now().toString(),
+            text: `📝 コード生成完了:\n${message.data.code}`,
+            type: 'output',
+            timestamp: new Date(),
+            previewAvailable: false
+          };
+          setTerminalLines(prev => [...prev, codeLine]);
+        }
+        break;
+
+      case 'execution_error':
+      case 'error':
+        setIsExecuting(false);
+        const errorMessage = message.data?.error || message.data?.message || 'Unknown error occurred';
+        const errorLine: TerminalLine = {
+          id: Date.now().toString(),
+          text: `❌ エラー: ${errorMessage}`,
+          type: 'error',
+          timestamp: new Date(),
+          previewAvailable: false
+        };
+        setTerminalLines(prev => [...prev, errorLine]);
+        break;
+
+      default:
+        console.log('🔥 ENHANCED_DEV: Unhandled message type:', messageType);
+        break;
     }
-
-    const setupCommand = `pip install wandb && echo "${wandbApiKey}" | wandb login`;
-    await executeCommand(setupCommand);
-    setWandbIntegrated(true);
-    setShowWandbSetup(false);
-
-    // Add sample W&B tracking code
-    const sampleLine: TerminalLine = {
-      id: Date.now().toString(),
-      text: `✅ W&B integrated! Example usage:\n\nimport wandb\nrun = wandb.init(project="my-project")\nwandb.log({"metric": value})`,
-      type: 'system',
-      timestamp: new Date()
-    };
-    setTerminalLines(prev => [...prev, sampleLine]);
   };
 
   // WebSocket connection management
   useEffect(() => {
     const connectWebSocket = async () => {
       try {
-        await EnhancedWebSocketService.connect(serverUrl);
-        setIsConnected(true);
+        await EnhancedWebSocketService.connect(serverUrl, {
+          onOpen: () => {
+            console.log('✅ ENHANCED_DEV: WebSocket connected');
+            setIsConnected(true);
 
-        const welcomeLine: TerminalLine = {
-          id: Date.now().toString(),
-          text: `🚀 Connected to Remote Claude Server\n💡 Type 'help' for commands or start with basic commands like 'ls', 'pwd'\n🤖 For complex tasks, Claude Code integration is available\n`,
-          type: 'system',
-          timestamp: new Date()
-        };
-        setTerminalLines([welcomeLine]);
+            const welcomeLine: TerminalLine = {
+              id: Date.now().toString(),
+              text: `🚀 Connected to Remote Claude Server\n💡 Type 'help' for commands or start with basic commands like 'ls', 'pwd'\n🤖 For complex tasks, Claude Code integration is available\n`,
+              type: 'system',
+              timestamp: new Date()
+            };
+            setTerminalLines([welcomeLine]);
+          },
+          onMessage: handleServerMessage,
+          onError: (error) => {
+            console.error('❌ ENHANCED_DEV: WebSocket error:', error);
+            setIsConnected(false);
+          },
+          onClose: (event) => {
+            console.log('🔌 ENHANCED_DEV: WebSocket closed');
+            setIsConnected(false);
+          }
+        }, 'enhanced_development');
 
       } catch (error) {
         Alert.alert('Connection Error', 'Failed to connect to server');
@@ -430,7 +658,7 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
     connectWebSocket();
 
     return () => {
-      EnhancedWebSocketService.disconnect();
+      EnhancedWebSocketService.unregisterScreenCallbacks('enhanced_development');
     };
   }, [serverUrl]);
 
@@ -455,7 +683,11 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
       {item.previewAvailable && (
         <TouchableOpacity
           style={styles.previewButton}
-          onPress={() => setActiveMode('preview')}
+          onPress={() => navigation.navigate('Preview', {
+            serverUrl,
+            projectId,
+            projectName: route.params.projectName
+          })}
         >
           <Text style={styles.previewButtonText}>📱 View Preview</Text>
         </TouchableOpacity>
@@ -509,14 +741,6 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={styles.wandbButton}
-            onPress={() => setShowWandbSetup(true)}
-          >
-            <Text style={styles.wandbButtonText}>
-              {wandbIntegrated ? '✅ W&B' : '🔧 Setup W&B'}
-            </Text>
-          </TouchableOpacity>
         </View>
 
         {/* Main Content Area - 80% Terminal */}
@@ -589,6 +813,78 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
             </View>
           )}
 
+          {/* Autocomplete Suggestions */}
+          {showAutocomplete && autocompleteSuggestions.length > 0 && (
+            <View style={styles.autocompleteContainer}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {autocompleteSuggestions.map((suggestion, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.autocompleteSuggestion,
+                      index === selectedSuggestionIndex && styles.selectedAutocompleteSuggestion
+                    ]}
+                    onPress={() => {
+                      setCommand(suggestion);
+                      setShowAutocomplete(false);
+                      setSelectedSuggestionIndex(0);
+                    }}
+                  >
+                    <Text style={[
+                      styles.autocompleteSuggestionText,
+                      index === selectedSuggestionIndex && styles.selectedAutocompleteSuggestionText
+                    ]}>
+                      {suggestion}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* Custom Keyboard Toolbar */}
+          <View style={styles.keyboardToolbar}>
+            <TouchableOpacity
+              style={styles.toolbarButton}
+              onPress={handleTabCompletion}
+            >
+              <Text style={styles.toolbarButtonText}>TAB</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.toolbarButton}
+              onPress={() => handleArrowKey('up')}
+            >
+              <Text style={styles.toolbarButtonText}>↑</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.toolbarButton}
+              onPress={() => handleArrowKey('down')}
+            >
+              <Text style={styles.toolbarButtonText}>↓</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.toolbarButton}
+              onPress={() => setCommand('')}
+            >
+              <Text style={styles.toolbarButtonText}>Clear</Text>
+            </TouchableOpacity>
+
+            <View style={styles.toolbarSpacer} />
+
+            <TouchableOpacity
+              style={styles.toolbarInfoButton}
+              onPress={() => {
+                const historyInfo = `Command History (${commandHistory.length})\nAutocomplete: ${showAutocomplete ? 'ON' : 'OFF'}`;
+                Alert.alert('Keyboard Info', historyInfo);
+              }}
+            >
+              <Text style={styles.toolbarButtonText}>ℹ️</Text>
+            </TouchableOpacity>
+          </View>
+
           {/* Command Input */}
           <View style={styles.commandInputContainer}>
             <TextInput
@@ -597,11 +893,15 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
               value={command}
               onChangeText={(text) => {
                 setCommand(text);
-                const suggestions = generateSmartSuggestions(text);
-                setSmartSuggestions(suggestions);
-                setShowSuggestions(suggestions.length > 0);
+                const autoSuggestions = generateAutocompleteSuggestions(text);
+                setAutocompleteSuggestions(autoSuggestions);
+                setShowAutocomplete(autoSuggestions.length > 0);
+
+                const smartSugs = generateSmartSuggestions(text);
+                setSmartSuggestions(smartSugs);
+                setShowSuggestions(smartSugs.length > 0);
               }}
-              onKeyPress={handleKeyPress}
+              onKeyPress={handleEnhancedKeyPress}
               placeholder="Type command or describe what you want to do..."
               placeholderTextColor="#666"
               multiline={false}
@@ -635,50 +935,13 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.helperButton}
-              onPress={() => setCommand('python --version')}
+              onPress={() => setCommand('python3.11 --version')}
             >
               <Text style={styles.helperButtonText}>🐍 Python</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* W&B Setup Modal */}
-        <Modal
-          visible={showWandbSetup}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setShowWandbSetup(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>🚀 Setup Weights & Biases</Text>
-              <Text style={styles.modalDescription}>
-                Enter your W&B API key to enable model tracking and tuning:
-              </Text>
-              <TextInput
-                style={styles.modalInput}
-                value={wandbApiKey}
-                onChangeText={setWandbApiKey}
-                placeholder="3c424d79b35640897bb8d970bbcdc872bdf9561a"
-                secureTextEntry={true}
-              />
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={styles.modalCancelButton}
-                  onPress={() => setShowWandbSetup(false)}
-                >
-                  <Text style={styles.modalCancelText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalConfirmButton}
-                  onPress={setupWandB}
-                >
-                  <Text style={styles.modalConfirmText}>Setup W&B</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
 
         {/* Preview Detail Modal */}
         {selectedPreview && (
@@ -749,17 +1012,6 @@ const styles = StyleSheet.create({
   },
   activeModeText: {
     color: '#fff',
-  },
-  wandbButton: {
-    backgroundColor: '#ff6b35',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  wandbButtonText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   mainContent: {
     flex: 1,
@@ -1039,6 +1291,70 @@ const styles = StyleSheet.create({
   },
   previewWebView: {
     flex: 1,
+  },
+  autocompleteContainer: {
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    marginBottom: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#444',
+  },
+  autocompleteSuggestion: {
+    backgroundColor: '#333',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginRight: 8,
+    minWidth: 80,
+  },
+  selectedAutocompleteSuggestion: {
+    backgroundColor: '#007AFF',
+  },
+  autocompleteSuggestionText: {
+    color: '#fff',
+    fontSize: 14,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  selectedAutocompleteSuggestionText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  keyboardToolbar: {
+    flexDirection: 'row',
+    backgroundColor: '#2a2a2a',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#444',
+  },
+  toolbarButton: {
+    backgroundColor: '#333',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginRight: 8,
+    minWidth: 40,
+    alignItems: 'center',
+  },
+  toolbarButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  toolbarSpacer: {
+    flex: 1,
+  },
+  toolbarInfoButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+    alignItems: 'center',
   },
 });
 
