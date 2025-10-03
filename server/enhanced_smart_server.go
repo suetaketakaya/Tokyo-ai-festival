@@ -440,15 +440,32 @@ func extractPortFromURL(url string) int {
 }
 
 func detectPreviewType(command string) string {
-	if strings.Contains(command, "matplotlib") || strings.Contains(command, "plt.") {
+	lowerCmd := strings.ToLower(command)
+
+	// Matplotlib/Plotting detection
+	if strings.Contains(lowerCmd, "matplotlib") || strings.Contains(lowerCmd, "plt.") || strings.Contains(lowerCmd, "plot") {
 		return "matplotlib"
 	}
-	if strings.Contains(command, "streamlit") || strings.Contains(command, "flask") || strings.Contains(command, "fastapi") {
-		return "web"
+
+	// Web/HTML/React/SPA detection - 拡張版
+	webPatterns := []string{
+		"react", "todo", "html", "web", "アプリ", "app",
+		"streamlit", "flask", "fastapi", "django",
+		"シングルページ", "spa", "single page",
+		"javascript", "js", "vue", "angular",
+		"website", "webpage", "サイト",
 	}
-	if strings.Contains(command, "tkinter") || strings.Contains(command, "PyQt") {
+	for _, pattern := range webPatterns {
+		if strings.Contains(lowerCmd, pattern) {
+			return "web"
+		}
+	}
+
+	// GUI detection
+	if strings.Contains(lowerCmd, "tkinter") || strings.Contains(lowerCmd, "pyqt") || strings.Contains(lowerCmd, "gui") {
 		return "gui"
 	}
+
 	return "unknown"
 }
 

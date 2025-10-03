@@ -385,15 +385,15 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
       const message = {
         type: 'claude_execute',
         data: {
-          project_id: 'demo_project', // Use existing project for command execution
+          project_id: projectId, // Use the actual project ID from route params
           command: cmd,
           command_type: 'linux',
           context: {
             current_dir: '/workspace',
             git_branch: 'main'
           },
-          client_version: '2.0.0', // Use older version to avoid staging
-          use_staging: false // Explicitly disable staging
+          client_version: '3.8.0', // Enable staging for HTML detection
+          use_staging: true // Enable staging for Preview button generation
         }
       };
 
@@ -614,6 +614,30 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
           previewAvailable: false
         };
         setTerminalLines(prev => [...prev, errorLine]);
+        break;
+
+      case 'preview_ready':
+        console.log('🔥 ENHANCED_DEV: Processing preview_ready message:', message.data);
+        if (message.data) {
+          const previewItem: PreviewItem = {
+            id: message.data.id || Date.now().toString(),
+            name: message.data.name || message.data.title || 'Preview',
+            type: message.data.type || 'webapp',
+            path: message.data.path,
+            port: message.data.port,
+            url: message.data.url,
+            proxyUrl: message.data.proxy_url,
+            lastModified: new Date(),
+            preview: message.data.preview
+          };
+
+          setPreviewItems(prev => {
+            const filtered = prev.filter(item => item.id !== previewItem.id);
+            return [...filtered, previewItem];
+          });
+
+          console.log('🔥 ENHANCED_DEV: Added preview item:', previewItem.name);
+        }
         break;
 
       default:
