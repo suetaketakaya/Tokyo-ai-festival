@@ -8,25 +8,84 @@ import (
 func determineCommandType(command string) string {
 	lowerCmd := strings.ToLower(command)
 
-	// Matplotlib/Plot detection
-	if strings.Contains(lowerCmd, "plot") || strings.Contains(lowerCmd, "matplotlib") || strings.Contains(lowerCmd, "グラフ") {
-		return "visualization"
+	// Machine Learning detection
+	mlKeywords := []string{"機械学習", "ml", "scikit-learn", "sklearn", "tensorflow", "keras", "pytorch",
+		"モデル訓練", "分類", "回帰", "クラスタリング", "ニューラルネットワーク", "cnn", "rnn", "lstm",
+		"アイリス", "mnist", "深層学習", "ハイパーパラメータ"}
+	for _, kw := range mlKeywords {
+		if strings.Contains(lowerCmd, kw) {
+			return "machine_learning"
+		}
 	}
 
-	// Web/HTML/React detection - 12 patterns
+	// Matplotlib/Plot/Visualization detection
+	vizKeywords := []string{"plot", "matplotlib", "seaborn", "グラフ", "可視化", "visualization",
+		"売上", "ヒートマップ", "散布図", "ヒストグラム", "円グラフ", "棒グラフ", "line plot", "bar chart",
+		"subplot", "heatmap", "scatter", "boxplot"}
+	for _, kw := range vizKeywords {
+		if strings.Contains(lowerCmd, kw) {
+			return "visualization"
+		}
+	}
+
+	// Data Science/Analysis detection (pandas, csv, データ分析)
+	dataKeywords := []string{"pandas", "csv", "データ分析", "data analysis", "dataframe", "統計", "相関"}
+	for _, kw := range dataKeywords {
+		if strings.Contains(lowerCmd, kw) {
+			return "data_analysis"
+		}
+	}
+
+	// Docker/Container detection
+	if strings.Contains(lowerCmd, "docker") || strings.Contains(lowerCmd, "dockerfile") ||
+	   strings.Contains(lowerCmd, "container") || strings.Contains(lowerCmd, "コンテナ") ||
+	   strings.Contains(lowerCmd, "docker-compose") {
+		return "docker"
+	}
+
+	// Jupyter Notebook detection
+	if strings.Contains(lowerCmd, "jupyter") || strings.Contains(lowerCmd, "notebook") ||
+	   strings.Contains(lowerCmd, "jupyterlab") {
+		return "jupyter"
+	}
+
+	// Testing detection
+	if strings.Contains(lowerCmd, "pytest") || strings.Contains(lowerCmd, "test") ||
+	   strings.Contains(lowerCmd, "selenium") || strings.Contains(lowerCmd, "テスト") ||
+	   strings.Contains(lowerCmd, "unittest") || strings.Contains(lowerCmd, "coverage") {
+		return "testing"
+	}
+
+	// Database detection
+	dbKeywords := []string{"database", "データベース", "sqlite", "mongodb", "postgres", "mysql",
+		"redis", "sql", "nosql", "キャッシュ"}
+	for _, kw := range dbKeywords {
+		if strings.Contains(lowerCmd, kw) {
+			return "database"
+		}
+	}
+
+	// API detection - FastAPI, Flask, Django
+	if strings.Contains(lowerCmd, "api") || strings.Contains(lowerCmd, "fastapi") ||
+	   strings.Contains(lowerCmd, "restful") || strings.Contains(lowerCmd, "swagger") {
+		return "api"
+	}
+
+	// Web Framework detection (Flask specific without "API")
+	if strings.Contains(lowerCmd, "flask") && !strings.Contains(lowerCmd, "api") {
+		return "web_app"
+	}
+
+	// Web/HTML/React detection
 	webKeywords := []string{
 		"web", "アプリ", "app", "html", "todo", "react", "vue", "angular",
-		"シングルページ", "spa", "website", "webpage", "サイト",
+		"シングルページ", "spa", "website", "webpage", "サイト", "フロントエンド",
+		"react native", "モバイル",
 	}
 	for _, kw := range webKeywords {
 		if strings.Contains(lowerCmd, kw) {
 			return "web_app"
 		}
-	}
-
-	// Data analysis detection
-	if strings.Contains(lowerCmd, "data") || strings.Contains(lowerCmd, "analysis") || strings.Contains(lowerCmd, "データ") {
-		return "data_analysis"
 	}
 
 	return "general"
@@ -65,6 +124,11 @@ func detectFramework(command string) string {
 func generateCodeContent(command, cmdType, framework string) string {
 	lowerCmd := strings.ToLower(command)
 
+	// Machine Learning, Visualization, Data Analysis
+	if cmdType == "machine_learning" || cmdType == "visualization" || cmdType == "data_analysis" {
+		return generateMLCode(command, cmdType)
+	}
+
 	// Check if this is a web application request
 	isWebApp := cmdType == "web_app" ||
 		framework == "react" ||
@@ -76,7 +140,9 @@ func generateCodeContent(command, cmdType, framework string) string {
 		strings.Contains(lowerCmd, "web")
 
 	if isWebApp {
-		return generateTodoAppHTML(command)
+		// Detect specific web app type
+		appType := detectWebAppType(command)
+		return generateWebAppHTML(command, appType)
 	}
 
 	// Default: Python script
@@ -230,13 +296,12 @@ cat > todo-app.html << 'HTMLEOF'
                 const todoItem = document.createElement('div');
                 todoItem.className = 'todo-item' + (todo.completed ? ' completed' : '');
 
-                todoItem.innerHTML = \x60
-                    <input type="checkbox"
-                           \${todo.completed ? 'checked' : ''}
-                           onchange="toggleTodo(\${todo.id})">
-                    <span class="todo-text">\${todo.text}</span>
-                    <button class="delete-btn" onclick="deleteTodo(\${todo.id})">削除</button>
-                \x60;
+                todoItem.innerHTML =
+                    '<input type="checkbox" ' +
+                    (todo.completed ? 'checked' : '') +
+                    ' onchange="toggleTodo(' + todo.id + ')">' +
+                    '<span class="todo-text">' + todo.text + '</span>' +
+                    '<button class="delete-btn" onclick="deleteTodo(' + todo.id + ')">削除</button>';
 
                 todoList.appendChild(todoItem);
             });
@@ -255,5 +320,8 @@ HTMLEOF
 echo "Created todo-app.html successfully"
 echo "File location: $(pwd)/todo-app.html"
 ls -la todo-app.html
+echo ""
+echo "HTML file will be served by RemoteClaude server"
+echo "No need to start separate HTTP server"
 `, command)
 }

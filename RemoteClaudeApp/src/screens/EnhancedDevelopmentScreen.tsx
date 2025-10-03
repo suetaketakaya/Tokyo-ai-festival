@@ -640,6 +640,12 @@ const EnhancedDevelopmentScreen: React.FC<Props> = ({ route, navigation }) => {
         }
         break;
 
+      case 'preview_clear':
+        console.log('🔥 ENHANCED_DEV: Clearing all preview items');
+        setPreviewItems([]);
+        console.log('✅ ENHANCED_DEV: Preview items cleared');
+        break;
+
       default:
         console.log('🔥 ENHANCED_DEV: Unhandled message type:', messageType);
         break;

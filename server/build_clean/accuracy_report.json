@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-10-04T05:46:04+09:00",
+  "overall_accuracy": 76.92307692307693,
+  "phases": {
+    "command_analysis": {
+      "accuracy": 76.92307692307693,
+      "confidence": 0.8807692307692307,
+      "test_count": 13,
+      "passed": 10,
+      "failed": 3,
+      "avg_duration_ms": 0
+    }
+  },
+  "improvements_needed": [
+    "Phase 1: コマンド分析精度向上 (76.9% → 90.0%)"
+  ]
+}

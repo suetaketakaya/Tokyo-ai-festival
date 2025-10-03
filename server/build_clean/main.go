@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -61,6 +62,10 @@ func main() {
 
 	http.HandleFunc("/status", handleStatus)
 
+	// Serve static HTML files from ./html/ directory
+	http.Handle("/html/", http.StripPrefix("/html/", http.FileServer(http.Dir("./html"))))
+	log.Printf("📁 Serving HTML files from ./html/ directory")
+
 	bindAddr := "0.0.0.0:" + port
 	log.Printf("🎯 Ready for connections on %s...", bindAddr)
 
@@ -88,6 +93,18 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request, validKey string, se
 	defer conn.Close()
 
 	log.Printf("✅ Mobile app connected from: %s", r.RemoteAddr)
+
+	// Send preview_clear message on connection to reset preview items
+	log.Printf("📤 Sending preview_clear message to reset preview items")
+	err = conn.WriteJSON(map[string]interface{}{
+		"type": "preview_clear",
+		"data": map[string]interface{}{
+			"message": "Preview items cleared on server restart",
+		},
+	})
+	if err != nil {
+		log.Printf("❌ Failed to send preview_clear: %v", err)
+	}
 
 	for {
 		var msg map[string]interface{}
@@ -127,6 +144,20 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request, validKey string, se
 
 		case "claude_execute":
 			handleClaudeExecute(conn, msg, server)
+
+		case "clear_previews":
+			log.Printf("📤 Manual preview clear requested")
+			err := conn.WriteJSON(map[string]interface{}{
+				"type": "preview_clear",
+				"data": map[string]interface{}{
+					"message": "Preview items cleared manually",
+				},
+			})
+			if err != nil {
+				log.Printf("❌ Failed to send preview_clear: %v", err)
+			} else {
+				log.Printf("✅ Sent preview_clear message")
+			}
 		}
 	}
 }
@@ -141,7 +172,7 @@ func handleClaudeExecute(conn *websocket.Conn, msg map[string]interface{}, serve
 	if isDirectLinuxCommand(command) {
 		executeDirectCommand(conn, command, data)
 	} else {
-		executeWithCodeGeneration(conn, command, data)
+		executeWithCodeGeneration(conn, command, data, server)
 	}
 }
 
@@ -155,14 +186,28 @@ func isDirectLinuxCommand(command string) bool {
 	directCommands := []string{
 		"ls", "pwd", "cd", "cat", "echo", "mkdir", "rm", "cp", "mv",
 		"grep", "find", "ps", "top", "df", "du", "free", "uname",
+		"python", "python3", "python3.11", "python3.10", "python3.9",
+		"node", "npm", "go", "java", "gcc", "make",
+		"git", "docker", "curl", "wget", "which", "whereis",
 	}
 
 	firstWord := strings.Fields(cmd)[0]
+
+	// Check exact match
 	for _, dc := range directCommands {
 		if firstWord == dc {
 			return true
 		}
 	}
+
+	// Check if it's a version check command (--version, -v, --help)
+	if len(strings.Fields(cmd)) > 1 {
+		secondWord := strings.Fields(cmd)[1]
+		if secondWord == "--version" || secondWord == "-v" || secondWord == "--help" || secondWord == "-h" {
+			return true
+		}
+	}
+
 	return false
 }
 
@@ -181,11 +226,31 @@ func executeDirectCommand(conn *websocket.Conn, command string, data map[string]
 		log.Printf("❌ Failed to send progress: %v", err)
 	}
 
-	// Execute command (placeholder - real implementation would use docker exec)
-	output := fmt.Sprintf("Command executed: %s\n(Direct execution - implementation pending)", command)
+	// Get project_id from data
+	projectID, _ := data["project_id"].(string)
+	if projectID == "" {
+		projectID = "demo-1759406078" // Default project
+	}
+
+	// Execute command via docker exec
+	containerID := getContainerIDForProject(projectID)
+	var output string
+	var execErr error
+
+	if containerID != "" {
+		log.Printf("🐳 Executing in container %s: %s", containerID, command)
+		output, execErr = executeInContainer(containerID, command)
+		if execErr != nil {
+			log.Printf("❌ Docker exec error: %v", execErr)
+			output = fmt.Sprintf("❌ Error executing command: %v", execErr)
+		}
+	} else {
+		log.Printf("⚠️ No container found for project %s, showing placeholder", projectID)
+		output = fmt.Sprintf("Command: %s\n(Container not available - start project first)", command)
+	}
 
 	// Send result
-	log.Printf("📤 Sending claude_output message: %s", output)
+	log.Printf("📤 Sending claude_output message (%d bytes)", len(output))
 	err = conn.WriteJSON(map[string]interface{}{
 		"type": "claude_output",
 		"data": map[string]interface{}{
@@ -201,7 +266,124 @@ func executeDirectCommand(conn *websocket.Conn, command string, data map[string]
 	}
 }
 
-func executeWithCodeGeneration(conn *websocket.Conn, command string, data map[string]interface{}) {
+func getContainerIDForProject(projectID string) string {
+	log.Printf("🔍 Looking for container for project: %s", projectID)
+
+	// Extract base project name from project_id (e.g., "demo-1759406078" -> "demo")
+	baseName := projectID
+	if idx := strings.LastIndex(projectID, "-"); idx > 0 {
+		// Check if everything after '-' is numeric (timestamp)
+		suffix := projectID[idx+1:]
+		isNumeric := true
+		for _, c := range suffix {
+			if c < '0' || c > '9' {
+				isNumeric = false
+				break
+			}
+		}
+		if isNumeric && len(suffix) >= 10 { // Unix timestamp length
+			baseName = projectID[:idx]
+		}
+	}
+
+	log.Printf("🔍 Extracted base name: %s", baseName)
+
+	// Try to find container by exact project_id match first
+	cmd := exec.Command("docker", "ps", "-q", "--filter", "status=running", "--filter", fmt.Sprintf("name=%s", projectID))
+	output, err := cmd.Output()
+	if err == nil && strings.TrimSpace(string(output)) != "" {
+		containerID := strings.TrimSpace(string(output))
+		log.Printf("✅ Found container by project_id: %s", containerID)
+		return containerID
+	}
+
+	// Try to find by base name
+	cmd = exec.Command("docker", "ps", "-q", "--filter", "status=running", "--filter", fmt.Sprintf("name=%s", baseName))
+	output, err = cmd.Output()
+	if err == nil && strings.TrimSpace(string(output)) != "" {
+		containerID := strings.TrimSpace(string(output))
+		log.Printf("✅ Found container by base name: %s", containerID)
+		return containerID
+	}
+
+	// Fallback: get ANY running container with remoteclaude image
+	cmd = exec.Command("docker", "ps", "-q", "--filter", "status=running", "--filter", "ancestor=remoteclaude-ubuntu-claude:latest")
+	output, err = cmd.Output()
+	if err == nil && strings.TrimSpace(string(output)) != "" {
+		containerID := strings.TrimSpace(string(output))
+		log.Printf("✅ Found container by image: %s", containerID)
+		return containerID
+	}
+
+	// Last resort: get any running container
+	cmd = exec.Command("docker", "ps", "-q", "--filter", "status=running")
+	output, err = cmd.Output()
+	if err != nil {
+		log.Printf("⚠️ Failed to get container ID: %v", err)
+		return ""
+	}
+
+	containerID := strings.TrimSpace(string(output))
+	if containerID != "" {
+		// If multiple containers, take the first one
+		if idx := strings.Index(containerID, "\n"); idx > 0 {
+			containerID = containerID[:idx]
+		}
+		log.Printf("✅ Found first running container: %s", containerID)
+	} else {
+		log.Printf("⚠️ No running containers found")
+	}
+
+	return containerID
+}
+
+func executeInContainer(containerID, command string) (string, error) {
+	// Execute command in container
+	cmd := exec.Command("docker", "exec", containerID, "sh", "-c", command)
+	output, err := cmd.CombinedOutput()
+
+	// If command failed with "command not found" (exit 127), try alternatives
+	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 127 {
+			// Try alternative commands for common cases
+			altCommand := getAlternativeCommand(command)
+			if altCommand != "" && altCommand != command {
+				log.Printf("⚠️ Command not found, trying alternative: %s", altCommand)
+				cmd = exec.Command("docker", "exec", containerID, "sh", "-c", altCommand)
+				altOutput, altErr := cmd.CombinedOutput()
+				if altErr == nil {
+					return string(altOutput), nil
+				}
+			}
+		}
+	}
+
+	return string(output), err
+}
+
+func getAlternativeCommand(command string) string {
+	cmd := strings.TrimSpace(command)
+
+	// Python version alternatives
+	if strings.HasPrefix(cmd, "python3.11") {
+		return strings.Replace(cmd, "python3.11", "python3", 1)
+	}
+	if strings.HasPrefix(cmd, "python3.10") {
+		return strings.Replace(cmd, "python3.10", "python3", 1)
+	}
+	if strings.HasPrefix(cmd, "python3.9") {
+		return strings.Replace(cmd, "python3.9", "python3", 1)
+	}
+
+	// Node version alternatives
+	if strings.HasPrefix(cmd, "node18") || strings.HasPrefix(cmd, "node20") {
+		return strings.Replace(cmd, strings.Fields(cmd)[0], "node", 1)
+	}
+
+	return ""
+}
+
+func executeWithCodeGeneration(conn *websocket.Conn, command string, data map[string]interface{}, server *Server) {
 	// Stage 1: Analysis
 	log.Printf("📤 Stage 1: Sending analyzing progress")
 	conn.WriteJSON(map[string]interface{}{
@@ -256,16 +438,308 @@ func executeWithCodeGeneration(conn *websocket.Conn, command string, data map[st
 
 	time.Sleep(500 * time.Millisecond)
 
-	// Check if preview should be shown
-	if cmdType == "web_app" || framework == "react" {
-		conn.WriteJSON(map[string]interface{}{
+	// Execute the generated code in Docker container
+	projectID, _ := data["project_id"].(string)
+	if projectID == "" {
+		projectID = "demo-1759406078"
+	}
+	containerID := getContainerIDForProject(projectID)
+
+	var output string
+	var generatedFileName string
+
+	if containerID != "" && (cmdType == "web_app" || cmdType == "visualization" || cmdType == "api" || cmdType == "machine_learning" || cmdType == "data_analysis") {
+		log.Printf("🐳 Executing generated code in container %s", containerID)
+
+		// Save and execute the script
+		execCmd := fmt.Sprintf("cat > /tmp/generated_script.sh << 'EOF'\n%s\nEOF\nchmod +x /tmp/generated_script.sh\n/tmp/generated_script.sh", code)
+		execOutput, err := executeInContainer(containerID, execCmd)
+		output = execOutput
+
+		if err != nil {
+			log.Printf("⚠️ Execution error: %v", err)
+		} else {
+			log.Printf("✅ Code executed successfully")
+			log.Printf("📄 Output: %s", output[:min(len(output), 200)])
+		}
+
+		// Copy HTML files from container to host for static serving
+		if cmdType == "web_app" || framework == "react" {
+			log.Printf("📋 Copying HTML files from container to host")
+			os.MkdirAll("./html", 0755)
+
+			// Extract filename from output
+			generatedFileName = extractGeneratedFileName(output)
+			log.Printf("🔍 Detected generated file: %s", generatedFileName)
+
+			// Copy the generated HTML file from container
+			copyCmd := exec.Command("docker", "cp", fmt.Sprintf("%s:/workspace/%s", containerID, generatedFileName), fmt.Sprintf("./html/%s", generatedFileName))
+			if copyErr := copyCmd.Run(); copyErr != nil {
+				log.Printf("⚠️ Failed to copy HTML file: %v", copyErr)
+			} else {
+				log.Printf("✅ HTML file copied to ./html/%s", generatedFileName)
+			}
+		}
+	}
+
+	// Check if preview should be shown (React/HTML static apps, not Flask)
+	if (cmdType == "web_app" || framework == "react") && framework != "flask" {
+		// Use extracted filename or default
+		if generatedFileName == "" {
+			generatedFileName = extractGeneratedFileName(output)
+		}
+		appType := detectWebAppType(command)
+
+		// Generate title based on app type
+		appTitle := map[string]string{
+			"calculator": "Calculator App",
+			"timer":      "Timer App",
+			"notes":      "Notes App",
+			"counter":    "Counter App",
+			"quiz":       "Quiz App",
+			"form":       "Form App",
+			"dashboard":  "Dashboard",
+			"todo":       "Todo App",
+			"generic":    "Web App",
+		}[appType]
+
+		// Generate stable ID based on app type
+		previewID := fmt.Sprintf("%s-app-8090", appType)
+
+		log.Printf("📤 Sending preview_ready message for %s (%s)", appTitle, generatedFileName)
+		err := conn.WriteJSON(map[string]interface{}{
 			"type": "preview_ready",
 			"data": map[string]interface{}{
-				"file_name":    "todo-app.html",
-				"preview_type": "web",
-				"port":         8000,
+				"id":        previewID,
+				"name":      generatedFileName,
+				"title":     appTitle,
+				"type":      "webapp",
+				"path":      fmt.Sprintf("/workspace/%s", generatedFileName),
+				"port":      8090,
+				"url":       fmt.Sprintf("http://%s:%s/html/%s", server.Host, server.Port, generatedFileName),
+				"proxy_url": fmt.Sprintf("http://%s:%s/html/%s", server.Host, server.Port, generatedFileName),
 			},
 		})
+		if err != nil {
+			log.Printf("❌ Failed to send preview_ready: %v", err)
+		} else {
+			log.Printf("✅ Successfully sent preview_ready for %s", appTitle)
+		}
+	}
+
+	// Check if this is a visualization or machine learning command
+	if cmdType == "visualization" || cmdType == "machine_learning" || cmdType == "data_analysis" {
+		log.Printf("📋 Copying visualization/ML images from container to host")
+		os.MkdirAll("./html/images", 0755)
+
+		// List of possible image files to copy
+		imageFiles := []string{
+			"visualization.png",
+			"data_analysis.png",
+			"mnist_training_history.png",
+			"mnist_predictions.png",
+		}
+
+		var copiedImages []string
+		for _, imgFile := range imageFiles {
+			copyCmd := exec.Command("docker", "cp", fmt.Sprintf("%s:/workspace/%s", containerID, imgFile), fmt.Sprintf("./html/images/%s", imgFile))
+			if copyErr := copyCmd.Run(); copyErr == nil {
+				log.Printf("✅ Copied image: %s", imgFile)
+				copiedImages = append(copiedImages, imgFile)
+			}
+		}
+
+		// Send preview_ready for each copied image
+		for _, imgFile := range copiedImages {
+			previewID := fmt.Sprintf("image-%s", imgFile)
+			title := map[string]string{
+				"visualization.png":          "Data Visualization",
+				"data_analysis.png":          "Data Analysis",
+				"mnist_training_history.png": "MNIST Training History",
+				"mnist_predictions.png":      "MNIST Predictions",
+			}[imgFile]
+
+			if title == "" {
+				title = imgFile
+			}
+
+			log.Printf("📤 Sending preview_ready for %s", imgFile)
+			err := conn.WriteJSON(map[string]interface{}{
+				"type": "preview_ready",
+				"data": map[string]interface{}{
+					"id":        previewID,
+					"name":      imgFile,
+					"title":     title,
+					"type":      "image",
+					"path":      fmt.Sprintf("/workspace/%s", imgFile),
+					"url":       fmt.Sprintf("http://%s:%s/html/images/%s", server.Host, server.Port, imgFile),
+					"proxy_url": fmt.Sprintf("http://%s:%s/html/images/%s", server.Host, server.Port, imgFile),
+				},
+			})
+			if err != nil {
+				log.Printf("❌ Failed to send preview_ready for %s: %v", imgFile, err)
+			} else {
+				log.Printf("✅ Successfully sent preview_ready for %s", imgFile)
+			}
+		}
+	}
+
+	// Check if this is an API command (FastAPI, Flask, etc.)
+	if cmdType == "api" || framework == "fastapi" || framework == "django" {
+		log.Printf("📤 Sending preview_ready message for API")
+		apiPort := 8000
+		if framework == "django" {
+			apiPort = 8000
+		}
+		apiURL := fmt.Sprintf("http://%s:%d/docs", server.Host, apiPort)
+
+		err := conn.WriteJSON(map[string]interface{}{
+			"type": "preview_ready",
+			"data": map[string]interface{}{
+				"id":        fmt.Sprintf("%s-api-%d", framework, apiPort), // Stable ID based on framework and port
+				"name":      "API Documentation",
+				"title":     fmt.Sprintf("%s API", strings.Title(framework)),
+				"type":      "webapp",
+				"path":      "/workspace",
+				"port":      apiPort,
+				"url":       apiURL,
+				"proxy_url": apiURL,
+			},
+		})
+		if err != nil {
+			log.Printf("❌ Failed to send preview_ready: %v", err)
+		} else {
+			log.Printf("✅ Successfully sent preview_ready for API")
+		}
+	}
+
+	// Flask Web App (not API) - separate handling
+	if framework == "flask" && cmdType != "api" {
+		log.Printf("📤 Sending preview_ready message for Flask Web App")
+		flaskPort := 5000
+		flaskURL := fmt.Sprintf("http://%s:%d/", server.Host, flaskPort)
+
+		err := conn.WriteJSON(map[string]interface{}{
+			"type": "preview_ready",
+			"data": map[string]interface{}{
+				"id":        fmt.Sprintf("flask-%d", flaskPort), // Stable ID based on port
+				"name":      "Flask Web App",
+				"title":     "Flask Application",
+				"type":      "webapp",
+				"path":      "/workspace",
+				"port":      flaskPort,
+				"url":       flaskURL,
+				"proxy_url": flaskURL,
+			},
+		})
+		if err != nil {
+			log.Printf("❌ Failed to send preview_ready: %v", err)
+		} else {
+			log.Printf("✅ Successfully sent preview_ready for Flask")
+		}
+	}
+
+	// Jupyter Notebook (only for explicit jupyter commands, not ML)
+	if cmdType == "jupyter" && cmdType != "machine_learning" {
+		log.Printf("📤 Sending preview_ready message for Jupyter")
+		err := conn.WriteJSON(map[string]interface{}{
+			"type": "preview_ready",
+			"data": map[string]interface{}{
+				"id":        "jupyter-8888",
+				"name":      "Jupyter Notebook",
+				"title":     "Jupyter Notebook",
+				"type":      "webapp",
+				"path":      "/workspace",
+				"port":      8888,
+				"url":       fmt.Sprintf("http://%s:8888", server.Host),
+				"proxy_url": fmt.Sprintf("http://%s:8888", server.Host),
+			},
+		})
+		if err != nil {
+			log.Printf("❌ Failed to send preview_ready: %v", err)
+		} else {
+			log.Printf("✅ Successfully sent preview_ready for Jupyter")
+		}
+	}
+
+	// Docker containers
+	if cmdType == "docker" {
+		log.Printf("📤 Sending preview_ready message for Docker")
+		err := conn.WriteJSON(map[string]interface{}{
+			"type": "preview_ready",
+			"data": map[string]interface{}{
+				"id":    "docker-container",
+				"name":  "Docker Container",
+				"title": "Container Status",
+				"type":  "terminal",
+				"path":  "/workspace",
+			},
+		})
+		if err != nil {
+			log.Printf("❌ Failed to send preview_ready: %v", err)
+		} else {
+			log.Printf("✅ Successfully sent preview_ready for Docker")
+		}
+	}
+
+	// Database
+	if cmdType == "database" {
+		log.Printf("📤 Sending preview_ready message for Database")
+		err := conn.WriteJSON(map[string]interface{}{
+			"type": "preview_ready",
+			"data": map[string]interface{}{
+				"id":    "database-results",
+				"name":  "Database",
+				"title": "Database Query Results",
+				"type":  "terminal",
+				"path":  "/workspace",
+			},
+		})
+		if err != nil {
+			log.Printf("❌ Failed to send preview_ready: %v", err)
+		} else {
+			log.Printf("✅ Successfully sent preview_ready for Database")
+		}
+	}
+
+	// Testing
+	if cmdType == "testing" {
+		log.Printf("📤 Sending preview_ready message for Testing")
+		err := conn.WriteJSON(map[string]interface{}{
+			"type": "preview_ready",
+			"data": map[string]interface{}{
+				"id":    "test-results",
+				"name":  "Test Results",
+				"title": "Test Execution Results",
+				"type":  "terminal",
+				"path":  "/workspace",
+			},
+		})
+		if err != nil {
+			log.Printf("❌ Failed to send preview_ready: %v", err)
+		} else {
+			log.Printf("✅ Successfully sent preview_ready for Testing")
+		}
+	}
+
+	// Data Analysis
+	if cmdType == "data_analysis" {
+		log.Printf("📤 Sending preview_ready message for Data Analysis")
+		err := conn.WriteJSON(map[string]interface{}{
+			"type": "preview_ready",
+			"data": map[string]interface{}{
+				"id":    "data-analysis-csv",
+				"name":  "analysis_results.csv",
+				"title": "Data Analysis Results",
+				"type":  "file",
+				"path":  "/workspace/analysis_results.csv",
+			},
+		})
+		if err != nil {
+			log.Printf("❌ Failed to send preview_ready: %v", err)
+		} else {
+			log.Printf("✅ Successfully sent preview_ready for Data Analysis")
+		}
 	}
 
 	// Stage 4: Completion
@@ -282,4 +756,11 @@ func executeWithCodeGeneration(conn *websocket.Conn, command string, data map[st
 func handleStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"status":"ok","mode":"local"}`))
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
