@@ -1,0 +1,1346 @@
+[
+  {
+    "id": "human_beginner_1",
+    "command": "画像認識ができるAIを作りたいんですが、どうすればいいですか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_2",
+    "command": "手書き数字を読み取るプログラムって作れますか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_3",
+    "command": "猫と犬を見分けるAIを作ってみたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_4",
+    "command": "音声認識のプログラムを書きたいのですが初心者でもできますか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_5",
+    "command": "株価予測のモデルを作りたいんですけど、何から始めればいいですか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_6",
+    "command": "自然言語処理って難しいですか？簡単な例が見たいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_7",
+    "command": "ディープラーニングに挑戦したいんですが、まず何をすればいいでしょう？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_8",
+    "command": "ニューラルネットワークの基本的なコードが欲しいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_9",
+    "command": "画像分類の簡単なサンプルコードを書いてください",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_10",
+    "command": "時系列データの予測モデルを作りたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_11",
+    "command": "TodoリストのWebアプリを作りたいんですが",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_12",
+    "command": "簡単なブログサイトを作ってみたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_13",
+    "command": "ログイン機能のあるWebアプリってどうやって作るんですか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_14",
+    "command": "レスポンシブなホームページを作りたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_15",
+    "command": "チャットアプリケーションを作ってみたいんですが",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_16",
+    "command": "ダークモードに対応したサイトを作りたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_17",
+    "command": "カレンダーアプリを作ってみたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_18",
+    "command": "ポートフォリオサイトを作りたいんですが、どんなコードを書けばいいですか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_19",
+    "command": "ドラッグ&ドロップできるTodoアプリが欲しいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_20",
+    "command": "モダンなデザインのダッシュボードを作りたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_21",
+    "command": "CSVファイルのデータを分析したいんですが",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_22",
+    "command": "Excelのデータをグラフにしたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_23",
+    "command": "売上データを可視化するにはどうすればいいですか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_24",
+    "command": "データのクレンジングってどうやるんですか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_25",
+    "command": "散布図を作りたいんですが、コードを教えてください",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_26",
+    "command": "時系列データをグラフで表示したいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_27",
+    "command": "ヒートマップを作ってデータの相関を見たいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_28",
+    "command": "統計分析の基本的なコードが欲しいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_29",
+    "command": "大量のデータから傾向を見つけたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_30",
+    "command": "データの外れ値を見つけるにはどうすればいいですか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_31",
+    "command": "REST APIの作り方を教えてください",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_32",
+    "command": "簡単なAPIサーバーを立てたいんですが",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_33",
+    "command": "JSONを返すAPIを作りたいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_34",
+    "command": "認証付きのAPIってどうやって作るんですか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_35",
+    "command": "ファイルアップロード機能のあるAPIが欲しいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_36",
+    "command": "Pythonでファイルを読み込むにはどうすればいいですか？",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_37",
+    "command": "自動化スクリプトを書きたいんですが",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_38",
+    "command": "バッチ処理のプログラムが欲しいです",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_39",
+    "command": "ログファイルを解析したいんですが",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_beginner_40",
+    "command": "設定ファイルを読み込むコードを書いてください",
+    "category": "natural_language",
+    "style": "beginner_question",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_casual_1",
+    "command": "TensorFlow使って何か面白いの作りたいな",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_2",
+    "command": "機械学習って難しそうだけど、簡単なやつから試してみたい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_3",
+    "command": "画像認識のコード、サクッと書いてもらえる？",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_4",
+    "command": "AIで遊んでみたいんだけど、おすすめある？",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_5",
+    "command": "ディープラーニングの入門的なコードちょうだい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_6",
+    "command": "PyTorchで何か作ってみたいんだよね",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_7",
+    "command": "CNNってやつを試してみたい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_8",
+    "command": "手書き文字の認識とかできたら楽しそう",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_9",
+    "command": "音声認識のプログラム、簡単なやつでいいから欲しい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_10",
+    "command": "時系列予測のモデル作ってみたいな",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_11",
+    "command": "React使ってかっこいいサイト作りたい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_12",
+    "command": "モダンなTodoアプリのコードが欲しいんだけど",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_13",
+    "command": "レスポンシブなWebサイト、サクッと作れない？",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_14",
+    "command": "ダークモード対応のサイト作ってみたいな",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_15",
+    "command": "チャットアプリって意外と簡単に作れるのかな？",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_16",
+    "command": "TypeScriptでアプリ作ってみたい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_17",
+    "command": "Next.js使って何か作りたいんだよね",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_18",
+    "command": "カレンダー機能のあるアプリ欲しいな",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_19",
+    "command": "ドラッグ&ドロップできるUIって面白そう",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_20",
+    "command": "ポートフォリオサイト、良い感じに作りたい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_21",
+    "command": "データ分析してみたいんだけど、何から始めればいい？",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_22",
+    "command": "CSVファイルをいい感じにグラフにしたい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_23",
+    "command": "pandas使ってデータいじってみたい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_24",
+    "command": "可視化のコード、きれいなやつが欲しい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_25",
+    "command": "売上データの分析とかやってみたいな",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_26",
+    "command": "統計処理のコード書いてよ",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_27",
+    "command": "データクレンジングって面倒そうだけど、自動化できない？",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_28",
+    "command": "グラフ作成のコード、シンプルなやつちょうだい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_29",
+    "command": "API作ってみたいんだけど、簡単なやつから",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_30",
+    "command": "REST APIの基本的なコード欲しい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_31",
+    "command": "FastAPI使ってサーバー立ててみたい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_32",
+    "command": "Flask使って何か作りたいな",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_33",
+    "command": "認証機能のあるAPIって作れる？",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_34",
+    "command": "ファイルアップロードできるAPIが欲しい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_35",
+    "command": "自動化スクリプト書きたいんだけど",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_36",
+    "command": "バッチ処理のプログラム、楽に作りたい",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_37",
+    "command": "ログ解析のコード書いてよ",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_casual_38",
+    "command": "設定ファイル読み込むやつ、サクッと作って",
+    "category": "natural_language",
+    "style": "casual",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_polite_1",
+    "command": "TensorFlowを使った画像分類のサンプルコードを作成していただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_2",
+    "command": "初心者向けの機械学習のコードを書いていただきたいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_3",
+    "command": "手書き数字認識のプログラムを作っていただけると助かります",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_4",
+    "command": "音声認識の基本的な実装をお願いできますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_5",
+    "command": "時系列データの予測モデルを作成していただきたいのですが",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_6",
+    "command": "CNNを使った画像分類のコードをお願いします",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_7",
+    "command": "自然言語処理の入門的なコードを書いていただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_8",
+    "command": "ディープラーニングの簡単なサンプルが欲しいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_9",
+    "command": "PyTorchでLSTMのコードを書いていただけませんか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_10",
+    "command": "異常検知のモデルを作成していただきたいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_11",
+    "command": "Reactを使ったTodoアプリを作成していただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_12",
+    "command": "レスポンシブデザインのWebサイトをお願いします",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_13",
+    "command": "ダークモード対応のアプリケーションを作っていただきたいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_14",
+    "command": "TypeScriptでモダンなWebアプリを書いていただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_15",
+    "command": "ログイン機能のあるサイトを作成していただきたいのですが",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_16",
+    "command": "チャットアプリケーションの実装をお願いできますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_17",
+    "command": "カレンダー機能のあるアプリを作っていただけると助かります",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_18",
+    "command": "ポートフォリオサイトのコードをお願いします",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_19",
+    "command": "ドラッグ&ドロップ機能を実装していただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_20",
+    "command": "Next.jsを使ったアプリケーションを作成していただきたいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_21",
+    "command": "CSVデータの分析コードを書いていただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_22",
+    "command": "pandasを使ったデータ処理をお願いします",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_23",
+    "command": "売上データの可視化をしていただきたいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_24",
+    "command": "統計分析のコードを作成していただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_25",
+    "command": "データクレンジングの実装をお願いできますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_26",
+    "command": "散布図を作成するコードを書いていただきたいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_27",
+    "command": "ヒートマップの実装をお願いします",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_28",
+    "command": "時系列データのグラフ化をしていただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_29",
+    "command": "外れ値検出のコードを作成していただきたいのですが",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_30",
+    "command": "相関分析の実装をお願いできますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_31",
+    "command": "REST APIの実装をお願いします",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_32",
+    "command": "FastAPIを使ったサーバーを作成していただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_33",
+    "command": "認証機能付きのAPIを書いていただきたいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_34",
+    "command": "ファイルアップロード機能の実装をお願いできますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_35",
+    "command": "JSONを返すエンドポイントを作っていただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_36",
+    "command": "自動化スクリプトを書いていただきたいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_37",
+    "command": "バッチ処理のプログラムをお願いします",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_38",
+    "command": "ログ解析のコードを作成していただけますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_39",
+    "command": "設定ファイルの読み込み処理をお願いできますか？",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_polite_40",
+    "command": "データベース接続のコードを書いていただきたいです",
+    "category": "natural_language",
+    "style": "polite",
+    "complexity": "natural",
+    "human_score": 8
+  },
+  {
+    "id": "human_context_1",
+    "command": "大学の課題で画像分類をやることになったんですが、TensorFlowで簡単なコードを書いてもらえますか？",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_2",
+    "command": "仕事でデータ分析が必要になって、pandasを勉強し始めたんですが、CSVファイルの読み込みと基本的な統計処理のコードを教えてください",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_3",
+    "command": "趣味でWebアプリを作ろうと思っていて、Reactは少し触ったことがあるんですが、Todoアプリのコードを書いてもらえますか？",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_4",
+    "command": "会社の業務効率化のために自動化スクリプトを作りたいんですが、Pythonでファイル処理の基本的なコードをお願いします",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_5",
+    "command": "卒業研究で機械学習を使うことになったんですが、初心者なのでCNNの簡単なサンプルコードが欲しいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_6",
+    "command": "副業でWeb制作を始めたいと思っていて、レスポンシブデザインのポートフォリオサイトを作ってもらえますか？",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_7",
+    "command": "データサイエンスに興味があって独学を始めたんですが、データ可視化の基本的なコードを教えてください",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_8",
+    "command": "APIの勉強を始めたばかりで、FastAPIで簡単なREST APIのサンプルコードが欲しいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_9",
+    "command": "機械学習エンジニアを目指していて、PyTorchでLSTMの実装を練習したいんですが、コードを書いてもらえますか？",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_10",
+    "command": "業務でログ解析が必要になったんですが、Pythonで効率的に処理するコードをお願いします",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_11",
+    "command": "フロントエンド開発を勉強中で、TypeScriptとReactを使ったモダンなアプリのコードが見たいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_12",
+    "command": "統計学の授業で使うために、pandasでデータの相関分析をするコードを書いてください",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_13",
+    "command": "個人プロジェクトでチャットアプリを作りたくて、リアルタイム通信の基本的な実装をお願いします",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_14",
+    "command": "転職活動用のポートフォリオとして、Next.jsでブログサイトを作りたいんですが",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_15",
+    "command": "研究でディープラーニングを使うことになって、Kerasで簡単な画像分類のコードが必要です",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_16",
+    "command": "起業準備中で、MVPとしてシンプルなWebアプリを作りたいんですが、ReactでTodoアプリのコードをお願いします",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_17",
+    "command": "データ分析の実務経験を積みたくて、売上データの可視化ダッシュボードを作りたいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_18",
+    "command": "プログラミング学習を始めたばかりで、機械学習の基礎的なコードから学びたいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_19",
+    "command": "会社のDX推進で、業務データの分析基盤を作ることになったんですが、pandasでデータパイプラインのコードをお願いします",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_20",
+    "command": "Webデザイナーからフロントエンドエンジニアに転向したくて、Reactの実践的なコードを学びたいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_21",
+    "command": "大学院入試の準備で機械学習を勉強していて、TensorFlowでニューラルネットワークの基本を実装したいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_22",
+    "command": "スタートアップでエンジニアとして働き始めたんですが、FastAPIでマイクロサービスのコードを書く必要があります",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_23",
+    "command": "独学でプログラミングを学んでいて、実際に動くものを作りながら理解したいので、Todoアプリのコードをお願いします",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_24",
+    "command": "データアナリストを目指していて、可視化スキルを磨きたいのでmatplotlibの実践的なコードが欲しいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_25",
+    "command": "社内ツールを作ることになって、Pythonで自動化スクリプトを書く必要があるんですが",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_26",
+    "command": "AI関連のプロジェクトに参加することになったんですが、自然言語処理の基礎から学びたいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_27",
+    "command": "フリーランスとして活動を始めたくて、ポートフォリオサイトをTypeScriptで作りたいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_28",
+    "command": "研究室のデータ整理を任されたんですが、pandasでデータクレンジングの効率的な方法を教えてください",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_29",
+    "command": "新しいサービスのプロトタイプとして、シンプルなREST APIを作る必要があります",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_context_30",
+    "command": "機械学習エンジニアとしてのキャリアをスタートしたくて、実践的なディープラーニングのコードで勉強したいです",
+    "category": "natural_language",
+    "style": "contextual",
+    "complexity": "natural",
+    "human_score": 10
+  },
+  {
+    "id": "human_colloquial_1",
+    "command": "機械学習って何から始めればいいかわかんないんだけど、とりあえずコード見せて",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_2",
+    "command": "Reactでサクッとアプリ作りたいんだよね",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_3",
+    "command": "データ分析とかよくわかんないけど、グラフ作ってみたい",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_4",
+    "command": "API作るのって難しい？簡単なやつでいいから教えて",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_5",
+    "command": "TensorFlowって聞いたことあるけど、どんな感じで使うの？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_6",
+    "command": "Webアプリ作りたいんだけど、何がおすすめ？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_7",
+    "command": "pandas使えばデータ処理できるって聞いたけど、どうやるの？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_8",
+    "command": "画像認識のAI作ってみたいんだけど、難しいかな？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_9",
+    "command": "チャットアプリとか作れたら面白そうじゃない？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_10",
+    "command": "ダークモード対応って今時必須だよね、コード教えて",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_11",
+    "command": "ディープラーニングやってみたいけど、どこから手つけたらいい？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_12",
+    "command": "データ可視化って重要って言われるけど、どう書くの？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_13",
+    "command": "REST APIって何？作り方知りたい",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_14",
+    "command": "TypeScript使った方がいいって言われるけど、例が見たい",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_15",
+    "command": "自動化スクリプトって便利そうだよね、書いてみたい",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_16",
+    "command": "機械学習エンジニアになりたいんだけど、何勉強すればいい？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_17",
+    "command": "フロントエンド開発って楽しそう、簡単なコードから始めたい",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_18",
+    "command": "データサイエンティストって憧れるけど、どんなコード書くの？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_19",
+    "command": "Webサイト作って公開してみたいんだよね",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  },
+  {
+    "id": "human_colloquial_20",
+    "command": "プログラミングで稼げるようになりたいんだけど、何作ればいい？",
+    "category": "natural_language",
+    "style": "colloquial",
+    "complexity": "natural",
+    "human_score": 9
+  }
+]

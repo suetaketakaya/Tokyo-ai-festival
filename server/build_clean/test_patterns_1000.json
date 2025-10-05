@@ -1,0 +1,7093 @@
+[
+  {
+    "id": "ml_1",
+    "command": "ResNetをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_2",
+    "command": "LSTMをPyTorchで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_3",
+    "command": "PyTorchを使用した自然言語処理のためのVAE",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_4",
+    "command": "scikit-learnでGANモデルを使って物体検出を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_5",
+    "command": "XGBoostでGANモデルを使って異常検知を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_6",
+    "command": "自然言語処理タスク向けのTensorFlow LSTM実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_7",
+    "command": "画像分類タスク向けのscikit-learn Autoencoder実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_8",
+    "command": "ResNetをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_9",
+    "command": "CNNをKerasで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_10",
+    "command": "画像分類タスク向けのTensorFlow LSTM実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_11",
+    "command": "KerasでVAEモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_12",
+    "command": "PyTorchを使用した物体検出のためのTransformer",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_13",
+    "command": "音声認識タスク向けのKeras BERT実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_14",
+    "command": "音声認識タスク向けのKeras VAE実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_15",
+    "command": "VAEをXGBoostで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_16",
+    "command": "BERTをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_17",
+    "command": "ResNetをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_18",
+    "command": "KerasでAutoencoderモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_19",
+    "command": "TensorFlowでAutoencoderモデルを使って自然言語処理を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_20",
+    "command": "AudioSetデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_21",
+    "command": "自然言語処理タスク向けのXGBoost LSTM実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_22",
+    "command": "時系列予測タスク向けのXGBoost CNN実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_23",
+    "command": "AutoencoderをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_24",
+    "command": "PyTorchでGANモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_25",
+    "command": "TransformerをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_26",
+    "command": "異常検知タスク向けのscikit-learn CNN実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_27",
+    "command": "scikit-learnでCNNモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_28",
+    "command": "PyTorchを使用した音声認識のためのCNN",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_29",
+    "command": "音声認識タスク向けのTensorFlow GAN実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_30",
+    "command": "TransformerをPyTorchで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_31",
+    "command": "MNISTデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_32",
+    "command": "scikit-learnでAutoencoderモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_33",
+    "command": "Transformerをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_34",
+    "command": "PyTorchでVAEモデルを使って自然言語処理を実装してください",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_35",
+    "command": "VAEをPyTorchで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_36",
+    "command": "COCOデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_37",
+    "command": "WikipediaデータセットをPyTorchで訓練",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_38",
+    "command": "Kerasを使用した異常検知のためのAutoencoder",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_39",
+    "command": "scikit-learnでCNNモデルを使って異常検知を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_40",
+    "command": "COCOデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_41",
+    "command": "異常検知タスク向けのscikit-learn Transformer実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_42",
+    "command": "XGBoostでAutoencoderモデルを使って自然言語処理を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_43",
+    "command": "Transformerをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_44",
+    "command": "音声認識タスク向けのPyTorch CNN実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_45",
+    "command": "MNISTデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_46",
+    "command": "WikipediaデータセットをXGBoostで訓練",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_47",
+    "command": "COCOデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_48",
+    "command": "Autoencoderをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_49",
+    "command": "AudioSetデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_50",
+    "command": "BERTをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_51",
+    "command": "LSTMをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_52",
+    "command": "scikit-learnを使用した自然言語処理のためのVAE",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_53",
+    "command": "MNISTデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_54",
+    "command": "AudioSetデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_55",
+    "command": "時系列予測タスク向けのPyTorch ResNet実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_56",
+    "command": "scikit-learnを使用した時系列予測のためのAutoencoder",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_57",
+    "command": "PyTorchでTransformerモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_58",
+    "command": "PyTorchを使用した物体検出のためのAutoencoder",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_59",
+    "command": "時系列予測タスク向けのXGBoost Transformer実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_60",
+    "command": "ResNetをXGBoostで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_61",
+    "command": "ResNetをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_62",
+    "command": "PyTorchを使用した画像分類のためのTransformer",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_63",
+    "command": "物体検出タスク向けのPyTorch Transformer実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_64",
+    "command": "XGBoostを使用した音声認識のためのCNN",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_65",
+    "command": "CNNをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_66",
+    "command": "GANをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_67",
+    "command": "MNISTデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_68",
+    "command": "時系列予測タスク向けのscikit-learn LSTM実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_69",
+    "command": "COCOデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_70",
+    "command": "自然言語処理タスク向けのPyTorch CNN実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_71",
+    "command": "LSTMをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_72",
+    "command": "TransformerをXGBoostで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_73",
+    "command": "LSTMをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_74",
+    "command": "XGBoostでVAEモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_75",
+    "command": "WikipediaデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_76",
+    "command": "XGBoostでAutoencoderモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_77",
+    "command": "GANをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_78",
+    "command": "XGBoostを使用した自然言語処理のためのLSTM",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_79",
+    "command": "TensorFlowでGANモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_80",
+    "command": "Autoencoderをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_81",
+    "command": "ResNetをPyTorchで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_82",
+    "command": "KerasでVAEモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_83",
+    "command": "時系列予測タスク向けのKeras Autoencoder実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_84",
+    "command": "MNISTデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_85",
+    "command": "XGBoostを使用した自然言語処理のためのLSTM",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_86",
+    "command": "PyTorchでLSTMモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_87",
+    "command": "時系列予測タスク向けのscikit-learn GAN実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_88",
+    "command": "TransformerをPyTorchで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_89",
+    "command": "WikipediaデータセットをPyTorchで訓練",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_90",
+    "command": "CNNをXGBoostで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_91",
+    "command": "TensorFlowでBERTモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_92",
+    "command": "VAEをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_93",
+    "command": "物体検出タスク向けのKeras Autoencoder実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_94",
+    "command": "KerasでGANモデルを使って自然言語処理を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_95",
+    "command": "CIFAR-10データセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_96",
+    "command": "scikit-learnを使用した音声認識のためのGAN",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_97",
+    "command": "XGBoostでAutoencoderモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_98",
+    "command": "時系列予測タスク向けのKeras Transformer実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_99",
+    "command": "PyTorchを使用した音声認識のためのAutoencoder",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_100",
+    "command": "Kerasを使用した自然言語処理のためのGAN",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_101",
+    "command": "ResNetをKerasで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_102",
+    "command": "CNNをXGBoostで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_103",
+    "command": "TensorFlowでGANモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_104",
+    "command": "音声認識タスク向けのscikit-learn ResNet実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_105",
+    "command": "PyTorchでGANモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_106",
+    "command": "BERTをKerasで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_107",
+    "command": "MNISTデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_108",
+    "command": "TensorFlowでResNetモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_109",
+    "command": "WikipediaデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_110",
+    "command": "TensorFlowを使用した異常検知のためのTransformer",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_111",
+    "command": "時系列予測タスク向けのPyTorch LSTM実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_112",
+    "command": "BERTをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_113",
+    "command": "MNISTデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_114",
+    "command": "異常検知タスク向けのTensorFlow ResNet実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_115",
+    "command": "CIFAR-10データセットをXGBoostで訓練",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_116",
+    "command": "XGBoostを使用した音声認識のためのGAN",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_117",
+    "command": "CIFAR-10データセットをPyTorchで訓練",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_118",
+    "command": "物体検出タスク向けのTensorFlow BERT実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_119",
+    "command": "ResNetをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_120",
+    "command": "scikit-learnを使用した画像分類のためのLSTM",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_121",
+    "command": "PyTorchを使用した画像分類のためのGAN",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_122",
+    "command": "時系列予測タスク向けのPyTorch Transformer実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_123",
+    "command": "ImageNetデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_124",
+    "command": "WikipediaデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_125",
+    "command": "XGBoostでLSTMモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_126",
+    "command": "MNISTデータセットをPyTorchで訓練",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_127",
+    "command": "GANをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_128",
+    "command": "scikit-learnでResNetモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_129",
+    "command": "Kerasを使用した音声認識のためのLSTM",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_130",
+    "command": "AutoencoderをXGBoostで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_131",
+    "command": "時系列予測タスク向けのTensorFlow Transformer実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_132",
+    "command": "XGBoostでLSTMモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_133",
+    "command": "TensorFlowを使用した時系列予測のためのGAN",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_134",
+    "command": "Kerasを使用した時系列予測のためのCNN",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_135",
+    "command": "TensorFlowでVAEモデルを使って自然言語処理を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_136",
+    "command": "WikipediaデータセットをPyTorchで訓練",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_137",
+    "command": "LSTMをKerasで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_138",
+    "command": "画像分類タスク向けのKeras Transformer実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_139",
+    "command": "PyTorchでVAEモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_140",
+    "command": "PyTorchを使用した異常検知のためのTransformer",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_141",
+    "command": "自然言語処理タスク向けのTensorFlow ResNet実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_142",
+    "command": "GANをKerasで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_143",
+    "command": "AudioSetデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_144",
+    "command": "時系列予測タスク向けのKeras GAN実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_145",
+    "command": "KerasでLSTMモデルを使って自然言語処理を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_146",
+    "command": "自然言語処理タスク向けのTensorFlow Transformer実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_147",
+    "command": "PyTorchを使用した音声認識のためのBERT",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_148",
+    "command": "画像分類タスク向けのKeras CNN実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_149",
+    "command": "画像分類タスク向けのTensorFlow GAN実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_150",
+    "command": "異常検知タスク向けのTensorFlow Transformer実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_151",
+    "command": "COCOデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_152",
+    "command": "Kerasを使用した異常検知のためのCNN",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_153",
+    "command": "COCOデータセットをPyTorchで訓練",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_154",
+    "command": "物体検出タスク向けのXGBoost Autoencoder実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_155",
+    "command": "COCOデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_156",
+    "command": "異常検知タスク向けのKeras ResNet実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_157",
+    "command": "KerasでTransformerモデルを使って自然言語処理を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_158",
+    "command": "AudioSetデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_159",
+    "command": "PyTorchでCNNモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_160",
+    "command": "MNISTデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_161",
+    "command": "TensorFlowを使用した時系列予測のためのBERT",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_162",
+    "command": "KerasでAutoencoderモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_163",
+    "command": "WikipediaデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_164",
+    "command": "MNISTデータセットをXGBoostで訓練",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_165",
+    "command": "PyTorchでBERTモデルを使って物体検出を実装してください",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_166",
+    "command": "AudioSetデータセットをXGBoostで訓練",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_167",
+    "command": "TensorFlowでCNNモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_168",
+    "command": "物体検出タスク向けのscikit-learn ResNet実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_169",
+    "command": "CIFAR-10データセットをXGBoostで訓練",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_170",
+    "command": "CIFAR-10データセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_171",
+    "command": "Wikipediaデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_172",
+    "command": "BERTをPyTorchで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_173",
+    "command": "物体検出タスク向けのPyTorch BERT実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_174",
+    "command": "MNISTデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_175",
+    "command": "Kerasを使用した自然言語処理のためのGAN",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_176",
+    "command": "異常検知タスク向けのXGBoost ResNet実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_177",
+    "command": "物体検出タスク向けのPyTorch GAN実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_178",
+    "command": "時系列予測タスク向けのscikit-learn ResNet実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_179",
+    "command": "KerasでBERTモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_180",
+    "command": "TensorFlowでVAEモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_181",
+    "command": "自然言語処理タスク向けのKeras Autoencoder実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_182",
+    "command": "LSTMをPyTorchで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_183",
+    "command": "WikipediaデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_184",
+    "command": "時系列予測タスク向けのTensorFlow GAN実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_185",
+    "command": "ImageNetデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_186",
+    "command": "BERTをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_187",
+    "command": "XGBoostでGANモデルを使って物体検出を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_188",
+    "command": "scikit-learnでGANモデルを使って異常検知を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_189",
+    "command": "PyTorchでResNetモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_190",
+    "command": "XGBoostを使用した音声認識のためのLSTM",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_191",
+    "command": "自然言語処理タスク向けのTensorFlow Autoencoder実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_192",
+    "command": "LSTMをKerasで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_193",
+    "command": "Transformerをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_194",
+    "command": "Kerasを使用した画像分類のためのVAE",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_195",
+    "command": "scikit-learnでAutoencoderモデルを使って自然言語処理を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_196",
+    "command": "AudioSetデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_197",
+    "command": "scikit-learnを使用した異常検知のためのCNN",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_198",
+    "command": "PyTorchを使用した画像分類のためのLSTM",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_199",
+    "command": "scikit-learnでGANモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_200",
+    "command": "Kerasを使用した物体検出のためのAutoencoder",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_201",
+    "command": "KerasでResNetモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_202",
+    "command": "自然言語処理タスク向けのscikit-learn GAN実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_203",
+    "command": "TensorFlowでGANモデルを使って異常検知を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_204",
+    "command": "COCOデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_205",
+    "command": "AutoencoderをKerasで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_206",
+    "command": "TensorFlowを使用した異常検知のためのBERT",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_207",
+    "command": "WikipediaデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_208",
+    "command": "自然言語処理タスク向けのXGBoost Autoencoder実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_209",
+    "command": "scikit-learnでTransformerモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_210",
+    "command": "時系列予測タスク向けのPyTorch ResNet実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_211",
+    "command": "LSTMをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_212",
+    "command": "TensorFlowでVAEモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_213",
+    "command": "scikit-learnでGANモデルを使って時系列予測を実装してください",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_214",
+    "command": "Kerasを使用した音声認識のためのCNN",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_215",
+    "command": "XGBoostでGANモデルを使って画像分類を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_216",
+    "command": "ImageNetデータセットをTensorFlowで訓練",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_217",
+    "command": "XGBoostでLSTMモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_218",
+    "command": "scikit-learnを使用した物体検出のためのTransformer",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_219",
+    "command": "異常検知タスク向けのTensorFlow ResNet実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_220",
+    "command": "Transformerをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_221",
+    "command": "WikipediaデータセットをXGBoostで訓練",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_222",
+    "command": "自然言語処理タスク向けのPyTorch Autoencoder実装",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_223",
+    "command": "WikipediaデータセットをXGBoostで訓練",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_224",
+    "command": "TensorFlowを使用した画像分類のためのLSTM",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_225",
+    "command": "AutoencoderをKerasで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_226",
+    "command": "CIFAR-10データセットをPyTorchで訓練",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_227",
+    "command": "TensorFlowを使用した画像分類のためのTransformer",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_228",
+    "command": "ResNetをscikit-learnで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_229",
+    "command": "自然言語処理タスク向けのKeras LSTM実装",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_230",
+    "command": "時系列予測タスク向けのXGBoost BERT実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_231",
+    "command": "KerasでCNNモデルを使って音声認識を実装してください",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_232",
+    "command": "XGBoostでCNNモデルを使って自然言語処理を実装してください",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_233",
+    "command": "画像分類タスク向けのXGBoost ResNet実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_234",
+    "command": "XGBoostを使用した自然言語処理のためのGAN",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_235",
+    "command": "Kerasを使用した自然言語処理のためのResNet",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_236",
+    "command": "AudioSetデータセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_237",
+    "command": "CIFAR-10データセットをscikit-learnで訓練",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_238",
+    "command": "COCOデータセットをPyTorchで訓練",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_239",
+    "command": "WikipediaデータセットをPyTorchで訓練",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_240",
+    "command": "VAEをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_241",
+    "command": "AudioSetデータセットをXGBoostで訓練",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_242",
+    "command": "異常検知タスク向けのXGBoost CNN実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_243",
+    "command": "物体検出タスク向けのXGBoost LSTM実装",
+    "category": "machine_learning",
+    "framework": "xgboost",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_244",
+    "command": "物体検出タスク向けのTensorFlow BERT実装",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_245",
+    "command": "AudioSetデータセットをKerasで訓練",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_246",
+    "command": "Kerasを使用した物体検出のためのTransformer",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_247",
+    "command": "TensorFlowを使用した画像分類のためのAutoencoder",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_248",
+    "command": "異常検知タスク向けのscikit-learn LSTM実装",
+    "category": "machine_learning",
+    "framework": "scikit-learn",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_249",
+    "command": "VAEをTensorFlowで実装して精度を測定",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "ml_250",
+    "command": "TensorFlowでVAEモデルを使って異常検知を実装してください",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_1",
+    "command": "多言語対応対応のNext.js Todoアプリ",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_2",
+    "command": "リアルタイム更新対応のAngular カレンダーアプリ",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_3",
+    "command": "Angular + リアルタイム更新のポートフォリオアプリケーション",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_4",
+    "command": "ブログWebアプリをAngularで実装",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_5",
+    "command": "認証対応のSvelte ブログアプリ",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_6",
+    "command": "ブログWebアプリをAngularで実装",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_7",
+    "command": "チャットWebアプリをVueで実装",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_8",
+    "command": "ブログWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_9",
+    "command": "Angularを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_10",
+    "command": "ダッシュボードWebアプリをReactで実装",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_11",
+    "command": "リアルタイム更新対応のVue カレンダーアプリ",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_12",
+    "command": "Svelteを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_13",
+    "command": "Reactでダークモード機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_14",
+    "command": "レスポンシブ対応のVue Todoアプリ",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_15",
+    "command": "ダッシュボードWebアプリをSvelteで実装",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_16",
+    "command": "Vue + 多言語対応のブログアプリケーション",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_17",
+    "command": "ポートフォリオWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_18",
+    "command": "ポートフォリオWebアプリをSvelteで実装",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_19",
+    "command": "Vueで認証機能付きダッシュボードサイト",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_20",
+    "command": "多言語対応対応のSvelte カレンダーアプリ",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_21",
+    "command": "チャットWebアプリをVueで実装",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_22",
+    "command": "ポートフォリオWebアプリをAngularで実装",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_23",
+    "command": "Svelte + 認証のチャットアプリケーション",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_24",
+    "command": "React + レスポンシブのTodoアプリケーション",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_25",
+    "command": "Svelteでレスポンシブ機能付きブログサイト",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_26",
+    "command": "カレンダーWebアプリをReactで実装",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_27",
+    "command": "Next.js + 認証のTodoアプリケーション",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_28",
+    "command": "Angularを使用してダッシュボードアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_29",
+    "command": "Svelteでレスポンシブ機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_30",
+    "command": "React + レスポンシブのTodoアプリケーション",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_31",
+    "command": "認証対応のVue ダッシュボードアプリ",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_32",
+    "command": "Next.jsを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_33",
+    "command": "Angular + リアルタイム更新のポートフォリオアプリケーション",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_34",
+    "command": "Angularを使用してダッシュボードアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_35",
+    "command": "カレンダーWebアプリをAngularで実装",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_36",
+    "command": "Next.js + レスポンシブのダッシュボードアプリケーション",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_37",
+    "command": "Vueを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_38",
+    "command": "ブログWebアプリをVueで実装",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_39",
+    "command": "Next.jsを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_40",
+    "command": "ポートフォリオWebアプリをSvelteで実装",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_41",
+    "command": "Angularを使用してカレンダーアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_42",
+    "command": "カレンダーWebアプリをSvelteで実装",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_43",
+    "command": "Vue + リアルタイム更新のブログアプリケーション",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_44",
+    "command": "ダークモード対応のVue カレンダーアプリ",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_45",
+    "command": "レスポンシブ対応のNext.js ダッシュボードアプリ",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_46",
+    "command": "Angular + リアルタイム更新のブログアプリケーション",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_47",
+    "command": "Vue + 認証のダッシュボードアプリケーション",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_48",
+    "command": "Svelteでダークモード機能付きポートフォリオサイト",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_49",
+    "command": "Svelteでレスポンシブ機能付きブログサイト",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_50",
+    "command": "Vueを使用してブログアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_51",
+    "command": "チャットWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_52",
+    "command": "Svelteを使用してブログアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_53",
+    "command": "Reactで認証機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_54",
+    "command": "レスポンシブ対応のAngular ブログアプリ",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_55",
+    "command": "リアルタイム更新対応のReact Todoアプリ",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_56",
+    "command": "リアルタイム更新対応のReact ブログアプリ",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_57",
+    "command": "Svelteを使用してブログアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_58",
+    "command": "Vueでリアルタイム更新機能付きダッシュボードサイト",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_59",
+    "command": "TodoWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_60",
+    "command": "Svelte + リアルタイム更新のTodoアプリケーション",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_61",
+    "command": "Angular + リアルタイム更新のTodoアプリケーション",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_62",
+    "command": "Svelte + 認証のブログアプリケーション",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_63",
+    "command": "Vueを使用してポートフォリオアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_64",
+    "command": "多言語対応対応のReact ポートフォリオアプリ",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_65",
+    "command": "ダークモード対応のVue カレンダーアプリ",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_66",
+    "command": "ブログWebアプリをVueで実装",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_67",
+    "command": "Angular + 認証のポートフォリオアプリケーション",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_68",
+    "command": "リアルタイム更新対応のSvelte ポートフォリオアプリ",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_69",
+    "command": "Svelteで多言語対応機能付きTodoサイト",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_70",
+    "command": "Next.js + 認証のカレンダーアプリケーション",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_71",
+    "command": "Reactでリアルタイム更新機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_72",
+    "command": "Reactを使用してポートフォリオアプリを作成してください",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_73",
+    "command": "Vueを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_74",
+    "command": "Reactで認証機能付きTodoサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_75",
+    "command": "Angular + レスポンシブのブログアプリケーション",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_76",
+    "command": "React + 多言語対応のダッシュボードアプリケーション",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_77",
+    "command": "Reactを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_78",
+    "command": "多言語対応対応のReact ブログアプリ",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_79",
+    "command": "チャットWebアプリをSvelteで実装",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_80",
+    "command": "Angularを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_81",
+    "command": "Reactで多言語対応機能付きチャットサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_82",
+    "command": "Next.jsで多言語対応機能付きTodoサイト",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_83",
+    "command": "Vueを使用してダッシュボードアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_84",
+    "command": "Vueを使用してダッシュボードアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_85",
+    "command": "Next.js + ダークモードのチャットアプリケーション",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_86",
+    "command": "Reactでレスポンシブ機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_87",
+    "command": "Angularを使用してブログアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_88",
+    "command": "TodoWebアプリをVueで実装",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_89",
+    "command": "Svelteでリアルタイム更新機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_90",
+    "command": "Svelte + リアルタイム更新のカレンダーアプリケーション",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_91",
+    "command": "Svelte + リアルタイム更新のチャットアプリケーション",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_92",
+    "command": "Svelteを使用してTodoアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_93",
+    "command": "Svelteで多言語対応機能付きダッシュボードサイト",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_94",
+    "command": "Next.js + リアルタイム更新のカレンダーアプリケーション",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_95",
+    "command": "ポートフォリオWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_96",
+    "command": "Vueを使用してカレンダーアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_97",
+    "command": "Reactでダークモード機能付きダッシュボードサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_98",
+    "command": "Vueでダークモード機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_99",
+    "command": "リアルタイム更新対応のSvelte ポートフォリオアプリ",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_100",
+    "command": "Reactで多言語対応機能付きチャットサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_101",
+    "command": "Next.jsを使用してポートフォリオアプリを作成してください",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_102",
+    "command": "ポートフォリオWebアプリをReactで実装",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_103",
+    "command": "ダークモード対応のSvelte Todoアプリ",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_104",
+    "command": "Next.jsを使用してダッシュボードアプリを作成してください",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_105",
+    "command": "認証対応のVue ダッシュボードアプリ",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_106",
+    "command": "ポートフォリオWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_107",
+    "command": "ダッシュボードWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_108",
+    "command": "Svelteを使用してカレンダーアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_109",
+    "command": "Vue + 認証のダッシュボードアプリケーション",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_110",
+    "command": "Vueでレスポンシブ機能付きポートフォリオサイト",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_111",
+    "command": "Svelteを使用してダッシュボードアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_112",
+    "command": "ダッシュボードWebアプリをReactで実装",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_113",
+    "command": "Angularを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_114",
+    "command": "Svelteを使用してダッシュボードアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_115",
+    "command": "Svelteを使用してカレンダーアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_116",
+    "command": "Reactで認証機能付きTodoサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_117",
+    "command": "Reactを使用してTodoアプリを作成してください",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_118",
+    "command": "Vue + 認証のブログアプリケーション",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_119",
+    "command": "カレンダーWebアプリをVueで実装",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_120",
+    "command": "ダッシュボードWebアプリをVueで実装",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_121",
+    "command": "リアルタイム更新対応のAngular ダッシュボードアプリ",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_122",
+    "command": "TodoWebアプリをVueで実装",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_123",
+    "command": "ポートフォリオWebアプリをAngularで実装",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_124",
+    "command": "カレンダーWebアプリをAngularで実装",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_125",
+    "command": "レスポンシブ対応のReact カレンダーアプリ",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_126",
+    "command": "認証対応のVue ポートフォリオアプリ",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_127",
+    "command": "Next.js + リアルタイム更新のチャットアプリケーション",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_128",
+    "command": "リアルタイム更新対応のReact チャットアプリ",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_129",
+    "command": "Next.jsでダークモード機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_130",
+    "command": "Angularでリアルタイム更新機能付きブログサイト",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_131",
+    "command": "Next.jsでダークモード機能付きTodoサイト",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_132",
+    "command": "リアルタイム更新対応のNext.js ダッシュボードアプリ",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_133",
+    "command": "Next.js + 認証のカレンダーアプリケーション",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_134",
+    "command": "Vue + リアルタイム更新のブログアプリケーション",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_135",
+    "command": "カレンダーWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_136",
+    "command": "認証対応のReact カレンダーアプリ",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_137",
+    "command": "Next.jsを使用してブログアプリを作成してください",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_138",
+    "command": "Svelteを使用してカレンダーアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_139",
+    "command": "Vueでリアルタイム更新機能付きポートフォリオサイト",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_140",
+    "command": "ダッシュボードWebアプリをAngularで実装",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_141",
+    "command": "チャットWebアプリをReactで実装",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_142",
+    "command": "Reactで多言語対応機能付きTodoサイト",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_143",
+    "command": "Svelteで認証機能付きダッシュボードサイト",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_144",
+    "command": "Svelte + ダークモードのカレンダーアプリケーション",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_145",
+    "command": "TodoWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_146",
+    "command": "Vueで多言語対応機能付きチャットサイト",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_147",
+    "command": "チャットWebアプリをSvelteで実装",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_148",
+    "command": "カレンダーWebアプリをReactで実装",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_149",
+    "command": "認証対応のAngular チャットアプリ",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_150",
+    "command": "Angularを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_151",
+    "command": "Next.jsを使用してTodoアプリを作成してください",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_152",
+    "command": "ポートフォリオWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_153",
+    "command": "Vueを使用してカレンダーアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_154",
+    "command": "Next.jsでダークモード機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_155",
+    "command": "Vue + レスポンシブのチャットアプリケーション",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_156",
+    "command": "Svelte + 多言語対応のダッシュボードアプリケーション",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_157",
+    "command": "Next.js + ダークモードのブログアプリケーション",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_158",
+    "command": "Next.jsを使用してカレンダーアプリを作成してください",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_159",
+    "command": "リアルタイム更新対応のSvelte チャットアプリ",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_160",
+    "command": "Angularを使用してTodoアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_161",
+    "command": "ポートフォリオWebアプリをAngularで実装",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_162",
+    "command": "認証対応のReact ブログアプリ",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_163",
+    "command": "TodoWebアプリをSvelteで実装",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_164",
+    "command": "Vueで多言語対応機能付きカレンダーサイト",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_165",
+    "command": "ポートフォリオWebアプリをVueで実装",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_166",
+    "command": "リアルタイム更新対応のReact ポートフォリオアプリ",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_167",
+    "command": "Reactを使用してTodoアプリを作成してください",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_168",
+    "command": "Svelteで多言語対応機能付きポートフォリオサイト",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_169",
+    "command": "Vueでダークモード機能付きチャットサイト",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_170",
+    "command": "Svelteを使用してカレンダーアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_171",
+    "command": "Vue + ダークモードのカレンダーアプリケーション",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_172",
+    "command": "リアルタイム更新対応のSvelte チャットアプリ",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_173",
+    "command": "ダッシュボードWebアプリをAngularで実装",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_174",
+    "command": "Angularでダークモード機能付きチャットサイト",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_175",
+    "command": "認証対応のSvelte ダッシュボードアプリ",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_176",
+    "command": "Svelte + 認証のカレンダーアプリケーション",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_177",
+    "command": "Next.jsを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_178",
+    "command": "React + リアルタイム更新のポートフォリオアプリケーション",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_179",
+    "command": "認証対応のVue ポートフォリオアプリ",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_180",
+    "command": "ダークモード対応のNext.js ポートフォリオアプリ",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_181",
+    "command": "Next.jsでリアルタイム更新機能付きポートフォリオサイト",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_182",
+    "command": "Vueを使用してカレンダーアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_183",
+    "command": "Svelteを使用してチャットアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_184",
+    "command": "Reactを使用してポートフォリオアプリを作成してください",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_185",
+    "command": "Next.jsでダークモード機能付きダッシュボードサイト",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_186",
+    "command": "Vueを使用してポートフォリオアプリを作成してください",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_187",
+    "command": "Next.jsでリアルタイム更新機能付きTodoサイト",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_188",
+    "command": "リアルタイム更新対応のVue Todoアプリ",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_189",
+    "command": "Svelteを使用してブログアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_190",
+    "command": "ポートフォリオWebアプリをSvelteで実装",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_191",
+    "command": "Svelteを使用してブログアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_192",
+    "command": "Angularを使用してダッシュボードアプリを作成してください",
+    "category": "web_app",
+    "framework": "angular",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_193",
+    "command": "Svelteを使用してブログアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_194",
+    "command": "Vueで多言語対応機能付きTodoサイト",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_195",
+    "command": "Next.js + 多言語対応のダッシュボードアプリケーション",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_196",
+    "command": "TodoWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_197",
+    "command": "Svelteを使用してブログアプリを作成してください",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_198",
+    "command": "カレンダーWebアプリをNext.jsで実装",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_199",
+    "command": "Svelte + リアルタイム更新のポートフォリオアプリケーション",
+    "category": "web_app",
+    "framework": "svelte",
+    "complexity": "medium"
+  },
+  {
+    "id": "web_200",
+    "command": "Next.jsで多言語対応機能付きポートフォリオサイト",
+    "category": "web_app",
+    "framework": "next",
+    "complexity": "medium"
+  },
+  {
+    "id": "viz_1",
+    "command": "matplotlibで地理データをヒストグラム表示",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_2",
+    "command": "bokehで時系列データを散布図表示",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_3",
+    "command": "altairで棒グラフを作成してください",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_4",
+    "command": "plotlyで散布図を作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_5",
+    "command": "地理データの散布図をseabornで可視化",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_6",
+    "command": "matplotlibで折れ線グラフを作成してください",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_7",
+    "command": "seabornで時系列データをヒストグラム表示",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_8",
+    "command": "時系列データの棒グラフをplotlyで可視化",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_9",
+    "command": "matplotlibでボックスプロットを作成してください",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_10",
+    "command": "altairで棒グラフを作成してください",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_11",
+    "command": "ネットワークデータの折れ線グラフをmatplotlibで可視化",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_12",
+    "command": "seabornを使った散布図の実装",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_13",
+    "command": "plotlyを使ったヒストグラムの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_14",
+    "command": "plotlyを使ったヒートマップの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_15",
+    "command": "散布図による時系列データ分析 (matplotlib)",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_16",
+    "command": "数値データの散布図をbokehで可視化",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_17",
+    "command": "数値データの折れ線グラフをplotlyで可視化",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_18",
+    "command": "seabornでカテゴリデータをヒストグラム表示",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_19",
+    "command": "ネットワークデータのヒートマップをplotlyで可視化",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_20",
+    "command": "seabornで棒グラフを作成してください",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_21",
+    "command": "plotlyで棒グラフを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_22",
+    "command": "時系列データのボックスプロットをplotlyで可視化",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_23",
+    "command": "plotlyで地理データをボックスプロット表示",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_24",
+    "command": "bokehでカテゴリデータをヒストグラム表示",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_25",
+    "command": "seabornで折れ線グラフを作成してください",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_26",
+    "command": "数値データの散布図をseabornで可視化",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_27",
+    "command": "ネットワークデータのヒートマップをaltairで可視化",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_28",
+    "command": "地理データの折れ線グラフをbokehで可視化",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_29",
+    "command": "bokehで棒グラフを作成してください",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_30",
+    "command": "bokehで折れ線グラフを作成してください",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_31",
+    "command": "plotlyを使ったヒストグラムの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_32",
+    "command": "seabornを使ったヒストグラムの実装",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_33",
+    "command": "altairを使った棒グラフの実装",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_34",
+    "command": "bokehでヒートマップを作成してください",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_35",
+    "command": "bokehを使った棒グラフの実装",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_36",
+    "command": "棒グラフによるネットワークデータ分析 (seaborn)",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_37",
+    "command": "seabornを使った棒グラフの実装",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_38",
+    "command": "ヒストグラムによる地理データ分析 (seaborn)",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_39",
+    "command": "bokehを使った棒グラフの実装",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_40",
+    "command": "altairで棒グラフを作成してください",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_41",
+    "command": "seabornで数値データを折れ線グラフ表示",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_42",
+    "command": "散布図によるカテゴリデータ分析 (plotly)",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_43",
+    "command": "ネットワークデータのヒストグラムをmatplotlibで可視化",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_44",
+    "command": "matplotlibでボックスプロットを作成してください",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_45",
+    "command": "ヒートマップによる数値データ分析 (seaborn)",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_46",
+    "command": "ネットワークデータの折れ線グラフをplotlyで可視化",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_47",
+    "command": "地理データのボックスプロットをbokehで可視化",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_48",
+    "command": "ヒートマップによる数値データ分析 (seaborn)",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_49",
+    "command": "地理データの散布図をplotlyで可視化",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_50",
+    "command": "数値データのヒートマップをplotlyで可視化",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_51",
+    "command": "plotlyを使ったヒストグラムの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_52",
+    "command": "plotlyを使ったヒストグラムの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_53",
+    "command": "seabornを使った棒グラフの実装",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_54",
+    "command": "seabornを使った散布図の実装",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_55",
+    "command": "plotlyを使った散布図の実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_56",
+    "command": "ボックスプロットによる時系列データ分析 (bokeh)",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_57",
+    "command": "altairで時系列データをヒートマップ表示",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_58",
+    "command": "カテゴリデータの折れ線グラフをbokehで可視化",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_59",
+    "command": "plotlyを使った折れ線グラフの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_60",
+    "command": "seabornでカテゴリデータを棒グラフ表示",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_61",
+    "command": "seabornで散布図を作成してください",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_62",
+    "command": "matplotlibで折れ線グラフを作成してください",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_63",
+    "command": "plotlyでヒートマップを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_64",
+    "command": "matplotlibを使ったヒストグラムの実装",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_65",
+    "command": "散布図による数値データ分析 (bokeh)",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_66",
+    "command": "plotlyで時系列データを折れ線グラフ表示",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_67",
+    "command": "plotlyでネットワークデータを棒グラフ表示",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_68",
+    "command": "棒グラフによる時系列データ分析 (seaborn)",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_69",
+    "command": "seabornを使ったヒートマップの実装",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_70",
+    "command": "plotlyでボックスプロットを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_71",
+    "command": "plotlyを使ったヒストグラムの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_72",
+    "command": "折れ線グラフによる数値データ分析 (plotly)",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_73",
+    "command": "時系列データのヒストグラムをbokehで可視化",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_74",
+    "command": "altairでヒストグラムを作成してください",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_75",
+    "command": "ボックスプロットによるカテゴリデータ分析 (matplotlib)",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_76",
+    "command": "カテゴリデータの折れ線グラフをmatplotlibで可視化",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_77",
+    "command": "altairを使ったヒストグラムの実装",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_78",
+    "command": "散布図による地理データ分析 (matplotlib)",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_79",
+    "command": "seabornでヒストグラムを作成してください",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_80",
+    "command": "bokehで散布図を作成してください",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_81",
+    "command": "seabornでカテゴリデータを散布図表示",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_82",
+    "command": "plotlyを使った折れ線グラフの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_83",
+    "command": "地理データのボックスプロットをplotlyで可視化",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_84",
+    "command": "seabornを使ったボックスプロットの実装",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_85",
+    "command": "plotlyでボックスプロットを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_86",
+    "command": "altairで時系列データを折れ線グラフ表示",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_87",
+    "command": "plotlyでヒートマップを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_88",
+    "command": "plotlyを使ったヒートマップの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_89",
+    "command": "plotlyでヒストグラムを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_90",
+    "command": "地理データの散布図をmatplotlibで可視化",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_91",
+    "command": "altairでヒートマップを作成してください",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_92",
+    "command": "bokehを使った棒グラフの実装",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_93",
+    "command": "plotlyで数値データをヒートマップ表示",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_94",
+    "command": "棒グラフによる地理データ分析 (seaborn)",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_95",
+    "command": "bokehを使った棒グラフの実装",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_96",
+    "command": "altairでカテゴリデータを散布図表示",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_97",
+    "command": "plotlyを使った棒グラフの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_98",
+    "command": "ボックスプロットによる数値データ分析 (bokeh)",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_99",
+    "command": "altairで散布図を作成してください",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_100",
+    "command": "matplotlibで折れ線グラフを作成してください",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_101",
+    "command": "plotlyを使ったボックスプロットの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_102",
+    "command": "matplotlibを使った棒グラフの実装",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_103",
+    "command": "ネットワークデータのボックスプロットをaltairで可視化",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_104",
+    "command": "plotlyで棒グラフを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_105",
+    "command": "plotlyで棒グラフを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_106",
+    "command": "plotlyを使った折れ線グラフの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_107",
+    "command": "plotlyを使ったボックスプロットの実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_108",
+    "command": "カテゴリデータの折れ線グラフをmatplotlibで可視化",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_109",
+    "command": "散布図によるネットワークデータ分析 (bokeh)",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_110",
+    "command": "棒グラフによる地理データ分析 (plotly)",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_111",
+    "command": "散布図による時系列データ分析 (seaborn)",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_112",
+    "command": "数値データのボックスプロットをmatplotlibで可視化",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_113",
+    "command": "地理データの棒グラフをseabornで可視化",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_114",
+    "command": "seabornで地理データをボックスプロット表示",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_115",
+    "command": "棒グラフによるネットワークデータ分析 (matplotlib)",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_116",
+    "command": "ヒストグラムによる数値データ分析 (plotly)",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_117",
+    "command": "ボックスプロットによる数値データ分析 (matplotlib)",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_118",
+    "command": "seabornで時系列データをボックスプロット表示",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_119",
+    "command": "altairを使った散布図の実装",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_120",
+    "command": "altairを使った散布図の実装",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_121",
+    "command": "plotlyで折れ線グラフを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_122",
+    "command": "数値データのヒートマップをbokehで可視化",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_123",
+    "command": "数値データのヒートマップをseabornで可視化",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_124",
+    "command": "seabornで棒グラフを作成してください",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_125",
+    "command": "ネットワークデータのボックスプロットをseabornで可視化",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_126",
+    "command": "カテゴリデータのボックスプロットをaltairで可視化",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_127",
+    "command": "plotlyを使った散布図の実装",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_128",
+    "command": "ネットワークデータのヒストグラムをbokehで可視化",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_129",
+    "command": "bokehで散布図を作成してください",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_130",
+    "command": "plotlyでボックスプロットを作成してください",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_131",
+    "command": "bokehで時系列データを散布図表示",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_132",
+    "command": "ボックスプロットによる数値データ分析 (altair)",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_133",
+    "command": "seabornを使ったボックスプロットの実装",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_134",
+    "command": "ネットワークデータのヒートマップをmatplotlibで可視化",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_135",
+    "command": "bokehでネットワークデータを散布図表示",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_136",
+    "command": "ネットワークデータの棒グラフをaltairで可視化",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_137",
+    "command": "seabornで地理データをヒストグラム表示",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_138",
+    "command": "bokehで時系列データを棒グラフ表示",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_139",
+    "command": "ヒートマップによるネットワークデータ分析 (altair)",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_140",
+    "command": "数値データのヒートマップをaltairで可視化",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_141",
+    "command": "matplotlibで折れ線グラフを作成してください",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_142",
+    "command": "seabornで時系列データを散布図表示",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_143",
+    "command": "bokehを使った折れ線グラフの実装",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_144",
+    "command": "seabornでヒストグラムを作成してください",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_145",
+    "command": "matplotlibで散布図を作成してください",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_146",
+    "command": "ボックスプロットによる地理データ分析 (plotly)",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_147",
+    "command": "altairを使ったヒストグラムの実装",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_148",
+    "command": "カテゴリデータのヒートマップをaltairで可視化",
+    "category": "visualization",
+    "framework": "altair",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_149",
+    "command": "ボックスプロットによるネットワークデータ分析 (matplotlib)",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low"
+  },
+  {
+    "id": "viz_150",
+    "command": "seabornでヒストグラムを作成してください",
+    "category": "visualization",
+    "framework": "seaborn",
+    "complexity": "low"
+  },
+  {
+    "id": "data_1",
+    "command": "Parquetファイルをnumpyでクレンジング",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_2",
+    "command": "numpyを使用したJSONデータの欠損値処理",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_3",
+    "command": "numpyを使用したJSONデータの外れ値検出",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_4",
+    "command": "daskでCSVデータのクレンジングを実施",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_5",
+    "command": "numpyによるParquetデータ外れ値検出",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_6",
+    "command": "daskを使用したJSONデータの相関分析",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_7",
+    "command": "pandasでSQLiteデータの相関分析を実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_8",
+    "command": "pandasによるJSONデータクレンジング",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_9",
+    "command": "polarsを使用したCSVデータの欠損値処理",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_10",
+    "command": "pandasでJSONデータの集計を実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_11",
+    "command": "numpyを使用したJSONデータの相関分析",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_12",
+    "command": "numpyでCSVデータの集計を実施",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_13",
+    "command": "daskでParquetデータの欠損値処理を実施",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_14",
+    "command": "欠損値処理をpolarsで実行 (JSON形式)",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_15",
+    "command": "JSONファイルをpandasでクレンジング",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_16",
+    "command": "polarsによるExcelデータ統計分析",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_17",
+    "command": "pandasによるCSVデータ外れ値検出",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_18",
+    "command": "pandasによるParquetデータ集計",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_19",
+    "command": "numpyによるSQLiteデータ相関分析",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_20",
+    "command": "daskを使用したParquetデータの集計",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_21",
+    "command": "JSONファイルをdaskで相関分析",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_22",
+    "command": "pandasを使用したExcelデータの外れ値検出",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_23",
+    "command": "numpyによるCSVデータ外れ値検出",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_24",
+    "command": "欠損値処理をdaskで実行 (Excel形式)",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_25",
+    "command": "polarsによるParquetデータクレンジング",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_26",
+    "command": "クレンジングをpolarsで実行 (JSON形式)",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_27",
+    "command": "pandasでSQLiteデータの欠損値処理を実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_28",
+    "command": "daskによるSQLiteデータ外れ値検出",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_29",
+    "command": "daskを使用したJSONデータの欠損値処理",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_30",
+    "command": "daskでCSVデータのクレンジングを実施",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_31",
+    "command": "polarsを使用したExcelデータの相関分析",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_32",
+    "command": "クレンジングをpolarsで実行 (JSON形式)",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_33",
+    "command": "pandasによるSQLiteデータ相関分析",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_34",
+    "command": "numpyを使用したSQLiteデータの集計",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_35",
+    "command": "polarsでExcelデータの欠損値処理を実施",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_36",
+    "command": "外れ値検出をnumpyで実行 (JSON形式)",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_37",
+    "command": "polarsによるJSONデータ統計分析",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_38",
+    "command": "polarsによるParquetデータ外れ値検出",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_39",
+    "command": "JSONファイルをnumpyで相関分析",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_40",
+    "command": "JSONファイルをpandasで相関分析",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_41",
+    "command": "CSVファイルをpolarsでクレンジング",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_42",
+    "command": "クレンジングをpandasで実行 (Parquet形式)",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_43",
+    "command": "numpyを使用したParquetデータの相関分析",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_44",
+    "command": "pandasによるJSONデータ外れ値検出",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_45",
+    "command": "統計分析をdaskで実行 (JSON形式)",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_46",
+    "command": "集計をdaskで実行 (SQLite形式)",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_47",
+    "command": "相関分析をnumpyで実行 (Parquet形式)",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_48",
+    "command": "daskでExcelデータの集計を実施",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_49",
+    "command": "Excelファイルをdaskで集計",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_50",
+    "command": "Parquetファイルをnumpyで相関分析",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_51",
+    "command": "pandasでSQLiteデータのクレンジングを実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_52",
+    "command": "pandasを使用したJSONデータのクレンジング",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_53",
+    "command": "numpyでCSVデータのクレンジングを実施",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_54",
+    "command": "JSONファイルをpandasで相関分析",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_55",
+    "command": "JSONファイルをnumpyで統計分析",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_56",
+    "command": "polarsによるParquetデータ欠損値処理",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_57",
+    "command": "欠損値処理をpolarsで実行 (SQLite形式)",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_58",
+    "command": "daskを使用したExcelデータの集計",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_59",
+    "command": "numpyを使用したCSVデータの集計",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_60",
+    "command": "クレンジングをpandasで実行 (Excel形式)",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_61",
+    "command": "pandasによるParquetデータ統計分析",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_62",
+    "command": "CSVファイルをpolarsで欠損値処理",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_63",
+    "command": "numpyでCSVデータの欠損値処理を実施",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_64",
+    "command": "polarsを使用したExcelデータの統計分析",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_65",
+    "command": "daskを使用したCSVデータの外れ値検出",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_66",
+    "command": "numpyでExcelデータの欠損値処理を実施",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_67",
+    "command": "JSONファイルをpandasで集計",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_68",
+    "command": "pandasによるParquetデータ相関分析",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_69",
+    "command": "集計をnumpyで実行 (Excel形式)",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_70",
+    "command": "polarsによるExcelデータ欠損値処理",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_71",
+    "command": "polarsでSQLiteデータの集計を実施",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_72",
+    "command": "polarsでSQLiteデータの集計を実施",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_73",
+    "command": "Excelファイルをdaskで統計分析",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_74",
+    "command": "pandasによるParquetデータ集計",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_75",
+    "command": "pandasを使用したExcelデータの相関分析",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_76",
+    "command": "daskでExcelデータの相関分析を実施",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_77",
+    "command": "numpyによるCSVデータ欠損値処理",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_78",
+    "command": "numpyでJSONデータの統計分析を実施",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_79",
+    "command": "CSVファイルをpolarsで外れ値検出",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_80",
+    "command": "numpyでExcelデータの外れ値検出を実施",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_81",
+    "command": "polarsによるExcelデータ統計分析",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_82",
+    "command": "pandasによるJSONデータ集計",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_83",
+    "command": "daskを使用したSQLiteデータの外れ値検出",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_84",
+    "command": "Parquetファイルをnumpyで欠損値処理",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_85",
+    "command": "pandasを使用したParquetデータの欠損値処理",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_86",
+    "command": "Excelファイルをdaskで外れ値検出",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_87",
+    "command": "pandasでJSONデータのクレンジングを実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_88",
+    "command": "pandasを使用したSQLiteデータの欠損値処理",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_89",
+    "command": "SQLiteファイルをdaskで統計分析",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_90",
+    "command": "欠損値処理をpolarsで実行 (Excel形式)",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_91",
+    "command": "pandasによるSQLiteデータ集計",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_92",
+    "command": "pandasでParquetデータのクレンジングを実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_93",
+    "command": "相関分析をnumpyで実行 (JSON形式)",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_94",
+    "command": "polarsでJSONデータの欠損値処理を実施",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_95",
+    "command": "pandasを使用したSQLiteデータの集計",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_96",
+    "command": "Parquetファイルをpandasで集計",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_97",
+    "command": "pandasを使用したSQLiteデータの外れ値検出",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_98",
+    "command": "pandasを使用したCSVデータのクレンジング",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_99",
+    "command": "numpyを使用したSQLiteデータのクレンジング",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_100",
+    "command": "daskを使用したExcelデータの集計",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_101",
+    "command": "numpyによるSQLiteデータ集計",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_102",
+    "command": "外れ値検出をpolarsで実行 (CSV形式)",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_103",
+    "command": "pandasでCSVデータのクレンジングを実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_104",
+    "command": "pandasでSQLiteデータの相関分析を実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_105",
+    "command": "polarsを使用したParquetデータの集計",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_106",
+    "command": "欠損値処理をnumpyで実行 (SQLite形式)",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_107",
+    "command": "クレンジングをpandasで実行 (Excel形式)",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_108",
+    "command": "統計分析をpolarsで実行 (SQLite形式)",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_109",
+    "command": "polarsを使用したSQLiteデータの集計",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_110",
+    "command": "polarsによるCSVデータクレンジング",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_111",
+    "command": "外れ値検出をnumpyで実行 (SQLite形式)",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_112",
+    "command": "numpyを使用したCSVデータの統計分析",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_113",
+    "command": "pandasでSQLiteデータの外れ値検出を実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_114",
+    "command": "polarsを使用したParquetデータの集計",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_115",
+    "command": "外れ値検出をdaskで実行 (SQLite形式)",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_116",
+    "command": "daskによるParquetデータ集計",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_117",
+    "command": "SQLiteファイルをpolarsでクレンジング",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_118",
+    "command": "numpyでParquetデータの外れ値検出を実施",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_119",
+    "command": "daskを使用したExcelデータのクレンジング",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_120",
+    "command": "pandasでExcelデータのクレンジングを実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_121",
+    "command": "Parquetファイルをdaskでクレンジング",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_122",
+    "command": "pandasによるCSVデータクレンジング",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_123",
+    "command": "統計分析をnumpyで実行 (Parquet形式)",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_124",
+    "command": "外れ値検出をpandasで実行 (CSV形式)",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_125",
+    "command": "Parquetファイルをpolarsで欠損値処理",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_126",
+    "command": "Excelファイルをdaskでクレンジング",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_127",
+    "command": "numpyでParquetデータの外れ値検出を実施",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_128",
+    "command": "クレンジングをpolarsで実行 (Parquet形式)",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_129",
+    "command": "CSVファイルをnumpyでクレンジング",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_130",
+    "command": "pandasによるSQLiteデータ外れ値検出",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_131",
+    "command": "numpyを使用したCSVデータの統計分析",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_132",
+    "command": "pandasによるParquetデータ相関分析",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_133",
+    "command": "統計分析をnumpyで実行 (CSV形式)",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_134",
+    "command": "pandasでJSONデータの相関分析を実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_135",
+    "command": "numpyを使用したSQLiteデータの集計",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_136",
+    "command": "統計分析をdaskで実行 (SQLite形式)",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_137",
+    "command": "SQLiteファイルをpandasで欠損値処理",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_138",
+    "command": "CSVファイルをpolarsで欠損値処理",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_139",
+    "command": "pandasによるParquetデータ統計分析",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_140",
+    "command": "numpyを使用したParquetデータの相関分析",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_141",
+    "command": "daskでCSVデータの集計を実施",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_142",
+    "command": "Parquetファイルをnumpyで外れ値検出",
+    "category": "data_analysis",
+    "framework": "numpy",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_143",
+    "command": "daskを使用したJSONデータのクレンジング",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_144",
+    "command": "集計をpolarsで実行 (JSON形式)",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_145",
+    "command": "polarsによるCSVデータ外れ値検出",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_146",
+    "command": "pandasでSQLiteデータの集計を実施",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_147",
+    "command": "欠損値処理をdaskで実行 (JSON形式)",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_148",
+    "command": "集計をdaskで実行 (JSON形式)",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_149",
+    "command": "daskでJSONデータの外れ値検出を実施",
+    "category": "data_analysis",
+    "framework": "dask",
+    "complexity": "medium"
+  },
+  {
+    "id": "data_150",
+    "command": "Excelファイルをpolarsで集計",
+    "category": "data_analysis",
+    "framework": "polars",
+    "complexity": "medium"
+  },
+  {
+    "id": "api_1",
+    "command": "Expressで通知APIを作成",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_2",
+    "command": "FastAPI + キャッシングのファイルアップロードAPI",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_3",
+    "command": "キャッシング対応認証API (Express)",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_4",
+    "command": "NestJS + CRUD操作のユーザー管理API",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_5",
+    "command": "CRUD操作対応商品一覧API (NestJS)",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_6",
+    "command": "FastAPIを使ったCRUD操作付きユーザー管理エンドポイント",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_7",
+    "command": "レート制限対応商品一覧API (Express)",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_8",
+    "command": "Flask + JWT認証の通知API",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_9",
+    "command": "Expressを使ったCRUD操作付き認証エンドポイント",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_10",
+    "command": "Flaskを使ったJWT認証付き商品一覧エンドポイント",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_11",
+    "command": "商品一覧のREST APIをFlaskで実装",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_12",
+    "command": "FastAPI + JWT認証のユーザー管理API",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_13",
+    "command": "商品一覧のREST APIをDjango RESTで実装",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_14",
+    "command": "Express + ページネーションのファイルアップロードAPI",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_15",
+    "command": "NestJSを使ったページネーション付き商品一覧エンドポイント",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_16",
+    "command": "NestJS + レート制限の商品一覧API",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_17",
+    "command": "ページネーション対応商品一覧API (Express)",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_18",
+    "command": "FastAPIで通知APIを作成",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_19",
+    "command": "ユーザー管理のREST APIをDjango RESTで実装",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_20",
+    "command": "通知のREST APIをExpressで実装",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_21",
+    "command": "ファイルアップロードのREST APIをNestJSで実装",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_22",
+    "command": "認証のREST APIをFastAPIで実装",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_23",
+    "command": "FastAPIを使ったキャッシング付きファイルアップロードエンドポイント",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_24",
+    "command": "NestJSを使ったレート制限付き通知エンドポイント",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_25",
+    "command": "JWT認証対応ユーザー管理API (Express)",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_26",
+    "command": "NestJSで認証APIを作成",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_27",
+    "command": "通知のREST APIをFastAPIで実装",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_28",
+    "command": "FastAPIで通知APIを作成",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_29",
+    "command": "Expressで通知APIを作成",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_30",
+    "command": "NestJSでユーザー管理APIを作成",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_31",
+    "command": "NestJS + JWT認証の通知API",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_32",
+    "command": "Django REST + ページネーションのファイルアップロードAPI",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_33",
+    "command": "認証のREST APIをExpressで実装",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_34",
+    "command": "Django REST + キャッシングの認証API",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_35",
+    "command": "FastAPIで通知APIを作成",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_36",
+    "command": "CRUD操作対応通知API (NestJS)",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_37",
+    "command": "認証のREST APIをDjango RESTで実装",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_38",
+    "command": "FastAPIで商品一覧APIを作成",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_39",
+    "command": "FastAPIで通知APIを作成",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_40",
+    "command": "Expressを使ったJWT認証付き商品一覧エンドポイント",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_41",
+    "command": "FastAPIでファイルアップロードAPIを作成",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_42",
+    "command": "JWT認証対応認証API (Django REST)",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_43",
+    "command": "商品一覧のREST APIをExpressで実装",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_44",
+    "command": "通知のREST APIをFastAPIで実装",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_45",
+    "command": "キャッシング対応認証API (NestJS)",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_46",
+    "command": "Django RESTを使ったCRUD操作付き商品一覧エンドポイント",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_47",
+    "command": "商品一覧のREST APIをNestJSで実装",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_48",
+    "command": "FastAPI + キャッシングの通知API",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_49",
+    "command": "FastAPIを使ったキャッシング付きファイルアップロードエンドポイント",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_50",
+    "command": "FastAPIを使ったCRUD操作付き商品一覧エンドポイント",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_51",
+    "command": "Flaskでユーザー管理APIを作成",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_52",
+    "command": "NestJS + ページネーションの商品一覧API",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_53",
+    "command": "Flaskを使ったページネーション付き認証エンドポイント",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_54",
+    "command": "NestJS + ページネーションの認証API",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_55",
+    "command": "ファイルアップロードのREST APIをDjango RESTで実装",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_56",
+    "command": "ExpressでファイルアップロードAPIを作成",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_57",
+    "command": "Flaskで商品一覧APIを作成",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_58",
+    "command": "Flask + CRUD操作の認証API",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_59",
+    "command": "キャッシング対応商品一覧API (FastAPI)",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_60",
+    "command": "Flask + キャッシングのユーザー管理API",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_61",
+    "command": "ユーザー管理のREST APIをDjango RESTで実装",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_62",
+    "command": "認証のREST APIをExpressで実装",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_63",
+    "command": "NestJSを使ったキャッシング付き商品一覧エンドポイント",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_64",
+    "command": "認証のREST APIをDjango RESTで実装",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_65",
+    "command": "NestJSで認証APIを作成",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_66",
+    "command": "Django REST + JWT認証の通知API",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_67",
+    "command": "Flaskで商品一覧APIを作成",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_68",
+    "command": "レート制限対応商品一覧API (Flask)",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_69",
+    "command": "Express + ページネーションのファイルアップロードAPI",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_70",
+    "command": "Flaskで通知APIを作成",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_71",
+    "command": "通知のREST APIをFlaskで実装",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_72",
+    "command": "FastAPI + レート制限の認証API",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_73",
+    "command": "Django RESTを使ったCRUD操作付きファイルアップロードエンドポイント",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_74",
+    "command": "レート制限対応ファイルアップロードAPI (Django REST)",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_75",
+    "command": "Django RESTを使ったページネーション付き商品一覧エンドポイント",
+    "category": "api",
+    "framework": "django",
+    "complexity": "high"
+  },
+  {
+    "id": "api_76",
+    "command": "CRUD操作対応通知API (Flask)",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_77",
+    "command": "Flaskを使ったCRUD操作付きファイルアップロードエンドポイント",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_78",
+    "command": "ファイルアップロードのREST APIをExpressで実装",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_79",
+    "command": "レート制限対応ファイルアップロードAPI (Express)",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_80",
+    "command": "Express + CRUD操作の通知API",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_81",
+    "command": "Expressでユーザー管理APIを作成",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_82",
+    "command": "レート制限対応通知API (Flask)",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_83",
+    "command": "ユーザー管理のREST APIをNestJSで実装",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_84",
+    "command": "ExpressでファイルアップロードAPIを作成",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_85",
+    "command": "認証のREST APIをNestJSで実装",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_86",
+    "command": "Flask + キャッシングのユーザー管理API",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_87",
+    "command": "Flaskを使ったキャッシング付き認証エンドポイント",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_88",
+    "command": "FastAPIで通知APIを作成",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_89",
+    "command": "Flask + レート制限の商品一覧API",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_90",
+    "command": "商品一覧のREST APIをExpressで実装",
+    "category": "api",
+    "framework": "express",
+    "complexity": "high"
+  },
+  {
+    "id": "api_91",
+    "command": "Flask + ページネーションの認証API",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_92",
+    "command": "NestJSを使ったJWT認証付き商品一覧エンドポイント",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_93",
+    "command": "NestJSを使ったJWT認証付き認証エンドポイント",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_94",
+    "command": "FastAPIで認証APIを作成",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high"
+  },
+  {
+    "id": "api_95",
+    "command": "Flask + キャッシングの認証API",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_96",
+    "command": "CRUD操作対応通知API (NestJS)",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "api_97",
+    "command": "Flaskを使ったキャッシング付き商品一覧エンドポイント",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_98",
+    "command": "キャッシング対応ユーザー管理API (Flask)",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_99",
+    "command": "Flaskで商品一覧APIを作成",
+    "category": "api",
+    "framework": "flask",
+    "complexity": "high"
+  },
+  {
+    "id": "api_100",
+    "command": "CRUD操作対応ファイルアップロードAPI (NestJS)",
+    "category": "api",
+    "framework": "nestjs",
+    "complexity": "high"
+  },
+  {
+    "id": "docker_1",
+    "command": "Docker docker-compose設定 for PostgreSQL",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_2",
+    "command": "MongoDBコンテナをイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_3",
+    "command": "DockerでNginxのコンテナ起動",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_4",
+    "command": "Docker イメージビルド for Redis",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_5",
+    "command": "MongoDBコンテナをマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_6",
+    "command": "DockerでNginxのイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_7",
+    "command": "Docker docker-compose設定 for RabbitMQ",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_8",
+    "command": "DockerでPostgreSQLのマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_9",
+    "command": "MongoDBコンテナをマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_10",
+    "command": "DockerでRabbitMQのマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_11",
+    "command": "DockerでMongoDBのイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_12",
+    "command": "MongoDBコンテナをイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_13",
+    "command": "マルチステージビルドを使用したRedisのDocker環境構築",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_14",
+    "command": "PostgreSQLコンテナをdocker-compose設定",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_15",
+    "command": "RabbitMQコンテナをイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_16",
+    "command": "Docker コンテナ起動 for PostgreSQL",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_17",
+    "command": "DockerでRedisのイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_18",
+    "command": "DockerでPostgreSQLのマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_19",
+    "command": "Redisコンテナをマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_20",
+    "command": "Docker マルチステージビルド for Nginx",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_21",
+    "command": "Nginxコンテナをdocker-compose設定",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_22",
+    "command": "Docker イメージビルド for RabbitMQ",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_23",
+    "command": "Docker マルチステージビルド for MongoDB",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_24",
+    "command": "DockerでRabbitMQのマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_25",
+    "command": "Docker マルチステージビルド for Nginx",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_26",
+    "command": "コンテナ起動を使用したNginxのDocker環境構築",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_27",
+    "command": "DockerでRedisのコンテナ起動",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_28",
+    "command": "Redisコンテナをイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_29",
+    "command": "RabbitMQコンテナをコンテナ起動",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_30",
+    "command": "Docker コンテナ起動 for Nginx",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_31",
+    "command": "Docker マルチステージビルド for MongoDB",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_32",
+    "command": "コンテナ起動を使用したNginxのDocker環境構築",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_33",
+    "command": "マルチステージビルドを使用したRabbitMQのDocker環境構築",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_34",
+    "command": "DockerでMongoDBのコンテナ起動",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_35",
+    "command": "DockerでMongoDBのイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_36",
+    "command": "イメージビルドを使用したPostgreSQLのDocker環境構築",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_37",
+    "command": "Docker docker-compose設定 for Redis",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_38",
+    "command": "DockerでPostgreSQLのコンテナ起動",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_39",
+    "command": "Redisコンテナをdocker-compose設定",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_40",
+    "command": "Redisコンテナをdocker-compose設定",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_41",
+    "command": "DockerでRedisのイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_42",
+    "command": "Docker コンテナ起動 for RabbitMQ",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_43",
+    "command": "Redisコンテナをマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_44",
+    "command": "MongoDBコンテナをマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_45",
+    "command": "Nginxコンテナをイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_46",
+    "command": "Nginxコンテナをマルチステージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_47",
+    "command": "Docker マルチステージビルド for MongoDB",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_48",
+    "command": "DockerでMongoDBのイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_49",
+    "command": "DockerでRabbitMQのイメージビルド",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "docker_50",
+    "command": "Docker docker-compose設定 for RabbitMQ",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium"
+  },
+  {
+    "id": "jupyter_1",
+    "command": "Jupyterを使ったレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_2",
+    "command": "Notebook形式でデータ探索",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_3",
+    "command": "Jupyter notebookでモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_4",
+    "command": "Jupyterを使ったレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_5",
+    "command": "Jupyter notebookでレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_6",
+    "command": "レポート作成をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_7",
+    "command": "Jupyterを使ったモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_8",
+    "command": "Jupyterを使ったインタラクティブ分析",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_9",
+    "command": "可視化をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_10",
+    "command": "Jupyter notebookで可視化",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_11",
+    "command": "Jupyter notebookでモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_12",
+    "command": "可視化をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_13",
+    "command": "レポート作成をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_14",
+    "command": "データ探索をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_15",
+    "command": "Jupyter notebookでインタラクティブ分析",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_16",
+    "command": "データ探索をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_17",
+    "command": "Jupyterを使ったレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_18",
+    "command": "Jupyterを使ったインタラクティブ分析",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_19",
+    "command": "Notebook形式でモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_20",
+    "command": "Jupyterを使った可視化",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_21",
+    "command": "Jupyter notebookでインタラクティブ分析",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_22",
+    "command": "Notebook形式でデータ探索",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_23",
+    "command": "Jupyter notebookでインタラクティブ分析",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_24",
+    "command": "モデル訓練をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_25",
+    "command": "Jupyter notebookで可視化",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_26",
+    "command": "データ探索をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_27",
+    "command": "Jupyter notebookでインタラクティブ分析",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_28",
+    "command": "Notebook形式でレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_29",
+    "command": "Notebook形式でレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_30",
+    "command": "Jupyterを使ったモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_31",
+    "command": "モデル訓練をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_32",
+    "command": "インタラクティブ分析をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_33",
+    "command": "Jupyterを使ったモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_34",
+    "command": "Jupyterを使ったデータ探索",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_35",
+    "command": "Jupyterを使ったモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_36",
+    "command": "Jupyter notebookでデータ探索",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_37",
+    "command": "Jupyter notebookでレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_38",
+    "command": "Notebook形式で可視化",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_39",
+    "command": "Notebook形式でモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_40",
+    "command": "Jupyterを使ったレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_41",
+    "command": "Notebook形式でインタラクティブ分析",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_42",
+    "command": "Jupyterを使ったモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_43",
+    "command": "Jupyter notebookで可視化",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_44",
+    "command": "Notebook形式で可視化",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_45",
+    "command": "Jupyter notebookでレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_46",
+    "command": "可視化をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_47",
+    "command": "Notebook形式でインタラクティブ分析",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_48",
+    "command": "データ探索をJupyter Labで実施",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_49",
+    "command": "Jupyter notebookでモデル訓練",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "jupyter_50",
+    "command": "Notebook形式でレポート作成",
+    "category": "jupyter",
+    "framework": "jupyter",
+    "complexity": "low"
+  },
+  {
+    "id": "general_1",
+    "command": "データ処理パイプラインプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_2",
+    "command": "Pythonでログ解析を作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_3",
+    "command": "バッチ処理の実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_4",
+    "command": "Pythonで自動化スクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_5",
+    "command": "データ処理パイプラインの実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_6",
+    "command": "バッチ処理の実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_7",
+    "command": "設定ファイルパーサープログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_8",
+    "command": "ファイル読み込みスクリプトの実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_9",
+    "command": "バッチ処理プログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_10",
+    "command": "Pythonで自動化スクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_11",
+    "command": "ファイル読み込みスクリプトプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_12",
+    "command": "Pythonでファイル読み込みスクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_13",
+    "command": "ファイル読み込みスクリプトプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_14",
+    "command": "バッチ処理プログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_15",
+    "command": "Pythonで自動化スクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_16",
+    "command": "Pythonでファイル読み込みスクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_17",
+    "command": "ファイル読み込みスクリプトの実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_18",
+    "command": "Pythonでデータ処理パイプラインを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_19",
+    "command": "Pythonでファイル読み込みスクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_20",
+    "command": "ファイル読み込みスクリプトプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_21",
+    "command": "データ処理パイプラインプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_22",
+    "command": "Pythonで自動化スクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_23",
+    "command": "バッチ処理プログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_24",
+    "command": "Pythonで設定ファイルパーサーを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_25",
+    "command": "自動化スクリプトプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_26",
+    "command": "ファイル読み込みスクリプトプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_27",
+    "command": "Pythonでファイル読み込みスクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_28",
+    "command": "データ処理パイプラインプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_29",
+    "command": "データ処理パイプラインの実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_30",
+    "command": "データ処理パイプラインの実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_31",
+    "command": "Pythonで自動化スクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_32",
+    "command": "Pythonでファイル読み込みスクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_33",
+    "command": "Pythonでファイル読み込みスクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_34",
+    "command": "Pythonで設定ファイルパーサーを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_35",
+    "command": "ファイル読み込みスクリプトプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_36",
+    "command": "データ処理パイプラインプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_37",
+    "command": "バッチ処理の実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_38",
+    "command": "Pythonでデータ処理パイプラインを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_39",
+    "command": "自動化スクリプトプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_40",
+    "command": "Pythonでファイル読み込みスクリプトを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_41",
+    "command": "バッチ処理の実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_42",
+    "command": "ログ解析プログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_43",
+    "command": "ログ解析の実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_44",
+    "command": "バッチ処理の実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_45",
+    "command": "ファイル読み込みスクリプトプログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_46",
+    "command": "設定ファイルパーサープログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_47",
+    "command": "設定ファイルパーサープログラム",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_48",
+    "command": "バッチ処理の実装",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_49",
+    "command": "Pythonでデータ処理パイプラインを作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "general_50",
+    "command": "Pythonでログ解析を作成",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "low"
+  },
+  {
+    "id": "edge_1",
+    "command": "グラフ作成",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_2",
+    "command": "API作成",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_3",
+    "command": "モデル訓練",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_4",
+    "command": "データ分析",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_5",
+    "command": "アプリ作成",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_6",
+    "command": "TensorFlowとKerasを使用してMNISTデータセットで手書き数字認識のためのCNNモデルを構築し、訓練後に精度評価を実施してください。さらに、訓練履歴をmatplotlibでグラフ化し、混同行列も表示してください",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_7",
+    "command": "React.jsとTypeScriptを使用してレスポンシブデザインのTodoアプリケーションを作成してください。ローカルストレージでデータ永続化し、ダークモード対応、ドラッグ&ドロップ機能、フィルタリング機能を実装してください",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_8",
+    "command": "何か作って",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_9",
+    "command": "プログラム書いて",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_10",
+    "command": "良い感じのやつ",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_11",
+    "command": "FlaskでREST APIを作成してReactでフロントエンド実装",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_12",
+    "command": "PandasでCSV読み込んでMatplotlibで可視化",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  },
+  {
+    "id": "edge_13",
+    "command": "TensorFlowでモデル訓練してFastAPIでデプロイ",
+    "category": "unknown",
+    "framework": "mixed",
+    "complexity": "variable"
+  }
+]

@@ -48,7 +48,11 @@
       "Read(//Users/**)",
       "Bash(npx expo run:ios:*)",
       "Bash(./remoteclaude-server-matplotlib --port=8090)",
-      "Bash(./remoteclaude-server-matplotlib-mgmt --port=8094)"
+      "Bash(./remoteclaude-server-matplotlib-mgmt --port=8094)",
+      "Bash(go test:*)",
+      "Bash(./evaluate_sample)",
+      "Bash(tee:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
