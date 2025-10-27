@@ -18,6 +18,16 @@ import joblib
 import os
 from datetime import datetime
 
+# Product mapping dictionary for real-world data accuracy improvement
+try:
+    from product_mapping_dictionary import get_product_category
+    PRODUCT_DICT_AVAILABLE = True
+except ImportError:
+    print("⚠️ Product mapping dictionary not found. Running without product detection.", file=sys.stderr)
+    PRODUCT_DICT_AVAILABLE = False
+    def get_product_category(text):
+        return {'detected_products': [], 'suggested_category': None, 'confidence_boost': 0.0}
+
 class RemoteClaudeMLModel:
     """
     ML Model for command classification and confidence estimation
@@ -610,13 +620,24 @@ class RemoteClaudeMLModel:
         """
         Single prediction (internal method used by both predict and _predict_long_prompt)
 
+        Enhanced with product name detection for real-world data accuracy improvement.
+
         Args:
             command: Command text
             claude_cli_result: Optional Claude CLI result
 
         Returns:
-            Prediction dict
+            Prediction dict with product detection metadata
         """
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # Step 1: Product Name Detection (NEW!)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        product_info = get_product_category(command)
+        product_detected = product_info['suggested_category'] is not None
+
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # Step 2: ML Prediction
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         # Vectorize command
         X_text = self.vectorizer.transform([command])
 
@@ -636,7 +657,42 @@ class RemoteClaudeMLModel:
         predicted_confidence = float(self.confidence_estimator.predict(X_combined)[0])
         predicted_confidence = max(0.0, min(1.0, predicted_confidence))
 
-        # If Claude CLI result exists, blend predictions
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # Step 3: Product-Based Boosting (NEW!)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        if product_detected:
+            suggested_cat = product_info['suggested_category']
+            boost_weight = product_info['confidence_boost']
+
+            # Case 1: Product category matches ML prediction → Boost confidence
+            if suggested_cat == predicted_category:
+                predicted_confidence = min(1.0, predicted_confidence + 0.15)  # +15% boost
+                prediction_source = "ml_with_product_boost"
+
+            # Case 2: Product category differs from ML prediction → Override if high confidence
+            elif boost_weight >= 0.90:  # High confidence product (e.g., Slack, Stripe)
+                predicted_category = suggested_cat
+                predicted_confidence = boost_weight
+                prediction_source = "product_override"
+
+            # Case 3: Medium confidence product → Blend with ML
+            else:
+                # Weighted blend: 60% ML, 40% Product
+                if predicted_confidence > 0.7:
+                    # ML is confident → keep ML but small boost
+                    predicted_confidence = min(1.0, predicted_confidence + 0.05)
+                    prediction_source = "ml_primary_with_product"
+                else:
+                    # ML is not confident → use product
+                    predicted_category = suggested_cat
+                    predicted_confidence = boost_weight * 0.9
+                    prediction_source = "product_primary"
+        else:
+            prediction_source = "ml_only"
+
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        # Step 4: Claude CLI Blending (Existing Logic)
+        # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         if claude_cli_result:
             claude_category = claude_cli_result.get('command_type', predicted_category)
             claude_confidence = claude_cli_result.get('confidence', predicted_confidence)
@@ -666,6 +722,14 @@ class RemoteClaudeMLModel:
             },
             "claude_category": claude_cli_result.get('command_type') if claude_cli_result else None,
             "claude_confidence": claude_cli_result.get('confidence') if claude_cli_result else None,
+            "product_detection": {
+                "detected": product_detected,
+                "products": product_info['detected_products'] if product_detected else [],
+                "suggested_category": product_info['suggested_category'],
+                "boost_applied": product_info['confidence_boost'] if product_detected else 0.0,
+                "num_matches": product_info.get('num_matches', 0)
+            },
+            "prediction_source": prediction_source,
             "timestamp": datetime.now().isoformat()
         }
 
