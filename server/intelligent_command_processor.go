@@ -17,20 +17,21 @@ type IntelligentCommandProcessor struct {
 	matplotlibDetector *MatplotlibDetector
 }
 
-// CommandType represents the category of command
-type CommandType int
+// IntelligentCommandType represents the category of command
+type IntelligentCommandType int
 
 const (
-	LinuxCommand CommandType = iota
+	LinuxCommand IntelligentCommandType = iota
 	PythonExecution
-	FileExecution
+	IntelligentFileExecution
 	CodeImplementation
 	WebAppExecution
 )
 
-// CommandClassification contains analysis of the input command
-type CommandClassification struct {
-	Type CommandType
+// IntelligentCommandClassification contains analysis of the input command
+// (renamed to avoid conflict with CommandClassification in common_utils.go)
+type IntelligentCommandClassification struct {
+	Type IntelligentCommandType
 	Command string
 	Priority int
 	RequiresGUI bool
@@ -48,12 +49,12 @@ func NewIntelligentCommandProcessor(dm *DockerManager, md *MatplotlibDetector) *
 }
 
 // ClassifyCommand analyzes the input and determines the appropriate execution strategy
-func (icp *IntelligentCommandProcessor) ClassifyCommand(input string) CommandClassification {
+func (icp *IntelligentCommandProcessor) ClassifyCommand(input string) IntelligentCommandClassification {
 	input = strings.TrimSpace(input)
 
 	// Priority 1: Linux basic commands (highest priority)
 	if icp.isLinuxCommand(input) {
-		return CommandClassification{
+		return IntelligentCommandClassification{
 			Type: LinuxCommand,
 			Command: input,
 			Priority: 1,
@@ -65,7 +66,7 @@ func (icp *IntelligentCommandProcessor) ClassifyCommand(input string) CommandCla
 
 	// Priority 2: Python execution with GUI/plotting
 	if icp.isPythonWithGUI(input) {
-		return CommandClassification{
+		return IntelligentCommandClassification{
 			Type: PythonExecution,
 			Command: input,
 			Priority: 2,
@@ -78,8 +79,8 @@ func (icp *IntelligentCommandProcessor) ClassifyCommand(input string) CommandCla
 
 	// Priority 3: File execution
 	if icp.isFileExecution(input) {
-		classification := CommandClassification{
-			Type: FileExecution,
+		classification := IntelligentCommandClassification{
+			Type:        IntelligentFileExecution,
 			Command: input,
 			Priority: 3,
 			RequiresGUI: icp.fileRequiresGUI(input),
@@ -96,7 +97,7 @@ func (icp *IntelligentCommandProcessor) ClassifyCommand(input string) CommandCla
 
 	// Priority 4: Web application execution
 	if icp.isWebAppExecution(input) {
-		return CommandClassification{
+		return IntelligentCommandClassification{
 			Type: WebAppExecution,
 			Command: input,
 			Priority: 4,
@@ -108,7 +109,7 @@ func (icp *IntelligentCommandProcessor) ClassifyCommand(input string) CommandCla
 	}
 
 	// Priority 5: Complex code implementation (lowest priority - route to Claude Code CLI)
-	return CommandClassification{
+	return IntelligentCommandClassification{
 		Type: CodeImplementation,
 		Command: input,
 		Priority: 5,
@@ -353,7 +354,7 @@ func (icp *IntelligentCommandProcessor) getPathAutoComplete(partial string) []st
 }
 
 // ProcessCommand executes the command based on its classification
-func (icp *IntelligentCommandProcessor) ProcessCommand(conn *websocket.Conn, classification CommandClassification, projectID string) {
+func (icp *IntelligentCommandProcessor) ProcessCommand(conn *websocket.Conn, classification IntelligentCommandClassification, projectID string) {
 	log.Printf("🧠 Processing command: %s (Type: %d, Priority: %d)", classification.Command, classification.Type, classification.Priority)
 
 	switch classification.Type {
@@ -361,7 +362,7 @@ func (icp *IntelligentCommandProcessor) ProcessCommand(conn *websocket.Conn, cla
 		icp.executeLinuxCommand(conn, classification, projectID)
 	case PythonExecution:
 		icp.executePythonWithGUI(conn, classification, projectID)
-	case FileExecution:
+	case IntelligentFileExecution:
 		icp.executeFile(conn, classification, projectID)
 	case WebAppExecution:
 		icp.executeWebApp(conn, classification, projectID)
@@ -371,7 +372,7 @@ func (icp *IntelligentCommandProcessor) ProcessCommand(conn *websocket.Conn, cla
 }
 
 // executeLinuxCommand executes basic Linux commands directly
-func (icp *IntelligentCommandProcessor) executeLinuxCommand(conn *websocket.Conn, classification CommandClassification, projectID string) {
+func (icp *IntelligentCommandProcessor) executeLinuxCommand(conn *websocket.Conn, classification IntelligentCommandClassification, projectID string) {
 	log.Printf("🐧 Executing Linux command: %s", classification.Command)
 
 	// Execute command in container
@@ -395,7 +396,7 @@ func (icp *IntelligentCommandProcessor) executeLinuxCommand(conn *websocket.Conn
 }
 
 // executePythonWithGUI executes Python commands that require GUI display
-func (icp *IntelligentCommandProcessor) executePythonWithGUI(conn *websocket.Conn, classification CommandClassification, projectID string) {
+func (icp *IntelligentCommandProcessor) executePythonWithGUI(conn *websocket.Conn, classification IntelligentCommandClassification, projectID string) {
 	log.Printf("🐍 Executing Python with GUI: %s", classification.Command)
 
 	// Set up port forwarding for GUI display
@@ -412,7 +413,8 @@ func (icp *IntelligentCommandProcessor) executePythonWithGUI(conn *websocket.Con
 	}
 
 	// Check for matplotlib output
-	icp.matplotlibDetector.CheckForMatplotlibOutput(output, projectID)
+	// TODO: Implement CheckForMatplotlibOutput method or use alternative
+	// icp.matplotlibDetector.CheckForMatplotlibOutput(output, projectID)
 
 	// Send response with preview information
 	response := map[string]interface{}{
@@ -430,7 +432,7 @@ func (icp *IntelligentCommandProcessor) executePythonWithGUI(conn *websocket.Con
 }
 
 // executeFile executes file-based commands
-func (icp *IntelligentCommandProcessor) executeFile(conn *websocket.Conn, classification CommandClassification, projectID string) {
+func (icp *IntelligentCommandProcessor) executeFile(conn *websocket.Conn, classification IntelligentCommandClassification, projectID string) {
 	log.Printf("📄 Executing file: %s", classification.Command)
 
 	// Set up port if needed
@@ -461,7 +463,7 @@ func (icp *IntelligentCommandProcessor) executeFile(conn *websocket.Conn, classi
 }
 
 // executeWebApp executes web application commands
-func (icp *IntelligentCommandProcessor) executeWebApp(conn *websocket.Conn, classification CommandClassification, projectID string) {
+func (icp *IntelligentCommandProcessor) executeWebApp(conn *websocket.Conn, classification IntelligentCommandClassification, projectID string) {
 	log.Printf("🌐 Starting web application: %s", classification.Command)
 
 	// Set up port forwarding
@@ -490,7 +492,7 @@ func (icp *IntelligentCommandProcessor) executeWebApp(conn *websocket.Conn, clas
 }
 
 // routeToClaudeCodeCLI routes complex commands to Claude Code CLI
-func (icp *IntelligentCommandProcessor) routeToClaudeCodeCLI(conn *websocket.Conn, classification CommandClassification, projectID string) {
+func (icp *IntelligentCommandProcessor) routeToClaudeCodeCLI(conn *websocket.Conn, classification IntelligentCommandClassification, projectID string) {
 	log.Printf("🤖 Routing to Claude Code CLI: %s", classification.Command)
 
 	// Send to Claude Code CLI processing

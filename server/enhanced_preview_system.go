@@ -1,16 +1,16 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
+	// "context"
+	// "encoding/json"
 	"fmt"
-	"io/ioutil"
+	// "io/ioutil"
 	"net/http"
-	"os"
-	"os/exec"
-	"path/filepath"
+	// "os"
+	// "os/exec"
+	// "path/filepath"
 	"regexp"
-	"strconv"
+	// "strconv"
 	"strings"
 	"time"
 )
@@ -534,10 +534,10 @@ func (eps *EnhancedPreviewSystem) retuneModel() {
 			if matched {
 				if feedback.IsCorrect && feedback.UserRating >= 4.0 {
 					// 正確な予測だった場合、信頼度を向上
-					eps.tuningModel.DetectionRules[i].Confidence = min(rule.Confidence+0.02, 1.0)
+					eps.tuningModel.DetectionRules[i].Confidence = minf(rule.Confidence+0.02, 1.0)
 				} else if !feedback.IsCorrect {
 					// 不正確な予測だった場合、信頼度を低下
-					eps.tuningModel.DetectionRules[i].Confidence = max(rule.Confidence-0.05, 0.1)
+					eps.tuningModel.DetectionRules[i].Confidence = maxf(rule.Confidence-0.05, 0.1)
 				}
 			}
 		}
@@ -642,16 +642,4 @@ func (eps *EnhancedPreviewSystem) calculateAverageConfidence() float64 {
 	return total / float64(len(eps.tuningModel.DetectionRules))
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
+// min and max functions moved to common_utils.go

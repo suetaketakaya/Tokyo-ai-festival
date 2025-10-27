@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"context"
+	// "context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -47,7 +47,7 @@ type TrainingExample struct {
 // Claude Code リクエスト構造体
 type ClaudeCodeRequest struct {
 	Task        string                 `json:"task"`
-	Context     map[string]interface{} `json:"context"`
+	Context     map[string]interface{} `json:// "context"`
 	Priority    string                 `json:"priority"`
 	ProjectInfo map[string]string      `json:"project_info"`
 	History     []string               `json:"history"`
@@ -138,7 +138,7 @@ func (cci *ClaudeCodeIntegration) calculateComplexityScore(command string) float
 		score += 0.3
 	}
 
-	return min(score, 1.0)
+	return minf(score, 1.0)
 }
 
 // チューニングモデルでの評価
@@ -575,16 +575,4 @@ func (cci *ClaudeCodeIntegration) AdjustPreviewAccuracy(feedback map[string]inte
 	}
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
+// min and max functions moved to common_utils.go

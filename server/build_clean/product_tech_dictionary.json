@@ -1,0 +1,220 @@
+{
+  "web_app": {
+    "collaboration": [
+      "Slack", "Discord", "Microsoft Teams", "Zoom", "Google Meet",
+      "Webex", "GoToMeeting", "Skype", "Mattermost", "Rocket.Chat"
+    ],
+    "project_management": [
+      "Jira", "Trello", "Asana", "Monday.com", "ClickUp", "Linear",
+      "Basecamp", "Wrike", "Smartsheet", "Airtable", "Height"
+    ],
+    "documentation": [
+      "Notion", "Confluence", "Obsidian", "Roam Research", "Coda",
+      "GitBook", "Docusaurus", "ReadTheDocs", "Sphinx"
+    ],
+    "social": [
+      "Twitter", "Facebook", "Instagram", "LinkedIn", "Reddit",
+      "TikTok", "Pinterest", "Snapchat", "Mastodon", "Bluesky"
+    ],
+    "ecommerce": [
+      "Shopify", "WooCommerce", "Magento", "BigCommerce",
+      "PrestaShop", "Wix", "Squarespace"
+    ],
+    "streaming": [
+      "Netflix", "Spotify", "YouTube", "Twitch", "SoundCloud",
+      "Hulu", "Disney+", "Prime Video", "Apple Music"
+    ],
+    "design": [
+      "Figma", "Miro", "Canva", "Adobe XD", "InVision",
+      "Sketch", "Framer", "Penpot", "Excalidraw"
+    ]
+  },
+  "api": {
+    "payment": [
+      "Stripe", "PayPal", "Square", "Braintree", "Adyen",
+      "Razorpay", "Paddle", "Mollie", "Checkout.com"
+    ],
+    "communication": [
+      "Twilio", "SendGrid", "Mailgun", "Postmark", "Vonage",
+      "MessageBird", "Plivo", "Nexmo", "Amazon SES"
+    ],
+    "cloud": [
+      "AWS", "Google Cloud", "Azure", "Heroku", "Vercel",
+      "Netlify", "DigitalOcean", "Linode", "Fly.io", "Railway"
+    ],
+    "ai": [
+      "OpenAI", "Anthropic", "Cohere", "AI21", "Replicate",
+      "Hugging Face", "Stability AI", "Google Vertex AI"
+    ],
+    "maps": [
+      "Google Maps", "Mapbox", "HERE", "TomTom", "OpenStreetMap"
+    ],
+    "auth": [
+      "Auth0", "Okta", "Firebase Auth", "Supabase Auth",
+      "Clerk", "Magic", "NextAuth", "Keycloak"
+    ],
+    "search": [
+      "Algolia", "Elasticsearch", "Meilisearch", "Typesense",
+      "Amazon CloudSearch", "Azure Search"
+    ]
+  },
+  "machine_learning": {
+    "frameworks": [
+      "TensorFlow", "PyTorch", "Keras", "JAX", "MXNet",
+      "scikit-learn", "XGBoost", "LightGBM", "CatBoost"
+    ],
+    "platforms": [
+      "Hugging Face", "Kaggle", "Google Colab", "Paperspace",
+      "Weights & Biases", "MLflow", "Neptune.ai", "Comet.ml"
+    ],
+    "deployment": [
+      "TensorFlow Serving", "TorchServe", "ONNX",
+      "BentoML", "Seldon", "KServe", "Ray Serve"
+    ],
+    "nlp": [
+      "spaCy", "NLTK", "Transformers", "Gensim",
+      "Stanford NLP", "AllenNLP", "Flair"
+    ]
+  },
+  "visualization": {
+    "bi_tools": [
+      "Tableau", "Power BI", "Looker", "Metabase", "Redash",
+      "Apache Superset", "Google Data Studio", "Qlik"
+    ],
+    "monitoring": [
+      "Grafana", "Kibana", "Datadog", "New Relic", "Splunk",
+      "Prometheus", "AppDynamics", "Dynatrace"
+    ],
+    "libraries": [
+      "D3.js", "Chart.js", "Plotly", "Highcharts", "ECharts",
+      "Matplotlib", "Seaborn", "Bokeh", "Altair", "Vega"
+    ]
+  },
+  "data_analysis": {
+    "processing": [
+      "Pandas", "NumPy", "Polars", "Dask", "Vaex",
+      "Apache Spark", "Apache Flink", "Ray", "Modin"
+    ],
+    "warehouses": [
+      "Snowflake", "BigQuery", "Redshift", "Athena", "Databricks",
+      "Azure Synapse", "ClickHouse", "Firebolt"
+    ],
+    "notebooks": [
+      "Jupyter", "JupyterLab", "Google Colab", "Kaggle Notebooks",
+      "Deepnote", "Hex", "Observable", "Zeppelin"
+    ],
+    "etl": [
+      "Apache Airflow", "Prefect", "Dagster", "Luigi",
+      "dbt", "Fivetran", "Airbyte", "Stitch"
+    ]
+  },
+  "docker": {
+    "container": [
+      "Docker", "Podman", "containerd", "CRI-O", "LXC"
+    ],
+    "orchestration": [
+      "Kubernetes", "Docker Swarm", "Nomad", "Rancher",
+      "OpenShift", "Amazon ECS", "Google GKE", "Azure AKS"
+    ],
+    "tools": [
+      "Docker Compose", "Helm", "Kustomize", "Skaffold",
+      "Tilt", "DevSpace", "Telepresence"
+    ],
+    "registry": [
+      "Docker Hub", "GitHub Container Registry", "Amazon ECR",
+      "Google GCR", "Azure ACR", "Harbor", "Quay.io"
+    ]
+  },
+  "network": {
+    "cdn": [
+      "Cloudflare", "Akamai", "Fastly", "Amazon CloudFront",
+      "Azure CDN", "Google Cloud CDN", "StackPath"
+    ],
+    "proxy": [
+      "nginx", "Apache", "HAProxy", "Traefik", "Caddy",
+      "Envoy", "Kong", "Istio", "Linkerd"
+    ],
+    "tools": [
+      "Wireshark", "tcpdump", "nmap", "Postman", "Insomnia",
+      "cURL", "HTTPie", "netcat", "dig", "traceroute"
+    ]
+  },
+  "general": {
+    "editors": [
+      "VS Code", "IntelliJ IDEA", "PyCharm", "WebStorm",
+      "Sublime Text", "Atom", "Vim", "Emacs", "Neovim"
+    ],
+    "vcs": [
+      "Git", "GitHub", "GitLab", "Bitbucket", "Azure DevOps",
+      "Gitea", "Mercurial", "SVN", "Perforce"
+    ],
+    "ci_cd": [
+      "Jenkins", "CircleCI", "Travis CI", "GitHub Actions",
+      "GitLab CI", "Bamboo", "TeamCity", "Drone"
+    ],
+    "iac": [
+      "Terraform", "Ansible", "Puppet", "Chef", "SaltStack",
+      "Pulumi", "CloudFormation", "ARM Templates"
+    ]
+  },
+  "keywords": {
+    "web_app": [
+      "リアルタイム", "チャット", "メッセージング", "コラボレーション",
+      "プロジェクト管理", "タスク", "カンバン", "ダッシュボード",
+      "SNS", "投稿", "いいね", "コメント", "フォロー",
+      "Eコマース", "カート", "決済", "注文", "在庫",
+      "ストリーミング", "動画", "音楽", "配信",
+      "ドキュメント", "エディタ", "共同編集", "バージョン管理"
+    ],
+    "api": [
+      "REST", "RESTful", "GraphQL", "gRPC", "WebSocket",
+      "OAuth", "JWT", "認証", "API Key", "トークン",
+      "Webhook", "イベント", "サブスクリプション",
+      "レート制限", "スロットリング", "ペイロード",
+      "エンドポイント", "リクエスト", "レスポンス"
+    ],
+    "machine_learning": [
+      "モデル", "訓練", "学習", "推論", "予測",
+      "分類", "回帰", "クラスタリング", "異常検知",
+      "CNN", "RNN", "LSTM", "Transformer", "BERT",
+      "ニューラルネットワーク", "ディープラーニング",
+      "特徴量", "ハイパーパラメータ", "過学習",
+      "ファインチューニング", "転移学習", "強化学習"
+    ],
+    "visualization": [
+      "グラフ", "チャート", "可視化", "ダッシュボード",
+      "折れ線", "棒", "円", "散布図", "ヒートマップ",
+      "BI", "ビジネスインテリジェンス", "レポート",
+      "監視", "メトリクス", "ログ", "トレース",
+      "アラート", "通知", "しきい値"
+    ],
+    "data_analysis": [
+      "データ", "分析", "集計", "統計", "SQL",
+      "DataFrame", "クエリ", "ETL", "パイプライン",
+      "クレンジング", "変換", "正規化", "結合",
+      "ウェアハウス", "データレイク", "データマート",
+      "バッチ処理", "ストリーム処理", "リアルタイム"
+    ],
+    "docker": [
+      "コンテナ", "イメージ", "Dockerfile", "ビルド",
+      "オーケストレーション", "ポッド", "デプロイ",
+      "スケーリング", "ローリングアップデート",
+      "マイクロサービス", "サービスメッシュ",
+      "レジストリ", "プッシュ", "プル"
+    ],
+    "network": [
+      "CDN", "キャッシュ", "エッジ", "配信",
+      "ロードバランサー", "プロキシ", "リバースプロキシ",
+      "SSL", "TLS", "証明書", "HTTPS",
+      "トラフィック", "帯域", "レイテンシ", "遅延",
+      "DDoS", "ファイアウォール", "セキュリティ"
+    ],
+    "general": [
+      "自動化", "スクリプト", "ツール", "プラグイン",
+      "設定", "環境", "ビルド", "テスト", "デバッグ",
+      "バージョン管理", "ブランチ", "マージ", "コミット",
+      "CI/CD", "パイプライン", "デプロイ", "リリース",
+      "Infrastructure as Code", "プロビジョニング"
+    ]
+  }
+}

@@ -424,7 +424,7 @@ export default function ProjectListScreen({ navigation, route }: Props) {
                 <TouchableOpacity
                   style={styles.manageButton}
                   onPress={() => navigation.navigate('ProjectManagement', {
-                    serverUrl: route.params.serverUrl,
+                    serverUrl: connectionUrl || '',
                     projectId: project.id,
                     projectName: project.name,
                   })}

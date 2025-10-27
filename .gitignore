@@ -52,3 +52,33 @@ qr-code.png
 
 # Post form data
 /postform/
+
+# Installer built packages (large binary files)
+installer/dist-packages/
+*.exe
+*.AppImage
+*.snap
+
+# Backup files
+*.bak
+*.bak2
+*.bak3
+*.bak4
+*.bak5
+*.bak6
+*.bak7
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# ML model files (large binary files)
+*.pkl
+*.joblib
+
+# Large JSON training data
+*training_data*.json
+*test_data*.json
+*evaluation*.json
+*_data_*.json

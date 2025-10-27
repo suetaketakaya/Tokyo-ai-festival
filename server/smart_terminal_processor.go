@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bufio"
-	"context"
+	// "bufio"
+	// "context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -33,19 +33,19 @@ type ProcessManager struct {
 }
 
 // CommandType represents the type of command
-type CommandType int
+type TerminalCommandType int
 
 const (
-	SystemCommand CommandType = iota  // ls, pwd, cd, etc.
-	PythonCode                        // Python execution
-	FileExecution                     // Script/binary execution
-	ClaudeCodeTask                    // Complex development task
-	PreviewRequired                   // GUI/Web preview needed
+	SystemCommand TerminalCommandType = iota  // ls, pwd, cd, etc.
+	PythonCode                                // Python execution
+	TerminalFileExecution                     // Script/binary execution
+	ClaudeCodeTask                            // Complex development task
+	PreviewRequired                           // GUI/Web preview needed
 )
 
 // CommandContext contains command execution context
 type CommandContext struct {
-	Type        CommandType
+	Type        TerminalCommandType
 	Command     string
 	Args        []string
 	WorkingDir  string
@@ -103,7 +103,7 @@ func (stp *SmartTerminalProcessor) AnalyzeCommand(input string) *CommandContext 
 
 	// Priority 3: File execution
 	if stp.isFileExecution(input) {
-		ctx.Type = FileExecution
+		ctx.Type = TerminalFileExecution
 		ctx.RequiresPreview = stp.detectPreviewNeed(input)
 		if ctx.RequiresPreview {
 			ctx.Port = stp.previewPort
@@ -264,13 +264,13 @@ func (stp *SmartTerminalProcessor) detectPreviewNeed(input string) bool {
 }
 
 // ExecuteCommand executes the command based on its type
-func (stp *SmartTerminalProcessor) ExecuteCommand(ctx *CommandContext) (*ExecutionResult, error) {
+func (stp *SmartTerminalProcessor) ExecuteCommand(ctx *CommandContext) (*TerminalExecutionResult, error) {
 	switch ctx.Type {
 	case SystemCommand:
 		return stp.executeSystemCommand(ctx)
 	case PythonCode:
 		return stp.executePythonCode(ctx)
-	case FileExecution:
+	case TerminalFileExecution:
 		return stp.executeFile(ctx)
 	case ClaudeCodeTask:
 		return stp.handleClaudeCodeTask(ctx)
@@ -280,7 +280,7 @@ func (stp *SmartTerminalProcessor) ExecuteCommand(ctx *CommandContext) (*Executi
 }
 
 // ExecutionResult contains command execution results
-type ExecutionResult struct {
+type TerminalExecutionResult struct {
 	Output          string
 	Error           string
 	ExitCode        int
@@ -291,7 +291,7 @@ type ExecutionResult struct {
 }
 
 // executeSystemCommand executes basic Linux commands
-func (stp *SmartTerminalProcessor) executeSystemCommand(ctx *CommandContext) (*ExecutionResult, error) {
+func (stp *SmartTerminalProcessor) executeSystemCommand(ctx *CommandContext) (*TerminalExecutionResult, error) {
 	start := time.Now()
 
 	// Handle cd command specially
@@ -311,7 +311,7 @@ func (stp *SmartTerminalProcessor) executeSystemCommand(ctx *CommandContext) (*E
 
 	output, err := cmd.CombinedOutput()
 
-	result := &ExecutionResult{
+	result := &TerminalExecutionResult{
 		Output:   string(output),
 		Duration: time.Since(start),
 	}
@@ -327,7 +327,7 @@ func (stp *SmartTerminalProcessor) executeSystemCommand(ctx *CommandContext) (*E
 }
 
 // handleCdCommand handles directory changes
-func (stp *SmartTerminalProcessor) handleCdCommand(ctx *CommandContext) (*ExecutionResult, error) {
+func (stp *SmartTerminalProcessor) handleCdCommand(ctx *CommandContext) (*TerminalExecutionResult, error) {
 	parts := strings.Fields(ctx.Command)
 	var targetDir string
 
@@ -346,7 +346,7 @@ func (stp *SmartTerminalProcessor) handleCdCommand(ctx *CommandContext) (*Execut
 
 	// Check if directory exists
 	if _, err := os.Stat(targetDir); os.IsNotExist(err) {
-		return &ExecutionResult{
+		return &TerminalExecutionResult{
 			Error:    fmt.Sprintf("cd: %s: No such file or directory", targetDir),
 			ExitCode: 1,
 		}, nil
@@ -355,13 +355,13 @@ func (stp *SmartTerminalProcessor) handleCdCommand(ctx *CommandContext) (*Execut
 	// Update current directory
 	stp.currentDir = targetDir
 
-	return &ExecutionResult{
+	return &TerminalExecutionResult{
 		Output: fmt.Sprintf("Changed directory to: %s", targetDir),
 	}, nil
 }
 
 // executePythonCode executes Python code with preview support
-func (stp *SmartTerminalProcessor) executePythonCode(ctx *CommandContext) (*ExecutionResult, error) {
+func (stp *SmartTerminalProcessor) executePythonCode(ctx *CommandContext) (*TerminalExecutionResult, error) {
 	start := time.Now()
 
 	// Prepare Python execution environment
@@ -380,7 +380,7 @@ func (stp *SmartTerminalProcessor) executePythonCode(ctx *CommandContext) (*Exec
 	// Execute
 	output, err := cmd.CombinedOutput()
 
-	result := &ExecutionResult{
+	result := &TerminalExecutionResult{
 		Output:          string(output),
 		Duration:        time.Since(start),
 		RequiresPreview: ctx.RequiresPreview,
@@ -463,7 +463,7 @@ except Exception as e:
 }
 
 // executeFile executes files with preview support
-func (stp *SmartTerminalProcessor) executeFile(ctx *CommandContext) (*ExecutionResult, error) {
+func (stp *SmartTerminalProcessor) executeFile(ctx *CommandContext) (*TerminalExecutionResult, error) {
 	start := time.Now()
 
 	cmd := exec.Command("bash", "-c", ctx.Command)
@@ -473,7 +473,7 @@ func (stp *SmartTerminalProcessor) executeFile(ctx *CommandContext) (*ExecutionR
 		// For web servers, run in background
 		err := cmd.Start()
 		if err != nil {
-			return &ExecutionResult{
+			return &TerminalExecutionResult{
 				Error: err.Error(),
 			}, err
 		}
@@ -487,7 +487,7 @@ func (stp *SmartTerminalProcessor) executeFile(ctx *CommandContext) (*ExecutionR
 		// Give server time to start
 		time.Sleep(2 * time.Second)
 
-		return &ExecutionResult{
+		return &TerminalExecutionResult{
 			Output:          fmt.Sprintf("Server started with PID: %d", cmd.Process.Pid),
 			Duration:        time.Since(start),
 			RequiresPreview: true,
@@ -499,7 +499,7 @@ func (stp *SmartTerminalProcessor) executeFile(ctx *CommandContext) (*ExecutionR
 	// Regular execution
 	output, err := cmd.CombinedOutput()
 
-	result := &ExecutionResult{
+	result := &TerminalExecutionResult{
 		Output:   string(output),
 		Duration: time.Since(start),
 	}
@@ -515,9 +515,9 @@ func (stp *SmartTerminalProcessor) executeFile(ctx *CommandContext) (*ExecutionR
 }
 
 // handleClaudeCodeTask handles complex development tasks
-func (stp *SmartTerminalProcessor) handleClaudeCodeTask(ctx *CommandContext) (*ExecutionResult, error) {
+func (stp *SmartTerminalProcessor) handleClaudeCodeTask(ctx *CommandContext) (*TerminalExecutionResult, error) {
 	// This will be handled by the main Claude Code integration
-	return &ExecutionResult{
+	return &TerminalExecutionResult{
 		Output: fmt.Sprintf("Complex task identified: %s", ctx.Command),
 		RequiresPreview: false,
 	}, nil
@@ -571,7 +571,7 @@ func (stp *SmartTerminalProcessor) GetTabCompletion(partial string) []string {
 
 	// History-based completion
 	for _, histCmd := range stp.GetHistory() {
-		if strings.HasPrefix(histCmd, partial) && !contains(suggestions, histCmd) {
+		if strings.HasPrefix(histCmd, partial) && !containsString(suggestions, histCmd) {
 			suggestions = append(suggestions, histCmd)
 		}
 	}
@@ -610,7 +610,7 @@ func (stp *SmartTerminalProcessor) getFileCompletions(partial string) []string {
 }
 
 // Helper function to check if slice contains string
-func contains(slice []string, item string) bool {
+func containsString(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {
 			return true

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -49,7 +50,7 @@ func (s *Server) handleClaudeCodeCLIAnalyze(conn *websocket.Conn, msg map[string
 			"filtered_buttons": len(finalButtons),
 			"categories":       s.getButtonCategories(finalButtons),
 		},
-		"timestamp": s.getCurrentTimestamp(),
+		"timestamp": time.Now().Unix(),
 	}
 
 	if err := conn.WriteJSON(response); err != nil {
@@ -91,7 +92,7 @@ func (s *Server) handleAutoButtonExecute(conn *websocket.Conn, msg map[string]in
 		"project_id": projectID,
 		"button_id":  buttonID,
 		"result":     result,
-		"timestamp":  s.getCurrentTimestamp(),
+		"timestamp":  time.Now().Unix(),
 	}
 
 	if err := conn.WriteJSON(response); err != nil {
@@ -196,8 +197,8 @@ func (s *Server) storeGeneratedButtons(projectID string, buttons []*GeneratedBut
 		session = &ConversationSession{
 			ProjectID:      projectID,
 			MessageHistory: make([]ConversationMessage, 0),
-			CreatedAt:      s.getCurrentTime(),
-			LastActivity:   s.getCurrentTime(),
+			CreatedAt:      time.Now(),
+			LastActivity:   time.Now(),
 			Context:        make(map[string]string),
 		}
 		s.sessions[projectID] = session
@@ -206,7 +207,7 @@ func (s *Server) storeGeneratedButtons(projectID string, buttons []*GeneratedBut
 	// Store buttons in session context
 	buttonData, _ := json.Marshal(buttons)
 	session.Context["generated_buttons"] = string(buttonData)
-	session.LastActivity = s.getCurrentTime()
+	session.LastActivity = time.Now()
 
 	log.Printf("💾 Stored %d generated buttons for project %s", len(buttons), projectID)
 }

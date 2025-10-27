@@ -1,0 +1,112 @@
+{
+  "name": "remoteclaude-installer",
+  "version": "4.0.0-beta.1",
+  "description": "RemoteClaude クロスプラットフォーム GUI インストーラー",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "build:win": "electron-builder --win",
+    "build:all": "electron-builder -mwl"
+  },
+  "keywords": [
+    "remoteclaude",
+    "installer",
+    "electron",
+    "anthropic",
+    "claude"
+  ],
+  "author": {
+    "name": "RemoteClaude Team",
+    "email": "support@remoteclaude.dev"
+  },
+  "homepage": "https://github.com/remoteclaude/remoteclaude",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.3"
+  },
+  "build": {
+    "appId": "com.remoteclaude.installer",
+    "productName": "RemoteClaude",
+    "directories": {
+      "output": "dist-packages"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/**/*",
+      "assets/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../server/remoteclaude-server-matplotlib-mgmt",
+        "to": "server/remoteclaude-server",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "darkModeSupport": true,
+      "identity": null
+    },
+    "dmg": {
+      "title": "RemoteClaude ${version}",
+      "window": {
+        "width": 540,
+        "height": 380
+      }
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "tar.gz",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "category": "Development",
+      "icon": "assets/icon.png",
+      "synopsis": "RemoteClaude - iPhone から Claude を遠隔操作",
+      "description": "RemoteClaude は、iPhoneからClaudeを遠隔操作できる革新的なプラットフォームです。",
+      "maintainer": "RemoteClaude Team <support@remoteclaude.dev>",
+      "vendor": "RemoteClaude"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "RemoteClaude"
+    }
+  }
+}

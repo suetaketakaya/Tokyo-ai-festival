@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	// "bufio"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -684,7 +684,8 @@ func InitializeErrorCorrectionAgent(server *Server) {
 	agent.SetDebugMode(true)
 
 	// Attach to server for WebSocket communication
-	server.ErrorAgent = agent
+	// TODO: Add ErrorAgent field to Server struct
+	// server.ErrorAgent = agent
 
 	log.Println("✅ Error Correction Agent initialized successfully")
 }

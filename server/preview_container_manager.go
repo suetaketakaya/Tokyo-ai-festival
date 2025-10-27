@@ -2,19 +2,13 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
-	"os"
-	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
+// 	"github.com/docker/docker/api/types"
+	containertypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
@@ -117,9 +111,9 @@ func (pcm *PreviewContainerManager) LaunchPreviewContainer(config PreviewConfig)
 	}
 
 	// Start container
-	if err := pcm.client.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{}); err != nil {
+	if err := pcm.client.ContainerStart(context.Background(), resp.ID, containertypes.StartOptions{}); err != nil {
 		// Cleanup on failure
-		pcm.client.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{Force: true})
+		pcm.client.ContainerRemove(context.Background(), resp.ID, containertypes.RemoveOptions{Force: true})
 		return nil, fmt.Errorf("failed to start container: %v", err)
 	}
 
@@ -143,20 +137,20 @@ func (pcm *PreviewContainerManager) LaunchPreviewContainer(config PreviewConfig)
 
 // generateContainerConfig generates Docker container configuration based on preview type
 func (pcm *PreviewContainerManager) generateContainerConfig(config PreviewConfig, port int) (
-	*container.Config, *container.HostConfig, *network.NetworkingConfig, error) {
+	*containertypes.Config, *containertypes.HostConfig, *network.NetworkingConfig, error) {
 
 	// Base configuration
-	containerConfig := &container.Config{
+	containerConfig := &containertypes.Config{
 		Image:        config.BaseImage,
 		ExposedPorts: nat.PortSet{},
 		Env:          []string{},
 		WorkingDir:   "/workspace",
 	}
 
-	hostConfig := &container.HostConfig{
+	hostConfig := &containertypes.HostConfig{
 		PortBindings: nat.PortMap{},
 		AutoRemove:   false, // We manage removal ourselves
-		Resources: container.Resources{
+		Resources: containertypes.Resources{
 			Memory:   512 * 1024 * 1024, // 512MB limit
 			NanoCPUs: 1000000000,        // 1 CPU limit
 		},
@@ -196,7 +190,7 @@ func (pcm *PreviewContainerManager) generateContainerConfig(config PreviewConfig
 	return containerConfig, hostConfig, networkConfig, nil
 }
 
-func (pcm *PreviewContainerManager) configureWebApp(containerConfig *container.Config, hostConfig *container.HostConfig, port int) {
+func (pcm *PreviewContainerManager) configureWebApp(containerConfig *containertypes.Config, hostConfig *containertypes.HostConfig, port int) {
 	// Default web application configuration
 	if containerConfig.Image == "" {
 		containerConfig.Image = "nginx:alpine"
@@ -218,7 +212,7 @@ func (pcm *PreviewContainerManager) configureWebApp(containerConfig *container.C
 	)
 }
 
-func (pcm *PreviewContainerManager) configureMatplotlib(containerConfig *container.Config, hostConfig *container.HostConfig, port int) {
+func (pcm *PreviewContainerManager) configureMatplotlib(containerConfig *containertypes.Config, hostConfig *containertypes.HostConfig, port int) {
 	// Matplotlib/Data visualization configuration
 	if containerConfig.Image == "" {
 		containerConfig.Image = "python:3.9-slim"
@@ -267,7 +261,7 @@ with socketserver.TCPServer(('', PORT), Handler) as httpd:
 	}
 }
 
-func (pcm *PreviewContainerManager) configureJupyter(containerConfig *container.Config, hostConfig *container.HostConfig, port int) {
+func (pcm *PreviewContainerManager) configureJupyter(containerConfig *containertypes.Config, hostConfig *containertypes.HostConfig, port int) {
 	// Jupyter Notebook configuration
 	if containerConfig.Image == "" {
 		containerConfig.Image = "jupyter/datascience-notebook:latest"
@@ -298,7 +292,7 @@ func (pcm *PreviewContainerManager) configureJupyter(containerConfig *container.
 	)
 }
 
-func (pcm *PreviewContainerManager) configureGUIApp(containerConfig *container.Config, hostConfig *container.HostConfig, port int) {
+func (pcm *PreviewContainerManager) configureGUIApp(containerConfig *containertypes.Config, hostConfig *containertypes.HostConfig, port int) {
 	// GUI Application configuration (VNC-based)
 	if containerConfig.Image == "" {
 		containerConfig.Image = "dorowu/ubuntu-desktop-lxde-vnc:latest"
@@ -319,7 +313,7 @@ func (pcm *PreviewContainerManager) configureGUIApp(containerConfig *container.C
 	)
 }
 
-func (pcm *PreviewContainerManager) configureDataAnalysis(containerConfig *container.Config, hostConfig *container.HostConfig, port int) {
+func (pcm *PreviewContainerManager) configureDataAnalysis(containerConfig *containertypes.Config, hostConfig *containertypes.HostConfig, port int) {
 	// Data Analysis environment
 	if containerConfig.Image == "" {
 		containerConfig.Image = "jupyter/scipy-notebook:latest"
@@ -385,14 +379,14 @@ func (pcm *PreviewContainerManager) StopContainer(containerID string) error {
 	}
 
 	// Stop and remove container
-	timeout := 10 * time.Second
-	if err := pcm.client.ContainerStop(context.Background(), containerID, &timeout); err != nil {
+	timeout := 10
+	stopOpts := containertypes.StopOptions{Timeout: &timeout}
+	if err := pcm.client.ContainerStop(context.Background(), containerID, stopOpts); err != nil {
 		log.Printf("Warning: failed to stop container %s: %v", containerID, err)
 	}
 
-	if err := pcm.client.ContainerRemove(context.Background(), containerID, types.ContainerRemoveOptions{
-		Force: true,
-	}); err != nil {
+	removeOpts := containertypes.RemoveOptions{Force: true}
+	if err := pcm.client.ContainerRemove(context.Background(), containerID, removeOpts); err != nil {
 		log.Printf("Warning: failed to remove container %s: %v", containerID, err)
 	}
 
@@ -428,15 +422,17 @@ func (pcm *PreviewContainerManager) cleanupExpiredContainers() {
 	}
 
 	for _, id := range expiredContainers {
-		container := pcm.containers[id]
+		cont := pcm.containers[id]
 
 		// Stop and remove container
-		timeout := 5 * time.Second
-		pcm.client.ContainerStop(context.Background(), id, &timeout)
-		pcm.client.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{Force: true})
+		timeout := 5
+		stopOpts := containertypes.StopOptions{Timeout: &timeout}
+		removeOpts := containertypes.RemoveOptions{Force: true}
+		pcm.client.ContainerStop(context.Background(), id, stopOpts)
+		pcm.client.ContainerRemove(context.Background(), id, removeOpts)
 
 		delete(pcm.containers, id)
-		log.Printf("🧹 Cleaned up expired preview container: %s (Type: %s)", id[:12], container.Type)
+		log.Printf("🧹 Cleaned up expired preview container: %s (Type: %s)", id[:12], cont.Type)
 	}
 }
 

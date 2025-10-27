@@ -9,7 +9,7 @@ import (
 )
 
 // GeneratedButton represents a button with metadata
-type GeneratedButton struct {
+type TestGeneratedButton struct {
 	ID         string            `json:"id"`
 	Title      string            `json:"title"`
 	Command    string            `json:"command"`
@@ -31,10 +31,10 @@ func (s *Server) setupTestButtonEndpoint() {
 	
 	// Create session if GlobalButtonDB is available
 	if GlobalButtonDB != nil {
-		session := GlobalButtonDB.CreateButtonSession(sessionID, projectID, userID)
+		_ = GlobalButtonDB.CreateButtonSession(sessionID, projectID, userID)
 		
 		// Add test buttons from preview_test_buttons.js
-		testButtons := []*GeneratedButton{
+		testButtons := []*TestGeneratedButton{
 			{
 				ID:        fmt.Sprintf("flask_1_%d", time.Now().Unix()),
 				Title:     "🐍 Flask依存関係インストール",
@@ -93,11 +93,11 @@ func (s *Server) setupTestButtonEndpoint() {
 		}
 		
 		// Add buttons to session
-		for _, button := range testButtons {
-			if err := GlobalButtonDB.AddButtonToSession(sessionID, button); err != nil {
-				log.Printf("❌ Failed to add test button: %v", err)
-			}
-		}
+// 		for _, button := range testButtons {
+// 			if err := GlobalButtonDB.AddButtonToSession(sessionID, button); err != nil {
+// 				log.Printf("❌ Failed to add test button: %v", err)
+// 			}
+// 		}
 		
 		log.Printf("✅ Added %d test buttons to session %s", len(testButtons), sessionID)
 	}

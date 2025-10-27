@@ -46,7 +46,7 @@ type ProgressData struct {
 }
 
 // ExecutionResult holds the final result
-type ExecutionResult struct {
+type StagedExecutionResult struct {
 	Success      bool        `json:"success"`
 	Output       string      `json:"output"`
 	ErrorMessage string      `json:"error,omitempty"`
@@ -73,7 +73,7 @@ func NewStagedExecutor(projectID string, wsConn *websocket.Conn) *StagedExecutor
 }
 
 // ExecuteStaged performs staged execution with progress updates
-func (se *StagedExecutor) ExecuteStaged(command string) (*ExecutionResult, error) {
+func (se *StagedExecutor) ExecuteStaged(command string) (*StagedExecutionResult, error) {
 	defer se.cancel()
 
 	log.Printf("🚀 Starting staged execution for project %s", se.projectID)
@@ -130,7 +130,7 @@ func (se *StagedExecutor) ExecuteStaged(command string) (*ExecutionResult, error
 		return nil, err
 	}
 
-	result := &ExecutionResult{
+	result := &StagedExecutionResult{
 		Success:      true,
 		Output:       executionResult.Output,
 		FilesCreated: executionResult.FilesCreated,
@@ -191,7 +191,7 @@ func (se *StagedExecutor) sendCodeGenerated(code GeneratedCode) {
 }
 
 // sendFinalResult sends the final execution result
-func (se *StagedExecutor) sendFinalResult(result *ExecutionResult) {
+func (se *StagedExecutor) sendFinalResult(result *StagedExecutionResult) {
 	resultMsg := map[string]interface{}{
 		"type": "execution_completed",
 		"data": result,

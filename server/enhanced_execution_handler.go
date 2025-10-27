@@ -1,8 +1,8 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
+	// "context"
+	// "encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
+	// "strconv"
 	"strings"
 	"time"
 )
@@ -21,12 +21,7 @@ type EnhancedExecutionHandler struct {
 	wandbIntegrated bool
 }
 
-type CommandClassification struct {
-	Type        string   `json:"type"`        // linux, python, code, webapp, file, claude
-	Priority    string   `json:"priority"`    // immediate, deferred, claude-assisted
-	Suggestions []string `json:"suggestions,omitempty"`
-	Description string   `json:"description,omitempty"`
-}
+// CommandClassification moved to common_utils.go
 
 type ExecutionRequest struct {
 	Type      string `json:"type"`
@@ -42,10 +37,7 @@ type ExecutionResponse struct {
 	Classification *CommandClassification `json:"classification,omitempty"`
 }
 
-type PreviewManager struct {
-	previewPorts []int
-	activeWebApps map[int]string
-}
+// PreviewManager moved to common_utils.go
 
 func NewEnhancedExecutionHandler() *EnhancedExecutionHandler {
 	return &EnhancedExecutionHandler{

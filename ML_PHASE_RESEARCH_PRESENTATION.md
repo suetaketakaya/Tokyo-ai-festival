@@ -1154,3 +1154,108 @@ remoteclaude-ml/
 **最終更新**: 2025年10月4日
 **ドキュメントバージョン**: v1.0
 **発表ステータス**: Draft for Review
+
+```mermaid
+
+  stateDiagram-v2
+      [*] --> Input: 自然言語入力
+
+      state "Phase 1: Claude CLI統合" as Phase1 {
+          [*] --> ClaudeCLI
+          ClaudeCLI --> ParseResponse: JSON解析
+          ParseResponse --> Fallback: エラー時
+          Fallback --> SimulationMode: フォールバック
+          ParseResponse --> ClaudeResult: 成功時
+          SimulationMode --> ClaudeResult
+      }
+
+      state "Phase 2: ML強化予測" as Phase2 {
+          [*] --> FeatureExtraction
+          FeatureExtraction --> TF_IDF: TF-IDFベクトル化<br/>(100次元)
+          FeatureExtraction --> ManualFeatures: 手作り特徴量<br/>(86次元)
+          TF_IDF --> Combine: 特徴量結合
+          ManualFeatures --> Combine
+          Combine --> MLClassifier: RandomForest分類<br/>(8カテゴリ)
+          Combine --> ConfidenceEstimator: GradientBoosting<br/>(信頼度推定)
+          MLClassifier --> MLResult
+          ConfidenceEstimator --> MLResult
+      }
+
+      state "ハイブリッド予測" as Blend {
+          [*] --> CompareResults
+          CompareResults --> Agreed: 予測一致
+          CompareResults --> Disagreed: 予測不一致
+          Agreed --> WeightedAverage: 0.7*ML + 0.3*Claude + 0.05
+          Disagreed --> SelectHighConfidence: 高信頼度側を選択
+          WeightedAverage --> FinalPrediction
+          SelectHighConfidence --> FinalPrediction
+      }
+
+      state "Phase 3: 動的ボタン生成" as Phase3 {
+          [*] --> GetTemplate: カテゴリ別<br/>テンプレート取得
+          GetTemplate --> ContextualAnalysis: コンテキスト分析
+          ContextualAnalysis --> AddContextButtons: 追加ボタン生成
+          AddContextButtons --> AttachMetadata: メタデータ付与
+          AttachMetadata --> SortPriority: 優先度ソート
+          SortPriority --> ButtonsReady
+      }
+
+      state "Phase 4: コード生成" as Phase4 {
+          [*] --> GenerateCode: Claude Code生成
+          GenerateCode --> ValidateCode: コード検証
+          ValidateCode --> CodeReady
+      }
+
+      state "Phase 5: Docker実行" as Phase5 {
+          [*] --> PrepareContainer: コンテナ準備
+          PrepareContainer --> ExecuteCode: コード実行
+          ExecuteCode --> CollectOutput: 出力収集
+          CollectOutput --> ExecutionComplete
+      }
+
+      state "Phase 6: フィードバック収集" as Phase6 {
+          [*] --> UserFeedback: ユーザー評価<br/>(1-5段階)
+          UserFeedback --> SaveFeedback: フィードバック保存
+          SaveFeedback --> CalculateStats: 統計分析
+          CalculateStats --> CheckRetrainCondition: 再訓練判定
+          CheckRetrainCondition --> NoRetrain: サンプル不足 or<br/>精度十分
+          CheckRetrainCondition --> Retrain: 条件満たす
+          NoRetrain --> [*]
+      }
+
+      state "継続学習ループ" as ContinuousLearning {
+          [*] --> ExportData: フィードバック<br/>データ出力
+          ExportData --> MergeData: 初期データと<br/>マージ
+          MergeData --> RemoveDuplicates: 重複除去
+          RemoveDuplicates --> RetrainModels: モデル再訓練
+          RetrainModels --> SaveToWandB: W&Bに保存
+          SaveToWandB --> ModelUpdated
+      }
+
+      Input --> Phase1
+      Phase1 --> ClaudeResult
+      ClaudeResult --> Phase2
+      Phase2 --> MLResult
+
+      ClaudeResult --> Blend
+      MLResult --> Blend
+      Blend --> FinalPrediction
+
+      FinalPrediction --> Phase3
+      Phase3 --> ButtonsReady
+      ButtonsReady --> Phase4
+      Phase4 --> CodeReady
+      CodeReady --> Phase5
+      Phase5 --> ExecutionComplete
+      ExecutionComplete --> Phase6
+
+      Phase6 --> Retrain
+      Retrain --> ContinuousLearning
+      ContinuousLearning --> ModelUpdated
+      ModelUpdated --> Phase2: モデル更新反映
+
+      ExecutionComplete --> [*]: 処理完了
+
+```
+
+

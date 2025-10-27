@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RemoteClaude セットアップ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      width: 600px;
+      min-height: 500px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .version {
+      opacity: 0.8;
+      font-size: 14px;
+    }
+
+    .screen {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .screen.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .screen-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .screen-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      opacity: 0.9;
+      margin-bottom: 20px;
+    }
+
+    .feature-list {
+      text-align: left;
+      margin: 20px 0;
+      padding: 0 20px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      margin: 12px 0;
+      font-size: 15px;
+    }
+
+    .feature-item::before {
+      content: "✓";
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      margin-right: 12px;
+      text-align: center;
+      line-height: 24px;
+      flex-shrink: 0;
+    }
+
+    .progress-container {
+      margin: 20px 0;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: white;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      margin-top: 10px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .input-group {
+      margin: 20px 0;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: white;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .input-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .status-box {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .status-box.success {
+      background: rgba(76, 175, 80, 0.3);
+    }
+
+    .status-box.error {
+      background: rgba(244, 67, 54, 0.3);
+    }
+
+    .qr-code {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      margin: 20px auto;
+    }
+
+    .qr-code img {
+      max-width: 300px;
+      display: block;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    button {
+      flex: 1;
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 30px;
+    }
+
+    .step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transition: all 0.3s;
+    }
+
+    .step-dot.active {
+      background: white;
+      width: 30px;
+      border-radius: 5px;
+    }
+
+    .step-dot.completed {
+      background: rgba(76, 175, 80, 0.8);
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: flex-start;
+      text-align: left;
+      margin: 20px 0;
+      cursor: pointer;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      margin-right: 12px;
+      margin-top: 4px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .checkbox-container label {
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.1);
+      border-left: 4px solid white;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .info-box strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 RemoteClaude</h1>
+      <div class="version">Version 4.0.0-beta.1</div>
+    </div>
+
+    <div class="step-indicator">
+      <div class="step-dot active" data-step="0"></div>
+      <div class="step-dot" data-step="1"></div>
+      <div class="step-dot" data-step="2"></div>
+      <div class="step-dot" data-step="3"></div>
+      <div class="step-dot" data-step="4"></div>
+      <div class="step-dot" data-step="5"></div>
+    </div>
+
+    <!-- Screen 1: Welcome -->
+    <div class="screen active" id="screen-welcome">
+      <div class="screen-content">
+        <div class="screen-icon">👋</div>
+        <h2>RemoteClaude へようこそ</h2>
+        <p>iPhoneからClaudeを遠隔操作できる革新的なプラットフォームです</p>
+
+        <div class="feature-list">
+          <div class="feature-item">W&B実験管理統合</div>
+          <div class="feature-item">リアルタイムコード実行</div>
+          <div class="feature-item">9msの超低遅延通信</div>
+          <div class="feature-item">QRコードで簡単セットアップ</div>
+        </div>
+
+        <p style="font-size: 14px; opacity: 0.8;">セットアップは約45秒で完了します</p>
+      </div>
+
+      <div class="button-group">
+        <button onclick="nextScreen()">セットアップを開始</button>
+      </div>
+    </div>
+
+    <!-- Screen 2: License -->
+    <div class="screen" id="screen-license">
+      <div class="screen-content">
+        <div class="screen-icon">📄</div>
+        <h2>ライセンス条項</h2>
+
+        <div class="info-box" style="max-height: 200px; overflow-y: auto; font-size: 13px;">
+          <strong>RemoteClaude ソフトウェア使用許諾契約</strong>
+          <p>本ソフトウェアは、以下の条件に基づいて提供されます：</p>
+          <ul style="margin-left: 20px; line-height: 1.8;">
+            <li>個人および商用利用が可能です</li>
+            <li>Claude API キーが必要です（別途Anthropicとの契約）</li>
+            <li>Dockerの実行環境が必要です</li>
+            <li>データはローカル環境で処理されます</li>
+            <li>実験データはW&Bに送信される場合があります</li>
+          </ul>
+        </div>
+
+        <div class="checkbox-container">
+          <input type="checkbox" id="agree-license">
+          <label for="agree-license">上記のライセンス条項に同意します</label>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="secondary" onclick="prevScreen()">戻る</button>
+        <button id="btn-license-next" onclick="nextScreen()" disabled>次へ</button>
+      </div>
+    </div>
+
+    <!-- Screen 3: Docker Check -->
+    <div class="screen" id="screen-docker">
+      <div class="screen-content">
+        <div class="screen-icon">🐳</div>
+        <h2>Docker 確認</h2>
+        <p>RemoteClaude は Docker を使用して動作します</p>
+
+        <div class="status-box" id="docker-status">
+          Docker の起動を確認中...
+        </div>
+
+        <div class="info-box">
+          <strong>Docker が未インストールの場合:</strong>
+          <p>以下のURLから Docker Desktop をインストールしてください：<br>
+          https://www.docker.com/products/docker-desktop</p>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="secondary" onclick="prevScreen()">戻る</button>
+        <button id="btn-docker-retry" onclick="checkDocker()">再確認</button>
+        <button id="btn-docker-next" onclick="nextScreen()" disabled>次へ</button>
+      </div>
+    </div>
+
+    <!-- Screen 4: API Key -->
+    <div class="screen" id="screen-apikey">
+      <div class="screen-content">
+        <div class="screen-icon">🔑</div>
+        <h2>Claude API キー設定</h2>
+        <p>Anthropic Claude API キーを入力してください</p>
+
+        <div class="input-group">
+          <label for="api-key">API キー</label>
+          <input
+            type="password"
+            id="api-key"
+            placeholder="sk-ant-api03-..."
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="info-box">
+          <strong>API キーの取得方法:</strong>
+          <p>1. https://console.anthropic.com にアクセス<br>
+          2. API Keys セクションから新しいキーを作成<br>
+          3. キーをコピーして上記に貼り付け</p>
+        </div>
+
+        <div class="checkbox-container">
+          <input type="checkbox" id="save-api-key" checked>
+          <label for="save-api-key">APIキーをローカルに保存する（推奨）</label>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="secondary" onclick="prevScreen()">戻る</button>
+        <button id="btn-apikey-next" onclick="nextScreen()" disabled>次へ</button>
+      </div>
+    </div>
+
+    <!-- Screen 5: Installation -->
+    <div class="screen" id="screen-install">
+      <div class="screen-content">
+        <div class="screen-icon">⚙️</div>
+        <h2>インストール中</h2>
+
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="install-progress" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="install-status">準備中...</div>
+        </div>
+
+        <div class="status-box" id="install-log">
+          インストールを開始しています...
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button id="btn-install-cancel" class="secondary" onclick="cancelInstall()">キャンセル</button>
+      </div>
+    </div>
+
+    <!-- Screen 6: Complete -->
+    <div class="screen" id="screen-complete">
+      <div class="screen-content">
+        <div class="screen-icon">✅</div>
+        <h2>セットアップ完了！</h2>
+        <p>iPhoneアプリでこのQRコードをスキャンしてください</p>
+
+        <div class="qr-code" id="qr-container">
+          <div class="loading-spinner"></div> QRコード生成中...
+        </div>
+
+        <div class="info-box">
+          <strong>次のステップ:</strong>
+          <p>1. iPhone で RemoteClaude アプリを開く<br>
+          2. "+" ボタンをタップ<br>
+          3. 上記のQRコードをスキャン<br>
+          4. 接続完了！</p>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button onclick="openDocumentation()">ドキュメントを開く</button>
+        <button onclick="finishSetup()">完了</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    let currentScreen = 0;
+    const screens = ['welcome', 'license', 'docker', 'apikey', 'install', 'complete'];
+    let dockerChecked = false;
+    let installationStarted = false;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      setupEventListeners();
+      updateStepIndicator();
+    });
+
+    function setupEventListeners() {
+      // License checkbox
+      document.getElementById('agree-license').addEventListener('change', (e) => {
+        document.getElementById('btn-license-next').disabled = !e.target.checked;
+      });
+
+      // API key input
+      document.getElementById('api-key').addEventListener('input', (e) => {
+        const valid = e.target.value.trim().startsWith('sk-ant-');
+        document.getElementById('btn-apikey-next').disabled = !valid;
+      });
+    }
+
+    function nextScreen() {
+      if (currentScreen < screens.length - 1) {
+        // Hide current screen
+        document.getElementById(`screen-${screens[currentScreen]}`).classList.remove('active');
+
+        // Move to next
+        currentScreen++;
+        document.getElementById(`screen-${screens[currentScreen]}`).classList.add('active');
+
+        // Update indicator
+        updateStepIndicator();
+
+        // Trigger actions based on screen
+        handleScreenEnter();
+      }
+    }
+
+    function prevScreen() {
+      if (currentScreen > 0) {
+        document.getElementById(`screen-${screens[currentScreen]}`).classList.remove('active');
+        currentScreen--;
+        document.getElementById(`screen-${screens[currentScreen]}`).classList.add('active');
+        updateStepIndicator();
+      }
+    }
+
+    function updateStepIndicator() {
+      document.querySelectorAll('.step-dot').forEach((dot, index) => {
+        dot.classList.remove('active', 'completed');
+        if (index < currentScreen) {
+          dot.classList.add('completed');
+        } else if (index === currentScreen) {
+          dot.classList.add('active');
+        }
+      });
+    }
+
+    function handleScreenEnter() {
+      const screen = screens[currentScreen];
+
+      if (screen === 'docker' && !dockerChecked) {
+        setTimeout(() => checkDocker(), 500);
+      } else if (screen === 'install' && !installationStarted) {
+        setTimeout(() => startInstallation(), 500);
+      }
+    }
+
+    function checkDocker() {
+      const statusBox = document.getElementById('docker-status');
+      statusBox.className = 'status-box';
+      statusBox.innerHTML = '<div class="loading-spinner"></div> Docker を確認中...';
+
+      ipcRenderer.invoke('check-docker').then(isRunning => {
+        if (isRunning) {
+          statusBox.className = 'status-box success';
+          statusBox.textContent = '✓ Docker は正常に動作しています';
+          document.getElementById('btn-docker-next').disabled = false;
+          dockerChecked = true;
+        } else {
+          statusBox.className = 'status-box error';
+          statusBox.textContent = '✗ Docker が起動していません。Docker Desktop を起動してください。';
+          document.getElementById('btn-docker-next').disabled = true;
+        }
+      });
+    }
+
+    function startInstallation() {
+      installationStarted = true;
+      const apiKey = document.getElementById('api-key').value;
+      const saveKey = document.getElementById('save-api-key').checked;
+
+      // Send to main process
+      ipcRenderer.send('start-setup', { apiKey, saveKey });
+    }
+
+    // IPC Listeners
+    ipcRenderer.on('setup-progress', (event, data) => {
+      const { progress, message } = data;
+
+      document.getElementById('install-progress').style.width = `${progress}%`;
+      document.getElementById('install-status').textContent = message;
+      document.getElementById('install-log').textContent = message;
+    });
+
+    ipcRenderer.on('setup-complete', (event, qrCodeDataUrl) => {
+      // Move to complete screen
+      document.getElementById(`screen-${screens[currentScreen]}`).classList.remove('active');
+      currentScreen = screens.length - 1;
+      document.getElementById(`screen-${screens[currentScreen]}`).classList.add('active');
+      updateStepIndicator();
+
+      // Show QR code
+      const qrContainer = document.getElementById('qr-container');
+      qrContainer.innerHTML = `<img src="${qrCodeDataUrl}" alt="QR Code" />`;
+    });
+
+    ipcRenderer.on('setup-error', (event, error) => {
+      const logBox = document.getElementById('install-log');
+      logBox.className = 'status-box error';
+      logBox.textContent = `エラー: ${error}`;
+
+      document.getElementById('btn-install-cancel').textContent = '戻る';
+      document.getElementById('btn-install-cancel').onclick = () => {
+        currentScreen = 3; // Go back to API key screen
+        document.getElementById('screen-install').classList.remove('active');
+        document.getElementById('screen-apikey').classList.add('active');
+        updateStepIndicator();
+        installationStarted = false;
+      };
+    });
+
+    function cancelInstall() {
+      if (confirm('インストールをキャンセルしてもよろしいですか？')) {
+        ipcRenderer.send('cancel-setup');
+        window.close();
+      }
+    }
+
+    function openDocumentation() {
+      require('electron').shell.openExternal('https://github.com/yourusername/remoteclaude');
+    }
+
+    function finishSetup() {
+      window.close();
+    }
+  </script>
+</body>
+</html>

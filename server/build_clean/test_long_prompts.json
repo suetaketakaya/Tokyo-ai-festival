@@ -1,0 +1,98 @@
+[
+  {
+    "id": "long_ml_1",
+    "command": "TensorFlowを使用して、MNIST手書き数字データセットで畳み込みニューラルネットワーク(CNN)モデルを訓練してください。モデルは3層の畳み込み層と2層の全結合層で構成し、活性化関数はReLUを使用してください。さらに、過学習を防ぐためにDropoutレイヤーを追加し、最適化アルゴリズムはAdamを使用してください。訓練後、テストデータセットで精度を評価し、混同行列を可視化してください。また、学習曲線（loss/accuracy）もプロットして保存してください。",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "high",
+    "length": 257
+  },
+  {
+    "id": "long_ml_2",
+    "command": "PyTorchでBERTモデルを使用して日本語のテキスト分類タスクを実装してください。事前学習済みのcl-tohoku/bert-base-japaneseモデルをファインチューニングし、カスタムデータセットでsentiment analysisを行います。データローダーの実装、学習ループ、検証ループを含めてください。さらに、Early Stoppingとモデルチェックポイントの保存機能も追加してください。最終的に、F1スコア、Precision、Recallを計算してレポートを出力してください。学習には最大10エポックを使用し、バッチサイズは16としてください。",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "high",
+    "length": 312
+  },
+  {
+    "id": "long_web_1",
+    "command": "React.jsとTypeScriptを使用して、高機能なTodoアプリケーションを作成してください。機能要件は以下の通りです: 1) タスクの追加・編集・削除機能、2) タスクの完了状態の切り替え、3) タスクのフィルタリング（全て/未完了/完了済み）、4) タスクの優先度設定（高/中/低）、5) 期限の設定とソート機能、6) ローカルストレージへのデータ永続化、7) ダークモード切り替え機能。UIはTailwind CSSでスタイリングし、レスポンシブデザインに対応してください。コンポーネントは適切に分割し、再利用可能な設計にしてください。",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "high",
+    "length": 331
+  },
+  {
+    "id": "long_data_1",
+    "command": "pandasとnumpyを使用して、大規模CSVファイル（100万行以上）の探索的データ分析を実施してください。具体的な手順として、1) データの読み込みとchunk処理による効率的なメモリ管理、2) 欠損値の検出と適切な補完戦略の実施、3) 外れ値の検出とIQR法による除去、4) カテゴリカル変数のエンコーディング、5) 数値変数の正規化、6) 相関行列の計算と多重共線性のチェック、7) 統計的仮説検定の実施、8) 主成分分析による次元削減。結果はmatplotlibとseabornで可視化し、HTMLレポートとして出力してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "high",
+    "length": 353
+  },
+  {
+    "id": "long_data_2",
+    "command": "SQLiteデータベースからデータを抽出し、pandasで高度なデータ分析パイプラインを構築してください。手順: 1) 複数テーブルからJOINクエリでデータ取得、2) DataFrameへの変換と型変換、3) 時系列データのリサンプリングと集計、4) pivot_tableを使用した多次元集計、5) groupbyとaggregateによる統計量計算、6) ウィンドウ関数を使用した移動平均の計算、7) 異常検知アルゴリズムの適用、8) 最終結果をExcelファイルの複数シートに出力。さらに、処理速度を最適化するためにvectorized operationsを使用し、進捗をtqdmで表示してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "high",
+    "length": 388
+  },
+  {
+    "id": "long_viz_1",
+    "command": "matplotlibとseabornを使用して、多変量データの包括的な可視化ダッシュボードを作成してください。含めるグラフ: 1) 複数の時系列データを重ねた折れ線グラフ、2) カテゴリ別の箱ひげ図、3) ヒートマップによる相関行列の可視化、4) ペアプロット（散布図行列）、5) バイオリンプロット、6) 3Dの散布図。各グラフには適切なタイトル、軸ラベル、凡例を追加し、カラーパレットはseabornのdeepを使用してください。最終的に、subplotsを使用して1つのfigureに統合し、高解像度のPNGとして保存してください。",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "high",
+    "length": 356
+  },
+  {
+    "id": "long_api_1",
+    "command": "FastAPIを使用して、本格的なRESTful APIサーバーを構築してください。機能要件: 1) ユーザー認証（JWT tokenベース）、2) CRUD操作のエンドポイント（GET/POST/PUT/DELETE）、3) リクエストバリデーション（Pydantic models使用）、4) エラーハンドリングと適切なHTTPステータスコード、5) レート制限（1分間に10リクエスト）、6) CORS設定、7) OpenAPI（Swagger）ドキュメント自動生成、8) SQLAlchemyを使用したデータベース連携、9) ロギングとモニタリング、10) Dockerコンテナ化。テストコードも含めて実装してください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high",
+    "length": 393
+  },
+  {
+    "id": "long_docker_1",
+    "command": "Docker ComposeReを使用して、マイクロサービスアーキテクチャのアプリケーションスタックを構築してください。含めるサービス: 1) Nginx（リバースプロキシ）、2) React.jsフロントエンド、3) FastAPI バックエンドAPI、4) PostgreSQLデータベース、5) Redis（キャッシュ）、6) Elasticsearch（検索エンジン）。各サービスのDockerfileを作成し、docker-compose.ymlで統合してください。環境変数は.envファイルで管理し、ボリュームマウントでデータ永続化を実現してください。さらに、ヘルスチェックと自動再起動の設定も追加してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "high",
+    "length": 383
+  },
+  {
+    "id": "long_general_1",
+    "command": "Pythonで自動化スクリプトを作成してください。このスクリプトは、指定されたディレクトリ内のすべてのPDFファイルを読み込み、テキストを抽出し、自然言語処理を行い、キーワードを抽出して、結果をCSVファイルに保存します。さらに、処理の進捗をプログレスバーで表示し、エラーハンドリングを実装し、ログファイルに詳細な処理ログを出力してください。並列処理にも対応し、複数のPDFを同時に処理できるようにしてください。",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "medium",
+    "length": 274
+  },
+  {
+    "id": "long_ml_3",
+    "command": "Kerasを使用して、画像セグメンテーションのためのU-Netモデルを実装してください。データ拡張（回転、反転、ズーム、シフト）を含むデータジェネレータを作成し、Dice係数とIoU（Intersection over Union）を評価メトリクスとして使用してください。モデルの訓練中は、TensorBoardでリアルタイムに学習状況を監視できるようにしてください。また、最良のモデルを保存するModelCheckpointコールバックと、学習率を動的に調整するReduceLROnPlateauコールバックを追加してください。訓練完了後、テスト画像でセグメンテーション結果を可視化してください。",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "high",
+    "length": 380
+  },
+  {
+    "id": "medium_ml_1",
+    "command": "scikit-learnでランダムフォレスト分類器を訓練し、GridSearchCVでハイパーパラメータチューニングを行ってください。クロスバリデーションを使用して性能を評価し、feature importanceを可視化してください。",
+    "category": "machine_learning",
+    "framework": "sklearn",
+    "complexity": "medium",
+    "length": 156
+  },
+  {
+    "id": "medium_data_1",
+    "command": "pandasで時系列データのリサンプリングと移動平均を計算し、異常値を検出してください。結果をグラフで可視化し、統計サマリをDataFrameとして出力してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium",
+    "length": 120
+  }
+]

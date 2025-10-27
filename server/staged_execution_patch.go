@@ -1,12 +1,12 @@
 package main
 
 import (
-	"context"
+	// "context"
 	"fmt"
-	"log"
-	"time"
+	// "log"
+	// "time"
 
-	"github.com/gorilla/websocket"
+	// "github.com/gorilla/websocket"
 )
 
 // Patched version of detectFramework with React/Todo support

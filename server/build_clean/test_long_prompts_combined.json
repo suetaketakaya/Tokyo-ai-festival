@@ -1,0 +1,1144 @@
+[
+  {
+    "id": "long_ml_1",
+    "command": "TensorFlowを使用して、MNIST手書き数字データセットで畳み込みニューラルネットワーク(CNN)モデルを訓練してください。モデルは3層の畳み込み層と2層の全結合層で構成し、活性化関数はReLUを使用してください。さらに、過学習を防ぐためにDropoutレイヤーを追加し、最適化アルゴリズムはAdamを使用してください。訓練後、テストデータセットで精度を評価し、混同行列を可視化してください。また、学習曲線（loss/accuracy）もプロットして保存してください。",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "high",
+    "length": 257
+  },
+  {
+    "id": "long_ml_2",
+    "command": "PyTorchでBERTモデルを使用して日本語のテキスト分類タスクを実装してください。事前学習済みのcl-tohoku/bert-base-japaneseモデルをファインチューニングし、カスタムデータセットでsentiment analysisを行います。データローダーの実装、学習ループ、検証ループを含めてください。さらに、Early Stoppingとモデルチェックポイントの保存機能も追加してください。最終的に、F1スコア、Precision、Recallを計算してレポートを出力してください。学習には最大10エポックを使用し、バッチサイズは16としてください。",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "high",
+    "length": 312
+  },
+  {
+    "id": "long_web_1",
+    "command": "React.jsとTypeScriptを使用して、高機能なTodoアプリケーションを作成してください。機能要件は以下の通りです: 1) タスクの追加・編集・削除機能、2) タスクの完了状態の切り替え、3) タスクのフィルタリング（全て/未完了/完了済み）、4) タスクの優先度設定（高/中/低）、5) 期限の設定とソート機能、6) ローカルストレージへのデータ永続化、7) ダークモード切り替え機能。UIはTailwind CSSでスタイリングし、レスポンシブデザインに対応してください。コンポーネントは適切に分割し、再利用可能な設計にしてください。",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "high",
+    "length": 331
+  },
+  {
+    "id": "long_data_1",
+    "command": "pandasとnumpyを使用して、大規模CSVファイル（100万行以上）の探索的データ分析を実施してください。具体的な手順として、1) データの読み込みとchunk処理による効率的なメモリ管理、2) 欠損値の検出と適切な補完戦略の実施、3) 外れ値の検出とIQR法による除去、4) カテゴリカル変数のエンコーディング、5) 数値変数の正規化、6) 相関行列の計算と多重共線性のチェック、7) 統計的仮説検定の実施、8) 主成分分析による次元削減。結果はmatplotlibとseabornで可視化し、HTMLレポートとして出力してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "high",
+    "length": 353
+  },
+  {
+    "id": "long_data_2",
+    "command": "SQLiteデータベースからデータを抽出し、pandasで高度なデータ分析パイプラインを構築してください。手順: 1) 複数テーブルからJOINクエリでデータ取得、2) DataFrameへの変換と型変換、3) 時系列データのリサンプリングと集計、4) pivot_tableを使用した多次元集計、5) groupbyとaggregateによる統計量計算、6) ウィンドウ関数を使用した移動平均の計算、7) 異常検知アルゴリズムの適用、8) 最終結果をExcelファイルの複数シートに出力。さらに、処理速度を最適化するためにvectorized operationsを使用し、進捗をtqdmで表示してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "high",
+    "length": 388
+  },
+  {
+    "id": "long_viz_1",
+    "command": "matplotlibとseabornを使用して、多変量データの包括的な可視化ダッシュボードを作成してください。含めるグラフ: 1) 複数の時系列データを重ねた折れ線グラフ、2) カテゴリ別の箱ひげ図、3) ヒートマップによる相関行列の可視化、4) ペアプロット（散布図行列）、5) バイオリンプロット、6) 3Dの散布図。各グラフには適切なタイトル、軸ラベル、凡例を追加し、カラーパレットはseabornのdeepを使用してください。最終的に、subplotsを使用して1つのfigureに統合し、高解像度のPNGとして保存してください。",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "high",
+    "length": 356
+  },
+  {
+    "id": "long_api_1",
+    "command": "FastAPIを使用して、本格的なRESTful APIサーバーを構築してください。機能要件: 1) ユーザー認証（JWT tokenベース）、2) CRUD操作のエンドポイント（GET/POST/PUT/DELETE）、3) リクエストバリデーション（Pydantic models使用）、4) エラーハンドリングと適切なHTTPステータスコード、5) レート制限（1分間に10リクエスト）、6) CORS設定、7) OpenAPI（Swagger）ドキュメント自動生成、8) SQLAlchemyを使用したデータベース連携、9) ロギングとモニタリング、10) Dockerコンテナ化。テストコードも含めて実装してください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "high",
+    "length": 393
+  },
+  {
+    "id": "long_docker_1",
+    "command": "Docker ComposeReを使用して、マイクロサービスアーキテクチャのアプリケーションスタックを構築してください。含めるサービス: 1) Nginx（リバースプロキシ）、2) React.jsフロントエンド、3) FastAPI バックエンドAPI、4) PostgreSQLデータベース、5) Redis（キャッシュ）、6) Elasticsearch（検索エンジン）。各サービスのDockerfileを作成し、docker-compose.ymlで統合してください。環境変数は.envファイルで管理し、ボリュームマウントでデータ永続化を実現してください。さらに、ヘルスチェックと自動再起動の設定も追加してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "high",
+    "length": 383
+  },
+  {
+    "id": "long_general_1",
+    "command": "Pythonで自動化スクリプトを作成してください。このスクリプトは、指定されたディレクトリ内のすべてのPDFファイルを読み込み、テキストを抽出し、自然言語処理を行い、キーワードを抽出して、結果をCSVファイルに保存します。さらに、処理の進捗をプログレスバーで表示し、エラーハンドリングを実装し、ログファイルに詳細な処理ログを出力してください。並列処理にも対応し、複数のPDFを同時に処理できるようにしてください。",
+    "category": "general",
+    "framework": "standard",
+    "complexity": "medium",
+    "length": 274
+  },
+  {
+    "id": "long_ml_3",
+    "command": "Kerasを使用して、画像セグメンテーションのためのU-Netモデルを実装してください。データ拡張（回転、反転、ズーム、シフト）を含むデータジェネレータを作成し、Dice係数とIoU（Intersection over Union）を評価メトリクスとして使用してください。モデルの訓練中は、TensorBoardでリアルタイムに学習状況を監視できるようにしてください。また、最良のモデルを保存するModelCheckpointコールバックと、学習率を動的に調整するReduceLROnPlateauコールバックを追加してください。訓練完了後、テスト画像でセグメンテーション結果を可視化してください。",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "high",
+    "length": 380
+  },
+  {
+    "id": "medium_ml_1",
+    "command": "scikit-learnでランダムフォレスト分類器を訓練し、GridSearchCVでハイパーパラメータチューニングを行ってください。クロスバリデーションを使用して性能を評価し、feature importanceを可視化してください。",
+    "category": "machine_learning",
+    "framework": "sklearn",
+    "complexity": "medium",
+    "length": 156
+  },
+  {
+    "id": "medium_data_1",
+    "command": "pandasで時系列データのリサンプリングと移動平均を計算し、異常値を検出してください。結果をグラフで可視化し、統計サマリをDataFrameとして出力してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "medium",
+    "length": 120
+  },
+  {
+    "id": "long_machine_learning_100",
+    "command": "scikit-learnでランダムフォレスト分類器を使用して、アイリスデータセットで花の種類予測モデルを構築してください。GridSearchCVを使用してハイパーパラメータチューニングを行い、5分割クロスバリデーションで性能を評価してください。さらに、特徴量重要度を可視化し、混同行列とROC曲線をプロットしてください。最終的に、モデルをpickleファイルとして保存し、推論用のシンプルなAPIエンドポイントも実装してください。",
+    "category": "machine_learning",
+    "framework": "sklearn",
+    "complexity": "medium",
+    "length": 216
+  },
+  {
+    "id": "long_machine_learning_101",
+    "command": "PyTorchでGAN（敵対的生成ネットワーク）を実装し、MNIST手書き数字を生成してください。GeneratorとDiscriminatorの両方のネットワーク設計、BCELossによる損失関数、交互学習のループを実装してください。学習中の生成画像を定期的に保存し、FIDスコアで生成品質を定量評価してください。モデルの安定性向上のためにSpectral Normalizationも試してください。",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "medium",
+    "length": 202
+  },
+  {
+    "id": "long_machine_learning_102",
+    "command": "PyTorchで画像分類タスク用の ResNetベースのニューラルネットワークを実装してください。Albumentationsを使用したデータ拡張、Weight Decayによる正則化、CosineAnnealingスケジューラによる学習率調整を含めてください。検証データで最良のモデルを選択し、テストデータで最終評価を行い、結果をWandBにログしてください。混同行列も可視化してください。",
+    "category": "machine_learning",
+    "framework": "pytorch",
+    "complexity": "low",
+    "length": 196
+  },
+  {
+    "id": "long_machine_learning_103",
+    "command": "scikit-learnでクラスタリング（K-Means、DBSCAN、階層クラスタリング）を実装し、顧客セグメンテーションを行ってください。エルボー法とシルエット係数で最適クラスタ数を決定し、各アルゴリズムの結果を比較してください。PCAで2次元に次元削減してクラスタを可視化し、各セグメントの特性を統計的に分析してください。デンドログラムも作成してください。",
+    "category": "machine_learning",
+    "framework": "sklearn",
+    "complexity": "low",
+    "length": 181
+  },
+  {
+    "id": "long_machine_learning_104",
+    "command": "TensorFlowでオートエンコーダを実装し、画像の異常検知タスクに適用してください。エンコーダー、デコーダーのアーキテクチャを設計し、再構成誤差を損失関数として使用してください。正常データのみで訓練し、テストデータで異常スコアを計算してください。ROC曲線で検出性能を評価し、異常サンプルを可視化してください。Variational Autoencoderも試してください。",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "low",
+    "length": 189
+  },
+  {
+    "id": "long_machine_learning_105",
+    "command": "KerasでLSTMを使用した時系列予測モデルを構築し、株価データセットでトレーニングしてください。ModelCheckpointとEarlyStoppingコールバックを使用して学習を監視し、MAEとRMSEメトリクスで性能を評価してください。データ前処理パイプライン（正規化、シーケンス作成）も実装し、再現性のためにランダムシードを固定してください。予測結果を可視化してください。",
+    "category": "machine_learning",
+    "framework": "keras",
+    "complexity": "low",
+    "length": 192
+  },
+  {
+    "id": "long_machine_learning_106",
+    "command": "LightGBMで顧客離反予測（churn prediction）の二値分類モデルを実装してください。クラス不均衡に対処するためSMOTEを使用し、カテゴリカル特徴を適切にエンコーディングしてください。特徴量重要度に基づく特徴選択を実施し、ROC-AUCスコアを最大化するようハイパーパラメータを調整してください。最終モデルの精度、再現率、適合率を詳細に分析してください。",
+    "category": "machine_learning",
+    "framework": "mixed",
+    "complexity": "low",
+    "length": 186
+  },
+  {
+    "id": "long_machine_learning_107",
+    "command": "TensorFlow 2.xでCNNアーキテクチャを実装し、CIFAR-10画像データで学習させてください。Adamオプティマイザを使用し、categorical crossentropyの損失関数で最適化してください。過学習を防ぐため、Dropoutレイヤーと早期停止を導入してください。学習曲線をTensorBoardで可視化し、最終的なテストデータでのモデル性能を詳細にレポートしてください。データ拡張も実装してください。",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "medium",
+    "length": 214
+  },
+  {
+    "id": "long_machine_learning_108",
+    "command": "XGBoostで住宅価格予測の回帰モデルを実装してください。相互情報量による特徴量選択、Optunaによるハイパーパラメータ最適化を行い、5分割クロスバリデーションで性能を検証してください。SHAP値を使用してモデルの解釈可能性も分析し、重要な特徴量トップ10を可視化してください。最終モデルの予測精度をR2スコアとMAPEで評価してください。",
+    "category": "machine_learning",
+    "framework": "mixed",
+    "complexity": "low",
+    "length": 172
+  },
+  {
+    "id": "long_machine_learning_109",
+    "command": "TensorFlowでTransformerモデルを実装し、機械翻訳タスク（英語→日本語）で学習させてください。マルチヘッドアテンション、位置エンコーディング、学習率ウォームアップを含めてください。BLEUスコアで翻訳品質を評価し、アテンション重みを可視化してください。ビームサーチによるデコーディングも実装し、複数の翻訳候補を生成してください。",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "low",
+    "length": 173
+  },
+  {
+    "id": "long_machine_learning_110",
+    "command": "scikit-learnでサポートベクターマシン（SVM）を使用して、乳がん診断の二値分類モデルを構築してください。RBFカーネルを使用し、GridSearchCVでCとgammaパラメータを最適化してください。Stratified K-Fold交差検証で性能を評価し、precision、recall、F1スコアを計算してください。ROC曲線とPR曲線をプロットし、最適な閾値を決定してください。",
+    "category": "machine_learning",
+    "framework": "sklearn",
+    "complexity": "low",
+    "length": 199
+  },
+  {
+    "id": "long_data_analysis_111",
+    "command": "pandasで複数のJSONファイルを結合し、ネストされた構造をフラット化してください。json_normalizeを使用してDataFrameに変換し、重複レコードを削除し、データ型を適切に変換してください。explodeで配列カラムを展開し、mergeで関連データを結合してください。最終的にクリーンなCSVファイルとデータディクショナリを出力してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 181
+  },
+  {
+    "id": "long_data_analysis_112",
+    "command": "ETLパイプラインを構築し、PostgreSQLからデータ抽出、pandasで変換、BigQueryにロードしてください。SQLAlchemyでデータベース接続、read_sql_queryでデータ抽出、複数の変換処理（型変換、集計、正規化）を実施してください。to_gbqでBigQueryに書き込み、処理ログとエラーハンドリングも実装してください。処理時間を最適化してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 191
+  },
+  {
+    "id": "long_data_analysis_113",
+    "command": "pandasでCSV形式の大規模顧客データを読み込み、平均値による欠損値補完、IQR法による外れ値検出と除去を行ってください。One-Hot Encodingによるカテゴリカル変数のエンコーディング、Min-Max正規化による数値変数の正規化を実施し、最終的にクリーンなデータセットをCSVとして出力してください。各ステップの統計サマリも表示してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 178
+  },
+  {
+    "id": "long_data_analysis_114",
+    "command": "SQLiteデータベースから売上テーブルと顧客テーブルをINNER JOINして抽出し、pandasで月次売上分析を実施してください。groupbyによる集計、pivot_tableによるクロス集計、resampleによる時系列分析を含めてください。結果をExcelの複数シート（サマリ、詳細、グラフ）に分けて出力し、主要KPIのレポートも生成してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 179
+  },
+  {
+    "id": "long_data_analysis_115",
+    "command": "大規模ログデータ（数百万行）を効率的に処理し、異常パターンを検出してください。chunksizeによるバッチ読み込み、dtypeによる型指定、parse_datesによる日時解析を使用してください。groupbyでエラーコード別に集計し、時系列で異常スパイクを検出してください。結果をダッシュボード形式でHTMLレポートとして出力してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 172
+  },
+  {
+    "id": "long_data_analysis_116",
+    "command": "時系列売上データのリサンプリング（日次→月次）と移動平均（7日、30日）を計算し、異常値をZ-score法で検出してください。結果を折れ線グラフで可視化し、統計サマリ（平均、中央値、標準偏差、四分位数）をDataFrameとして出力してください。前年比成長率も計算し、トレンド変化を分析してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 150
+  },
+  {
+    "id": "long_data_analysis_117",
+    "command": "eコマースの購買データに対して探索的データ分析（EDA）を実施してください。describeによる基本統計量の算出、corrによる相関分析、histogramとboxplotによる分布の可視化を行ってください。異常値や興味深いパターンを特定し、pandas-profilingを使用してHTMLレポートとして出力してください。各カテゴリーの売上トレンドも分析してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 186
+  },
+  {
+    "id": "long_data_analysis_118",
+    "command": "大規模CSVファイル（100万行以上）を効率的に処理してください。read_csvのchunksizeパラメータによるチャンク読み込み、multiprocessingによる並列処理、カテゴリ型変換によるメモリ最適化を実装してください。処理進捗をtqdmで表示し、最終結果をParquet形式で保存してください。処理時間とメモリ使用量も計測してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 176
+  },
+  {
+    "id": "long_data_analysis_119",
+    "command": "SQLクエリでデータウェアハウスから販売データを抽出し、pandasで多次元分析を実施してください。WHERE句による期間フィルタリング、JOINによる複数テーブル結合、GROUP BYによる集計を含むクエリを作成してください。抽出データでコホート分析、RFM分析、バスケット分析を実行し、ビジネスインサイトをまとめたレポートを生成してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 173
+  },
+  {
+    "id": "long_data_analysis_120",
+    "command": "時系列データのトレンド分析とARIMAモデルによる予測を実施してください。seasonal_decomposeによるトレンド分解、ACF/PACFによる季節性検出、Isolation Forestによる異常検知を含めてください。ARIMAモデルを構築し、予測精度をMAE、RMSE、MAPEで評価してください。予測結果と信頼区間を可視化してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 175
+  },
+  {
+    "id": "long_data_analysis_121",
+    "command": "pandasでテキストデータのクリーニングと前処理を実施してください。str.stripによる空白除去、str.lowerによる小文字変換、正規表現による特殊文字除去、unicodedataによる正規化を含めてください。重複テキストの検出と除去、単語頻度分析、TF-IDF計算も実行し、クリーンなデータセットとして保存してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "low",
+    "length": 166
+  },
+  {
+    "id": "long_web_app_122",
+    "command": "React.jsとTypeScriptでタスク管理アプリケーションを構築してください。Reduxによるグローバル状態管理、React Routerによるページルーティング、Formikによるフォームバリデーションを実装してください。Material-UIでスタイリングし、レスポンシブデザインに対応してください。LocalStorageでデータ永続化し、ドラッグ&ドロップ機能も追加してください。",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "low",
+    "length": 198
+  },
+  {
+    "id": "long_web_app_123",
+    "command": "FastAPIとReact.jsでフルスタックアプリケーションを構築してください。バックエンドはFastAPIでRESTful API、フロントエンドはReactでSPAを実装してください。JWT認証、CORS設定、WebSocket通信を含めてください。Dockerで両方をコンテナ化し、docker-composeで統合してください。CI/CDパイプラインも設定してください。",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "low",
+    "length": 190
+  },
+  {
+    "id": "long_web_app_124",
+    "command": "Angular 15でエンタープライズ向け管理画面を開発してください。NgRxによる状態管理、Angular Routerによる遅延ロード、Reactive Formsによるバリデーションを実装してください。PrimeNGでリッチなUIコンポーネントを使用し、役割ベースのアクセス制御（RBAC）も実装してください。国際化（i18n）にも対応してください。",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "low",
+    "length": 178
+  },
+  {
+    "id": "long_web_app_125",
+    "command": "Electron + React.jsでデスクトップアプリケーションを開発してください。メインプロセスとレンダラープロセスの通信（IPC）、ファイルシステムアクセス、システムトレイ統合を実装してください。自動更新機能（electron-updater）、ネイティブ通知、メニューバー統合も含めてください。Windows/Mac/Linux向けにビルド設定してください。",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "low",
+    "length": 184
+  },
+  {
+    "id": "long_web_app_126",
+    "command": "React Nativeでクロスプラットフォームモバイルアプリを開発してください。React Navigationによる画面遷移、AsyncStorageによるローカルストレージ、Axiosによる API通信を実装してください。カメラ機能、プッシュ通知、位置情報サービスも統合してください。iOS/Android両方でビルド可能にし、アプリストア公開用の設定も含めてください。",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "low",
+    "length": 188
+  },
+  {
+    "id": "long_web_app_127",
+    "command": "Nuxt.jsでECサイトのフロントエンドを構築してください。Vuex Storeによるカート管理、Nuxt Contentによる商品データ管理、Stripe連携による決済機能を実装してください。SSRによるSEO最適化、PWA対応、画像最適化（next-image）も含めてください。検索機能とフィルタリングも実装してください。",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "low",
+    "length": 165
+  },
+  {
+    "id": "long_web_app_128",
+    "command": "Vue.js 3のComposition APIでリアルタイムチャット機能を実装してください。Piniaによる状態管理、Socket.ioによるWebSocket通信、VeeValidateによるフォーム検証を含めてください。コンポーネントは再利用可能な設計にし、TypeScriptで型安全性を確保してください。オンラインステータス表示と既読機能も実装してください。",
+    "category": "web_app",
+    "framework": "vue",
+    "complexity": "low",
+    "length": 184
+  },
+  {
+    "id": "long_web_app_129",
+    "command": "Gatsby.jsで静的サイトジェネレーターを使用したポートフォリオサイトを構築してください。GraphQLでデータ取得、gatsby-imageで画像最適化、gatsby-plugin-mdxでMarkdown記事を含めてください。Netlify CMSでコンテンツ管理、Contact Formでお問い合わせ機能を実装してください。パフォーマンススコア95+を目指してください。",
+    "category": "web_app",
+    "framework": "mixed",
+    "complexity": "low",
+    "length": 191
+  },
+  {
+    "id": "long_web_app_130",
+    "command": "Node.js + Expressでユーザー管理のRESTful APIを構築してください。Joiによるリクエストバリデーション、カスタムミドルウェアによるエラーハンドリング、Winstonによるログ記録を実装してください。JWTトークン認証、bcryptによるパスワードハッシュ化、express-rate-limitによるレート制限も追加してください。MongoDBと連携してください。",
+    "category": "web_app",
+    "framework": "mixed",
+    "complexity": "low",
+    "length": 195
+  },
+  {
+    "id": "long_web_app_131",
+    "command": "Reactで再利用可能なUIコンポーネントライブラリを作成してください。styled-componentsによるスタイリング、Framer Motionによるアニメーション、aria属性によるアクセシビリティ対応を含めてください。Button、Modal、Dropdown、Tooltipコンポーネントを実装し、Storybookでドキュメント化してください。TypeScriptで型定義を提供してください。",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "medium",
+    "length": 204
+  },
+  {
+    "id": "long_web_app_132",
+    "command": "Next.jsでブログシステムを構築してください。getStaticPropsによる静的サイト生成、Markdown記事のレンダリング、NextAuthによる認証、next-seoによるSEO最適化を実装してください。Tailwind CSSでモダンなUIを構築し、コメント機能とタグ検索も追加してください。Vercelへのデプロイ設定も含めてください。",
+    "category": "web_app",
+    "framework": "nextjs",
+    "complexity": "low",
+    "length": 177
+  },
+  {
+    "id": "long_visualization_133",
+    "command": "seabornで多変量データの統計的可視化を実施してください。pairplot（散布図行列）、jointplot（2変数の分布）、violinplot（分布比較）、clustermap（階層クラスタリングのヒートマップ）を作成してください。カテゴリカル変数による色分け、回帰直線の追加、統計検定結果の表示も含めてください。各グラフのスタイルを統一してください。",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low",
+    "length": 180
+  },
+  {
+    "id": "long_visualization_134",
+    "command": "Plotlyで営業実績のインタラクティブダッシュボードを作成してください。折れ線グラフ、棒グラフ、円グラフ、地図可視化を含め、dropdown/sliderによる動的フィルタリングを実装してください。Dashを使用してWebアプリとして公開し、ユーザーが期間やカテゴリを調整できるようにしてください。ホバー時の詳細情報表示も実装してください。",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low",
+    "length": 171
+  },
+  {
+    "id": "long_visualization_135",
+    "command": "Tableau PublicまたはPowerBIを使用して、販売データの経営ダッシュボードを作成してください。主要KPI（売上、利益率、成長率）のカード表示、地域別売上のマップ、商品カテゴリー別のツリーマップ、時系列トレンドのエリアチャートを含めてください。フィルター、ドリルダウン、パラメータによるシナリオ分析も実装してください。",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low",
+    "length": 166
+  },
+  {
+    "id": "long_visualization_136",
+    "command": "Vegaで宣言的文法による複雑なビジュアライゼーションを作成してください。JSON仕様でインタラクティブなダッシュボードを定義し、データ変換パイプライン、複数ビューの連携、動的フィルタリングを含めてください。クロスフィルタリング、ツールチップ、凡例のインタラクションも実装してください。Vega-Embedで埋め込み可能にしてください。",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low",
+    "length": 168
+  },
+  {
+    "id": "long_visualization_137",
+    "command": "matplotlibで科学論文向けの高品質グラフを作成してください。2カラム幅に最適化されたサイズ、LaTeX形式の数式ラベル、グレースケール印刷対応のカラースキームを使用してください。エラーバー、信頼区間、統計的有意性の表記も含めてください。複数のサブプロットを整列させ、PDF形式で300dpiで出力してください。",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low",
+    "length": 159
+  },
+  {
+    "id": "long_visualization_138",
+    "command": "Bokehで株価のリアルタイム可視化システムを構築してください。ColumnDataSourceによるストリーミングデータの更新、HoverToolによるインタラクティブ操作、Spanによる注釈表示を実装してください。複数銘柄の同時表示、ローソク足チャート、出来高グラフも含めてください。Bokeh Serverでホスティングし、複数ユーザーからアクセス可能にしてください。",
+    "category": "visualization",
+    "framework": "bokeh",
+    "complexity": "low",
+    "length": 187
+  },
+  {
+    "id": "long_visualization_139",
+    "command": "matplotlibとseabornで売上データの包括的な可視化ダッシュボードを作成してください。時系列の折れ線グラフ、カテゴリー別の棒グラフ、相関ヒートマップ、散布図、箱ひげ図を含めてください。各グラフに適切なタイトル、軸ラベル、凡例を追加し、viridisカラーパレットを使用してください。subplotsで6つのグラフを統合し、高解像度PNGとして保存してください。",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low",
+    "length": 186
+  },
+  {
+    "id": "long_visualization_140",
+    "command": "Matplotlibのアニメーション機能で時系列データの動的可視化を作成してください。FuncAnimationでフレームごとにデータを更新し、軌跡を残しながらプロットを描画してください。複数系列の同時アニメーション、再生速度調整、一時停止機能を実装してください。MP4動画またはGIFアニメーションとして保存してください。",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low",
+    "length": 162
+  },
+  {
+    "id": "long_visualization_141",
+    "command": "D3.jsでネットワークグラフのカスタムビジュアライゼーションを実装してください。force-directedレイアウト、ノードのドラッグ&ドロップ、ズーム&パン機能を使用してください。SVG要素を動的に生成し、ノードサイズを重要度で変更し、エッジの太さを関連度で調整してください。レスポンシブ対応にし、複雑なネットワーク関係を直感的に表現してください。",
+    "category": "visualization",
+    "framework": "matplotlib",
+    "complexity": "low",
+    "length": 177
+  },
+  {
+    "id": "long_visualization_142",
+    "command": "Plotlyで3D可視化と地理空間データの可視化を実装してください。3D散布図、サーフェスプロット、地図上のマーカープロット、コロプレス（塗り分け地図）を作成してください。アニメーションフレームで時系列変化を表現し、カメラアングルの自動回転も実装してください。Mapbox統合で高品質な地図表示を実現してください。",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low",
+    "length": 157
+  },
+  {
+    "id": "long_visualization_143",
+    "command": "Plotly + Dashで機械学習モデルの評価ダッシュボードを構築してください。ROC曲線、PR曲線、混同行列のヒートマップ、特徴量重要度の棒グラフを表示してください。モデル選択のドロップダウン、閾値調整のスライダーを実装し、選択に応じて動的に更新してください。精度、再現率、F1スコアのメトリクス表も表示してください。",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "low",
+    "length": 161
+  },
+  {
+    "id": "long_api_144",
+    "command": "Spring Boot（Java）でエンタープライズAPIを開発してください。Spring MVC、Spring Data JPA、Spring Securityによる認証・認可を実装してください。RestControllerでRESTエンドポイント、GlobalExceptionHandlerでエラーハンドリング、Swagger統合、HATEOAS対応も含めてください。マイクロサービスアーキテクチャ向けにSpring Cloudも統合してください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "medium",
+    "length": 227
+  },
+  {
+    "id": "long_api_145",
+    "command": "GoでハイパフォーマンスなgRPCサーバーを実装してください。Protocol Buffers定義、サーバー/クライアントストリーミング、インターセプターによる認証・ロギング、エラーハンドリングを含めてください。コンテキストによるタイムアウト制御、graceful shutdown、Prometheusメトリクスエクスポートも実装してください。",
+    "category": "api",
+    "framework": "grpc",
+    "complexity": "low",
+    "length": 173
+  },
+  {
+    "id": "long_api_146",
+    "command": "GraphQL APIをPython（Strawberry）で実装してください。スキーマ定義（Query、Mutation、Subscription）、リゾルバ実装、DataLoaderによるN+1問題の解決を含めてください。JWT認証、ページネーション（cursor-based）、フィールドレベルの権限制御も追加し、Apollo StudioでGraphiQL環境を提供してください。",
+    "category": "api",
+    "framework": "graphql",
+    "complexity": "low",
+    "length": 194
+  },
+  {
+    "id": "long_api_147",
+    "command": "Ktor（Kotlin）でRESTful APIサーバーを実装してください。ルーティング、コンテンツネゴシエーション、JWTプラグインによる認証、Exposedによるデータベースアクセスを含めてください。非同期処理（コルーチン）、ミドルウェアによるロギング、例外ハンドリング、OpenAPI生成も実装してください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "low",
+    "length": 157
+  },
+  {
+    "id": "long_api_148",
+    "command": "FastAPIでマイクロサービスAPIを実装してください。Consulによるサービスディスカバリー、Nginxによるロードバランシング、Circuitbreakerライブラリによるサーキットブレーカーパターンを含めてください。Jaegerで分散トレーシング、ELKスタックで集中ログ管理、Prometheusでメトリクス収集、ヘルスチェックエンドポイントも追加してください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "low",
+    "length": 187
+  },
+  {
+    "id": "long_api_149",
+    "command": "gRPCサービスをPythonで実装してください。Protocol Buffersによる.protoファイル定義、サーバー・クライアント実装、bidirectional streamingによるリアルタイム通信を含めてください。インターセプターによる認証・ロギング、エラーハンドリング（gRPCステータスコード）、メタデータ管理も実装し、Dockerで統合テストしてください。",
+    "category": "api",
+    "framework": "grpc",
+    "complexity": "low",
+    "length": 188
+  },
+  {
+    "id": "long_api_150",
+    "command": "FastAPIでユーザー認証付きのRESTful APIを構築してください。Pydanticによるリクエスト/レスポンスバリデーション、OAuth2 + JWTによる認証・認可、SQLAlchemyによるPostgreSQL連携を実装してください。OpenAPIドキュメント自動生成、CORS設定、レート制限（Slowapi）、構造化エラーハンドリングを含め、Dockerコンテナ化してください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "low",
+    "length": 198
+  },
+  {
+    "id": "long_api_151",
+    "command": "WebSocketサーバーをFastAPIで構築してください。ConnectionManagerによる接続管理、ルーム/チャンネル機能、broadcast/unicast メッセージング、heartbeatによる接続監視を実装してください。Redisでメッセージキューイングし、複数サーバー間でのメッセージ配信も可能にしてください。再接続処理とバックプレッシャー制御も実装してください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "low",
+    "length": 193
+  },
+  {
+    "id": "long_api_152",
+    "command": "Django REST Frameworkで大規模APIを構築してください。ViewSet、Serializer、Router による設計、django-filterによるクエリフィルタリング、JWT認証、throttlingによるレート制限を実装してください。Swagger/ReDocによるAPI文書化、drf-yasgによるスキーマ生成、CORS設定、ページネーションも含めてください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "low",
+    "length": 196
+  },
+  {
+    "id": "long_api_153",
+    "command": "Node.js + Expressで高速APIサーバーを構築してください。ミドルウェアチェーン、非同期エラーハンドリング、JWTトークン検証、Helmet.jsによるセキュリティ強化を実装してください。MongoDB（Mongoose）連携、Redis キャッシング、rate-limiterによるDDoS対策も含めてください。クラスターモードで複数プロセス起動してください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "low",
+    "length": 188
+  },
+  {
+    "id": "long_api_154",
+    "command": "NestJSでスケーラブルなNode.jsバックエンドを開発してください。モジュール、コントローラー、サービスによる階層設計、TypeORMによるDB連携、Passport.jsによるJWT認証を実装してください。Guards、Interceptors、Pipesを活用し、Swaggerドキュメント生成、GraphQLサポート、WebSocket統合も含めてください。",
+    "category": "api",
+    "framework": "graphql",
+    "complexity": "low",
+    "length": 185
+  },
+  {
+    "id": "long_docker_155",
+    "command": "ECS（Amazon Elastic Container Service）でDockerコンテナをデプロイしてください。タスク定義（CPU/メモリ/ポート/環境変数）、サービス定義（ロードバランサー統合、Auto Scaling）、Fargateによるサーバーレス実行を設定してください。CloudWatch Logsでログ収集、Secrets Managerでシークレット管理も実装してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "low",
+    "length": 199
+  },
+  {
+    "id": "long_docker_156",
+    "command": "Dockerでマルチステージビルドを使用したNode.jsアプリの最適化を実施してください。ビルドステージでnpm install + webpack、本番ステージで必要ファイルのみコピー、distrolessイメージまたはAlpineで最小化してください。.dockerignoreで不要ファイル除外、layer cachingで高速ビルド、最終イメージを100MB未満に抑えてください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "low",
+    "length": 195
+  },
+  {
+    "id": "long_docker_157",
+    "command": "Docker NetworkingでマイクロサービスのService DiscoveryとLoad Balancingを実装してください。カスタムブリッジネットワーク作成、サービス名によるDNS解決、内部ネットワーク分離（フロント/バック）を設定してください。外部公開ポートの最小化、ネットワークエイリアス、接続テストも含めてください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "low",
+    "length": 168
+  },
+  {
+    "id": "long_docker_158",
+    "command": "Docker Composeでローカル開発環境のフルスタック構築を実施してください。フロントエンド（Vite + React）、バックエンド（FastAPI）、DB（PostgreSQL）、キャッシュ（Redis）、メッセージキュー（RabbitMQ）を含めてください。ホットリロード対応、初期データシード、テストデータ投入スクリプトも実装してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "low",
+    "length": 177
+  },
+  {
+    "id": "long_docker_159",
+    "command": "Kubernetesで本番環境へのアプリケーションデプロイを実施してください。Deployment、Service、Ingress、PersistentVolumeClaim、ConfigMap、Secretのマニフェストを作成してください。ローリングアップデート戦略、Horizontal Pod Autoscaler、リソースリクエスト/リミット設定、Readiness/Livenessプローブを含めてください。Helmチャートも作成してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium",
+    "length": 227
+  },
+  {
+    "id": "long_docker_160",
+    "command": "Python Webアプリ用のDockerイメージを最適化してください。Alpine Linuxによる軽量ベースイメージ、マルチステージビルドによるビルド成果物の分離、レイヤーキャッシュ最適化（requirements.txt先コピー）、Trivyによる脆弱性スキャンを実施してください。イメージサイズを500MB未満に抑え、セキュリティベストプラクティスに従い、Docker Hubにプッシュしてください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "medium",
+    "length": 204
+  },
+  {
+    "id": "long_docker_161",
+    "command": "DockerでNginx + Let's Encrypt自動SSL証明書更新システムを構築してください。nginx.confでリバースプロキシ設定、Certbotコンテナで証明書取得・更新、cronで自動更新スケジューリングを実装してください。複数ドメイン対応、HSTS設定、セキュリティヘッダー追加も含めてください。docker-composeで統合してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "low",
+    "length": 183
+  },
+  {
+    "id": "long_docker_162",
+    "command": "Docker Swarmでコンテナオーケストレーションクラスターを構築してください。docker stack deployによるサービスデプロイ、Swarmルーティングメッシュによるロードバランシング、docker service scaleによるスケーリングを実装してください。Secretsによる機密情報管理、ローリングアップデート設定、ヘルスチェックとサービスリカバリーも設定してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "low",
+    "length": 198
+  },
+  {
+    "id": "long_docker_163",
+    "command": "Dockerで開発環境の完全再現可能性を実現してください。Dockerfileでランタイム環境定義、docker-compose.ymlで複数サービス統合、.envファイルで環境変数管理、Makefileでコマンド簡略化を実装してください。VSCode Remote-Containersでコンテナ内開発、ホットリロード、デバッガー接続も設定してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "low",
+    "length": 178
+  },
+  {
+    "id": "long_docker_164",
+    "command": "Docker VolumesとBindマウントを活用したデータ永続化戦略を実装してください。Named Volumeによるデータベースデータ保存、Bind Mountによる開発時のホットリロード、Volume Driverによるネットワークストレージ統合を含めてください。バックアップ戦略（docker run --rm backup）も実装し、データのポータビリティを確保してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "low",
+    "length": 194
+  },
+  {
+    "id": "long_docker_165",
+    "command": "GitHub ActionsでDockerイメージビルドのCI/CDパイプラインを構築してください。docker buildxによるマルチアーキテクチャビルド（amd64、arm64）、セマンティックバージョニングによるイメージタグ管理、GitHub Container Registryへのプッシュを実装してください。Trivyスキャン、ユニットテスト実行、ビルドキャッシュ活用も統合してください。",
+    "category": "docker",
+    "framework": "docker",
+    "complexity": "low",
+    "length": 200
+  },
+  {
+    "id": "long_general_166",
+    "command": "大量ファイルの自動バックアップスクリプトを作成してください。shutilによるファイルコピー、pathlibによるディレクトリ操作、日付ベースのバックアップフォルダ作成、zipfileによる圧縮を実装してください。増分バックアップ（差分ファイルのみ）、古いバックアップの自動削除、バックアップ検証（ハッシュ比較）、ログ記録も含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 170
+  },
+  {
+    "id": "long_general_167",
+    "command": "Jupyter Notebookの自動実行とHTMLレポート生成スクリプトを作成してください。nbconvert による実行と変換、パラメータ注入（papermill）、複数ノートブックの一括処理を実装してください。実行エラーのキャッチと通知、生成レポートのメール送信、S3/GCSへのアップロードも含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 158
+  },
+  {
+    "id": "long_general_168",
+    "command": "Pythonでシステムモニタリングスクリプトを作成してください。psutilでCPU/メモリ/ディスク使用率を取得、閾値監視、異常検知時のアラート送信（メール/Slack）を実装してください。グラフ可視化（matplotlib）、ログファイル出力、定期実行（schedule）、システムメトリクスのCSV保存も含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 163
+  },
+  {
+    "id": "long_general_169",
+    "command": "Click または argparseを使用した高機能CLIツールを開発してください。サブコマンド（init、run、deploy）、オプション引数（--verbose、--config）、環境変数読み込み、設定ファイル管理（TOML/YAML）を実装してください。カラー出力（colorama）、進捗表示、Bash/Zsh自動補完スクリプト生成も含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 181
+  },
+  {
+    "id": "long_general_170",
+    "command": "データベースマイグレーションツールを Python で実装してください。スキーマバージョン管理、up/down マイグレーション、トランザクション管理、ロールバック機能を実装してください。SQLAlchemy Coreによるスキーマ操作、マイグレーション履歴テーブル、CLI インターフェース、マイグレーションスクリプトの自動生成も含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 174
+  },
+  {
+    "id": "long_general_171",
+    "command": "Pythonで設定ファイル（JSON、YAML、TOML、.env）を統合管理するライブラリを作成してください。複数フォーマットの自動検出と読み込み、環境変数オーバーライド、スキーマバリデーション（Pydantic）、型安全なアクセスを実装してください。設定の階層的マージ、シークレット管理、設定変更の監視（watchdog）も含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 172
+  },
+  {
+    "id": "long_general_172",
+    "command": "大量画像ファイルの一括リサイズとフォーマット変換スクリプトを作成してください。Pillowによる画像処理、globによるファイル検索、EXIF情報保持、品質設定（JPEG圧縮率）を実装してください。concurrent.futuresによる並列処理、処理統計（成功/失敗件数）の出力、エラー画像の別フォルダ保存も含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 164
+  },
+  {
+    "id": "long_general_173",
+    "command": "ログ集約と分析のPythonスクリプトを作成してください。複数ログファイルの読み込み、正規表現によるパースィング、エラーパターンの検出、統計分析（エラー頻度、レスポンスタイム）を実装してください。Elasticsearchへの送信、Kibanaダッシュボード用のインデックス作成、アラート条件のチェックも含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 160
+  },
+  {
+    "id": "long_general_174",
+    "command": "Pythonで複数PDFファイルのテキスト抽出と分析の自動化スクリプトを作成してください。pathlibによるディレクトリ走査、PyPDF2によるテキスト抽出、spaCyによる固有表現抽出、結果のCSV保存を実装してください。エラーハンドリング（try-except）、詳細ログ記録（logging）、multiprocessingによる並列処理、tqdmプログレスバーも含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 194
+  },
+  {
+    "id": "long_general_175",
+    "command": "複数フォーマット（CSV、JSON、Excel）のデータを統一フォーマットに変換するETLスクリプトを作成してください。pandas による読み込み、データクリーニング、スキーマ統一、出力フォーマット選択を実装してください。バリデーションチェック、エラーレポート生成、処理サマリの出力、設定ファイル（YAML）による動作制御も含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 171
+  },
+  {
+    "id": "long_general_176",
+    "command": "cronまたはTask Schedulerで定期実行されるデータ収集バッチスクリプトを作成してください。API呼び出し（requests）、JSONパース、データベース保存（SQLAlchemy）、メール通知（smtplib）を実装してください。エラー時のリトライ（backoff）、処理結果サマリの生成、Slackへの通知、実行ログのローテーションも含めてください。",
+    "category": "general",
+    "framework": "python",
+    "complexity": "low",
+    "length": 184
+  },
+  {
+    "id": "long_network_177",
+    "command": "HTTP APIのレート制限とサーキットブレーカーを実装してください。Token Bucketアルゴリズムによるレート制限、Redisによる分散カウンター、Circuit Breakerパターン（Open/Half-Open/Closed）を含めてください。429エラー応答、Retry-Afterヘッダー、メトリクス記録（成功/失敗率）も実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "low",
+    "length": 179
+  },
+  {
+    "id": "long_network_178",
+    "command": "ロードバランサーをPythonで実装してください。ラウンドロビン、最小接続数、重み付けによるアルゴリズム、ヘルスチェック（HTTP/TCPプローブ）、バックエンドの動的登録/削除を含めてください。セッション永続化（スティッキーセッション）、接続プーリング、メトリクス収集（Prometheus）も実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "low",
+    "length": 157
+  },
+  {
+    "id": "long_network_179",
+    "command": "gRPCクライアント・サーバーをPythonで実装してください。Protocol Buffersによるメッセージ定義、Unary RPC、Server Streaming、Client Streaming、Bidirectional Streamingの4種類のRPCを含めてください。インターセプターによるロギング・認証、デッドライン設定、エラーハンドリング（gRPCステータス）、メタデータ管理も実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "medium",
+    "length": 209
+  },
+  {
+    "id": "long_network_180",
+    "command": "プロキシサーバーをPythonで構築してください。HTTP/HTTPSリクエストの転送、ヘッダー書き換え、キャッシング（LRUCache）、リクエストフィルタリング（ブラックリスト）を実装してください。アクセスログ記録、Basic認証、SSL/TLS終端、upstream選択（ラウンドロビン）も含めてください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "low",
+    "length": 156
+  },
+  {
+    "id": "long_network_181",
+    "command": "HTTP/2プロトコルを使用した高性能クライアントライブラリを実装してください。aiohttpによる非同期通信、HTTP/2多重化、接続プーリング、自動リトライ（exponential backoff with jitter）を含めてください。タイムアウト管理、エラーハンドリング、詳細ログ記録、接続メトリクス（レイテンシ、スループット）の収集も実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "low",
+    "length": 182
+  },
+  {
+    "id": "long_network_182",
+    "command": "WebSocketサーバーとクライアントをPythonで実装してください。websocketsライブラリによる非同期通信、ルーム/チャンネル管理、ブロードキャスト/ユニキャストメッセージング、heartbeatによる接続監視を含めてください。自動再接続処理（exponential backoff）、メッセージキューイング、接続状態管理も実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "low",
+    "length": 178
+  },
+  {
+    "id": "long_network_183",
+    "command": "DNSサーバー/クライアントを実装してください。dnspythonによるDNSクエリ、レコードタイプ（A、AAAA、MX、TXT）解決、キャッシング、再帰的問い合わせを含めてください。カスタムDNSサーバー（権威サーバー）の構築、ゾーンファイル管理、DNSSEC対応も実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "low",
+    "length": 143
+  },
+  {
+    "id": "long_network_184",
+    "command": "MQTTブローカー（Mosquitto）との通信クライアントを実装してください。paho-mqttによるpub/sub、QoSレベル設定（0、1、2）、Last Will and Testament、トピックフィルタリングを含めてください。TLS/SSL暗号化、認証（ユーザー名/パスワード）、再接続処理、メッセージバッファリングも実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "low",
+    "length": 175
+  },
+  {
+    "id": "long_network_185",
+    "command": "WebRTCによるP2P通信の実装を行ってください。aiortcライブラリによるPeer Connection、ICE Candidate交換、STUN/TURNサーバー統合、Data Channelによるメッセージング、Media Streamによる音声/動画ストリーミングを含めてください。シグナリングサーバー（WebSocket）、NAT traversal、接続品質モニタリングも実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "medium",
+    "length": 203
+  },
+  {
+    "id": "long_network_186",
+    "command": "SSHクライアントとSFTP転送を実装してください。paramikoライブラリによるSSH接続、コマンド実行、ファイル転送（SCP/SFTP）、ポートフォワーディング（ローカル/リモート）を含めてください。公開鍵認証、known_hosts管理、タイムアウト設定、リトライ処理も実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "low",
+    "length": 148
+  },
+  {
+    "id": "long_network_187",
+    "command": "TCPサーバーとクライアントを低レベルソケットAPIで実装してください。socketモジュールによる接続管理、selectまたはasyncioによる非同期I/O、カスタムプロトコル設計（メッセージ長プレフィックス）を含めてください。タイムアウト処理、graceful shutdown、接続数制限、ログ記録も実装してください。",
+    "category": "network",
+    "framework": "socket",
+    "complexity": "low",
+    "length": 163
+  },
+  {
+    "id": "ultra_ml_1",
+    "command": "TensorFlow 2.xとKerasを使用して、画像分類のための高度なCNNモデルを実装してください。具体的な要件として、1) ResNet50をベースモデルとして転移学習を実施し、最後の3層をファインチューニング、2) ImageDataGeneratorによるデータ拡張（回転、反転、ズーム、シフト、明度調整）、3) Mixupまたは CutMixによる高度なデータ拡張、4) Cosine Annealing学習率スケジューラ、5) EarlyStoppingとModelCheckpointによる最良モデル保存、6) TensorBoardによるリアルタイム学習監視、7) Grad-CAMによる予測根拠の可視化、8) テストデータでの混同行列、ROC曲線、PR曲線の作成、9) クラス不均衡対応のためのfocal lossまたはclass weights、10) 最終モデルのTFLite変換とモバイル展開用の最適化を含めてください。すべての実験結果をWandBにログし、再現性のためランダムシードを固定し、詳細なMarkdownレポートも生成してください。",
+    "category": "machine_learning",
+    "framework": "tensorflow",
+    "complexity": "very_high",
+    "length": 573
+  },
+  {
+    "id": "ultra_data_1",
+    "command": "pandasとSQL Alchemyを使用して、複数のデータソース（PostgreSQL、MySQL、CSV、JSON、Excel）からデータを抽出し、包括的なETLパイプラインを構築してください。具体的には、1) SQLAlchemyで複数DBに接続し、複雑なJOINクエリでデータ抽出、2) pandasでデータ統合時のスキーマ不一致を解決、3) 欠損値処理（MICE多重代入法、KNN補完）、4) 外れ値検出（Isolation Forest、LOF、DBSCAN）と処理、5) カテゴリカル変数のTarget Encoding、Frequency Encoding、6) 数値変数のRobust Scaler、Yeo-Johnson変換、7) 特徴量エンジニアリング（多項式特徴、交互作用項、時系列ラグ特徴）、8) 相関分析とVIFによる多重共線性チェック、9) クラスタリング（K-Means、GMM）による顧客セグメント作成、10) 最終データセットのバリデーション（Great Expectations使用）、11) 処理パイプライン全体をApache Airflow DAGとして実装、12) データ品質レポートとデータリネージ図の自動生成を含めてください。すべての処理ステップのログを構造化して記録し、エラー時のロールバック処理も実装してください。",
+    "category": "data_analysis",
+    "framework": "pandas",
+    "complexity": "very_high",
+    "length": 703
+  },
+  {
+    "id": "ultra_web_1",
+    "command": "React.js、TypeScript、Next.js 14を使用して、エンタープライズ向けのフルスタックWebアプリケーションを構築してください。フロントエンド要件: 1) Server Componentsとクライアントコンポーネントの適切な使い分け、2) App Routerによる ファイルベースルーティング、3) TanStack Query（React Query）による効率的なデータフェッチとキャッシング、4) Zustandによるグローバル状態管理、5) React Hook Formと Zodによる型安全なフォームバリデーション、6) Tailwind CSSとshadcn/uiによるモダンUI、7) Framer Motionによる滑らかなアニメーション、8) react-i18nextによる多言語対応、9) Next.js Middlewareによる認証ガード。バックエンド要件: 1) Next.js API RoutesまたはServer Actionsによるバックエンドロジック、2) Prisma ORMとPostgreSQLによるデータベース管理、3) NextAuth.jsによるOAuth2.0認証（Google、GitHub）とJWT、4) Stripe APIによる決済処理統合、5) SendGridによるメール送信、6) AWS S3による画像アップロード。品質・パフォーマンス要件: 1) Jest + React Testing Libraryによるユニットテスト、2) Playwrightによるe2eテスト、3) ESLintとPrettierによるコード品質管理、4) Lighthouse スコア95+達成、5) Web Vitals最適化（LCP、FID、CLS）、6) Vercelへのデプロイと CDN最適化を含めてください。",
+    "category": "web_app",
+    "framework": "react",
+    "complexity": "very_high",
+    "length": 797
+  },
+  {
+    "id": "ultra_api_1",
+    "command": "FastAPI、SQLAlchemy、Alembic、PostgreSQL を使用して、マイクロサービスアーキテクチャのRESTful APIを構築してください。アーキテクチャ要件: 1) レイヤードアーキテクチャ（Controller、Service、Repository）の実装、2) 依存性注入（Depends）による疎結合設計、3) Pydantic BaseSettingsによる環境変数管理。認証・認可: 1) OAuth2 + JWTによるトークンベース認証、2) リフレッシュトークン機構、3) role-based access control（RBAC）、4) API Keyによる外部システム連携。データベース: 1) SQLAlchemy 2.0のasync対応、2) Alembicによるマイグレーション管理、3) 楽観的ロックによる同時実行制御、4) ソフトデリートとタイムスタンプ管理。パフォーマンス: 1) Redisによるクエリ結果キャッシング、2) データベース接続プーリング、3) N+1問題の解決（selectinload）、4) ページネーション（cursor-based）。可観測性: 1) Prometheusメトリクスエクスポート、2) OpenTelemetryによる分散トレーシング、3) 構造化ログ記録（structlog）、4) Sentryエラートラッキング。セキュリティ: 1) CORS設定、2) rate limiting（Slowapi）、3) SQL injectionとXSS対策、4) Helmetによるセキュリティヘッダー、5) 機密情報のvault管理。その他: 1) OpenAPI/Swaggerドキュメント自動生成、2) WebSocketエンドポイント、3) バックグラウンドタスク（Celery + Redis）、4) ヘルスチェックエンドポイント、5) Docker Composeによる開発環境、6) pytestによるユニット・統合テスト（カバレッジ90%+）を含めてください。",
+    "category": "api",
+    "framework": "fastapi",
+    "complexity": "very_high",
+    "length": 974
+  },
+  {
+    "id": "ultra_docker_1",
+    "command": "Kubernetes（K8s）でマイクロサービスアプリケーションの完全な本番環境デプロイを実施してください。アプリケーション構成: 1) フロントエンド（React）、2) APIゲートウェイ（Kong/Nginx Ingress）、3) 認証サービス（Keycloak）、4) 3つのマイクロサービス（User、Order、Payment）、5) PostgreSQL StatefulSet、6) Redis Cluster、7) RabbitMQ、8) Elasticsearch + Kibana。Kubernetes リソース定義: 1) Deployment（ローリングアップデート戦略、PodDisruptionBudget）、2) Service（ClusterIP、LoadBalancer）、3) Ingress（TLS/SSL、パスベースルーティング）、4) StatefulSet（永続ボリューム）、5) ConfigMap（アプリケーション設定）、6) Secret（DB認証情報、API キー）、7) HorizontalPodAutoscaler（CPU/メモリベース）、8) NetworkPolicy（Pod間通信制御）、9) ServiceAccount + RBAC。オブザーバビリティ: 1) Prometheusによるメトリクス収集、2) Grafanaダッシュボード、3) Jaegerによる分散トレーシング、4) EFKスタック（Elasticsearch、Fluentd、Kibana）による集中ログ管理、5) Kubeステート メトリクス。CI/CD: 1) GitLab CI/CDパイプライン、2) Kaniko/Buildahによるコンテナビルド、3) Helmチャート管理、4) ArgoCD/Fluxによる GitOpsデプロイメント、5) テスト環境と本番環境の分離。セキュリティ: 1) Pod Security Standards、2) Trivyによるイメージスキャン、3) Sealed Secretsによる暗号化、4) OPA/Gatekeeperによるポリシー管理。その他: 1) cert-managerによる自動SSL証明書管理、2) Veleroによるバックアップ、3) クラスター監視とアラート設定を含めてください。",
+    "category": "docker",
+    "framework": "kubernetes",
+    "complexity": "very_high",
+    "length": 1014
+  },
+  {
+    "id": "ultra_viz_1",
+    "command": "Plotly Dashを使用して、企業経営層向けの包括的なビジネスインテリジェンスダッシュボードを構築してください。ダッシュボード要件: 1) レスポンシブレイアウト（Bootstrap/Tailwind統合）、2) ダークモード切り替え、3) ユーザー認証とロールベースアクセス制御、4) 複数ページ構成（売上分析、顧客分析、在庫管理、財務レポート）。可視化コンポーネント: 1) 主要KPIカード（売上高、利益率、成長率、顧客数）、2) 時系列折れ線グラフ（複数指標の比較、移動平均）、3) 地域別売上のコロプレス（塗り分け地図）、4) 商品カテゴリー別のサンバーストチャート、5) 顧客セグメント別の散布図バブルチャート、6) 在庫回転率のヒートマップ、7) 財務指標のウォーターフォールチャート、8) 予実比較の複合グラフ（棒+折れ線）。インタラクティブ機能: 1) 日付範囲ピッカーによるフィルタリング、2) ドロップダウンによる地域/商品選択、3) クロスフィルタリング（グラフ間連携）、4) ドリルダウン（年→四半期→月）、5) データテーブルの検索・ソート・ページネーション、6) グラフのPDF/PNG/CSVエクスポート。データ処理: 1) PostgreSQL/BigQueryからのデータ取得、2) pandasによる集計・変換、3) キャッシング（Redis/Memcached）、4) バックグラウンド更新（Celery）、5) リアルタイムデータストリーミング（WebSocket）。パフォーマンス最適化: 1) 遅延読み込み、2) クライアントサイドコールバック、3) Plotly Reactによる高速レンダリング、4) データサンプリング（大規模データ対応）。デプロイ: 1) Dockerコンテナ化、2) Gunicorn/uWSGI、3) Nginx リバースプロキシ、4) SSL/TLS設定、5) 本番環境での監視・アラート設定を含めてください。",
+    "category": "visualization",
+    "framework": "plotly",
+    "complexity": "very_high",
+    "length": 953
+  },
+  {
+    "id": "realworld_slack_1",
+    "command": "リアルタイムメッセージング機能を持つチームコラボレーションプラットフォームを構築してください。チャンネル作成、ダイレクトメッセージ、ファイル共有、スレッド機能、リアクション、通知システム、検索機能、ユーザーステータス管理を含めてください。",
+    "category": "web_app",
+    "length": 131,
+    "source": "Slack-like collaboration platform"
+  },
+  {
+    "id": "realworld_notion_1",
+    "command": "ドキュメント作成、データベース管理、カンバンボード、カレンダー、リスト表示を統合したオールインワン生産性ツールを開発してください。ブロックベースのエディタ、リアルタイム共同編集、テンプレート機能、権限管理、埋め込みコンテンツサポートを実装してください。",
+    "category": "web_app",
+    "length": 138,
+    "source": "Notion-like productivity tool"
+  },
+  {
+    "id": "realworld_figma_1",
+    "command": "ブラウザベースのベクターグラフィックス編集ツールを作成してください。レイヤー管理、パス編集、カラーピッカー、テキストツール、コンポーネントシステム、リアルタイムコラボレーション、バージョン履歴、プロトタイピング機能、エクスポートオプションを含めてください。",
+    "category": "visualization",
+    "length": 132,
+    "source": "Figma-like design tool"
+  },
+  {
+    "id": "realworld_github_1",
+    "command": "Git リポジトリホスティングプラットフォームを構築してください。コードレビュー、プルリクエスト、イシュー追跡、プロジェクト管理、CI/CD パイプライン統合、コード検索、ブランチ保護、ウェブフック、API アクセスを実装してください。",
+    "category": "web_app",
+    "length": 129,
+    "source": "GitHub-like repository platform"
+  },
+  {
+    "id": "realworld_spotify_1",
+    "command": "音楽ストリーミングサービスを開発してください。プレイリスト作成、レコメンデーションアルゴリズム、オフライン再生、歌詞表示、ソーシャル機能、パーソナライズされたホーム画面、検索・フィルタ機能、クロスデバイス同期、アーティストページを含めてください。",
+    "category": "web_app",
+    "length": 134,
+    "source": "Spotify-like streaming service"
+  },
+  {
+    "id": "realworld_netflix_1",
+    "command": "動画ストリーミングプラットフォームを構築してください。アダプティブビットレートストリーミング、コンテンツレコメンデーション、視聴履歴管理、マルチプロファイル対応、ペアレンタルコントロール、ダウンロード機能、字幕・音声トラック選択、続きから再生機能を実装してください。",
+    "category": "web_app",
+    "length": 143,
+    "source": "Netflix-like streaming platform"
+  },
+  {
+    "id": "realworld_trello_1",
+    "command": "カンバンスタイルのプロジェクト管理ツールを作成してください。ボード、リスト、カード管理、ドラッグ&ドロップインターフェース、ラベル、期日設定、チェックリスト、添付ファイル、コメント、アクティビティログ、Power-Ups統合を実装してください。",
+    "category": "web_app",
+    "length": 133,
+    "source": "Trello-like project management"
+  },
+  {
+    "id": "realworld_airbnb_1",
+    "command": "宿泊施設予約プラットフォームを開発してください。物件検索・フィルタリング、カレンダーベースの空室確認、予約システム、決済処理、レビュー・評価機能、ホスト管理ダッシュボード、メッセージング、地図統合、価格計算アルゴリズムを含めてください。",
+    "category": "web_app",
+    "length": 136,
+    "source": "Airbnb-like booking platform"
+  },
+  {
+    "id": "realworld_twitter_1",
+    "command": "マイクロブログソーシャルネットワークを構築してください。投稿作成(テキスト・画像・動画)、タイムライン表示、フォロー・フォロワー管理、いいね・リツイート・返信機能、ハッシュタグ、トレンド、通知、ダイレクトメッセージ、検索、ブックマークを実装してください。",
+    "category": "web_app",
+    "length": 142,
+    "source": "Twitter-like social network"
+  },
+  {
+    "id": "realworld_shopify_1",
+    "command": "Eコマースプラットフォームを作成してください。商品管理、在庫追跡、ショッピングカート、チェックアウトフロー、複数決済方法対応、配送料計算、注文管理、顧客管理、割引・クーポンシステム、分析ダッシュボード、SEO最適化を実装してください。",
+    "category": "web_app",
+    "length": 138,
+    "source": "Shopify-like e-commerce platform"
+  },
+  {
+    "id": "realworld_zoom_1",
+    "command": "ビデオ会議プラットフォームを開発してください。HD ビデオ・オーディオ、画面共有、チャット機能、バーチャル背景、ブレイクアウトルーム、録画機能、ホワイトボード、投票機能、挙手機能、待機室、スケジューリング統合を実装してください。",
+    "category": "web_app",
+    "length": 130,
+    "source": "Zoom-like video conferencing"
+  },
+  {
+    "id": "realworld_linkedin_1",
+    "command": "プロフェッショナルネットワーキングプラットフォームを構築してください。プロフィール管理、コネクション機能、求人投稿・応募、企業ページ、ニュースフィード、メッセージング、エンドースメント、スキル管理、記事投稿、検索・フィルタリング、レコメンデーションを実装してください。",
+    "category": "web_app",
+    "length": 143,
+    "source": "LinkedIn-like professional network"
+  },
+  {
+    "id": "realworld_uber_1",
+    "command": "ライドシェアリングアプリを作成してください。リアルタイム位置追跡、ドライバーマッチング、料金計算、ルート最適化、決済処理、評価システム、ドライバー・乗客プロフィール、予約機能、プロモーション管理、リアルタイム通知、サポートチャットを実装してください。",
+    "category": "web_app",
+    "length": 137,
+    "source": "Uber-like ridesharing app"
+  },
+  {
+    "id": "realworld_medium_1",
+    "command": "ブログパブリッシングプラットフォームを開発してください。リッチテキストエディタ、画像・動画埋め込み、ドラフト管理、公開スケジューリング、タグ・カテゴリ、コメントシステム、いいね・拍手機能、フォロー機能、レコメンデーション、検索、統計分析、収益化オプションを実装してください。",
+    "category": "web_app",
+    "length": 148,
+    "source": "Medium-like publishing platform"
+  },
+  {
+    "id": "realworld_dropbox_1",
+    "command": "クラウドストレージサービスを構築してください。ファイルアップロード・ダウンロード、フォルダ階層管理、ファイル共有・権限設定、バージョン履歴、同期機能、ファイルプレビュー、検索、削除済みアイテムの復元、容量管理、モバイル対応を実装してください。",
+    "category": "web_app",
+    "length": 137,
+    "source": "Dropbox-like cloud storage"
+  },
+  {
+    "id": "realworld_stripe_1",
+    "command": "決済処理APIを開発してください。クレジットカード処理、サブスクリプション管理、請求書発行、返金処理、不正検知、複数通貨対応、webhook通知、顧客管理、レポート生成、PCI DSS準拠、3Dセキュア対応、決済リンク生成を実装してください。",
+    "category": "api",
+    "length": 144,
+    "source": "Stripe-like payment API"
+  },
+  {
+    "id": "realworld_twilio_1",
+    "command": "通信APIプラットフォームを作成してください。SMS送信、音声通話、ビデオ通話、WhatsApp メッセージング、Email API、認証サービス(2FA)、プログラマブル音声、通話録音、番号検証、使用量追跡、webhook統合、複数キャリア対応を実装してください。",
+    "category": "api",
+    "length": 145,
+    "source": "Twilio-like communication API"
+  },
+  {
+    "id": "realworld_googlemap_1",
+    "command": "地図・位置情報APIを開発してください。地図表示、ジオコーディング・リバースジオコーディング、ルート検索、距離計算、場所検索・オートコンプリート、タイムゾーン取得、高度情報、ストリートビュー統合、交通情報、複数地図スタイル、マーカー・オーバーレイ管理を実装してください。",
+    "category": "api",
+    "length": 158,
+    "source": "Google Maps-like location API"
+  },
+  {
+    "id": "realworld_sendgrid_1",
+    "command": "メール配信APIサービスを構築してください。トランザクションメール送信、バルクメール配信、テンプレート管理、A/Bテスト、配信スケジューリング、開封・クリック追跡、バウンス管理、スパムフィルタ対策、IPウォームアップ、リスト管理、webhook通知、詳細分析を実装してください。",
+    "category": "api",
+    "length": 154,
+    "source": "SendGrid-like email API"
+  },
+  {
+    "id": "realworld_aws_1",
+    "command": "クラウドインフラストラクチャAPIを作成してください。仮想マシン管理、コンテナオーケストレーション、オブジェクトストレージ、データベースサービス、ロードバランシング、CDN、DNS管理、IAM、VPC設定、監視・ログ、自動スケーリング、バックアップ・リカバリを実装してください。",
+    "category": "api",
+    "length": 149,
+    "source": "AWS-like cloud infrastructure API"
+  },
+  {
+    "id": "realworld_kaggle_1",
+    "command": "機械学習コンペティションプラットフォームを開発してください。データセット管理、Jupyter Notebook統合環境、モデル投稿・評価システム、リーダーボード、チーム編成、ディスカッションフォーラム、カーネル共有、評価メトリクス自動計算、賞金管理、進捗追跡を実装してください。",
+    "category": "machine_learning",
+    "length": 147,
+    "source": "Kaggle-like ML competition platform"
+  },
+  {
+    "id": "realworld_huggingface_1",
+    "command": "機械学習モデル共有プラットフォームを構築してください。モデルリポジトリ、データセットホスティング、モデル推論API、トレーニング環境、モデルカード、ファインチューニング機能、デモスペース、バージョン管理、コミュニティフォーラム、検索・フィルタリング、ダウンロード統計を実装してください。",
+    "category": "machine_learning",
+    "length": 156,
+    "source": "HuggingFace-like model sharing platform"
+  },
+  {
+    "id": "realworld_openai_1",
+    "command": "大規模言語モデルAPIサービスを開発してください。テキスト生成、チャット補完、画像生成、音声認識、テキスト読み上げ、埋め込みベクトル生成、ファインチューニング、プロンプトエンジニアリング、トークン管理、レート制限、使用量追跡、コスト最適化機能を実装してください。",
+    "category": "api",
+    "length": 149,
+    "source": "OpenAI-like LLM API service"
+  },
+  {
+    "id": "realworld_tableau_1",
+    "command": "ビジネスインテリジェンス・データ可視化プラットフォームを作成してください。ドラッグ&ドロップダッシュボード作成、複数データソース統合、インタラクティブチャート(棒・折れ線・円・散布図・ヒートマップ)、計算フィールド、フィルタリング、ドリルダウン、地図可視化、リアルタイム更新、共有・埋め込み、モバイル対応を実装してください。",
+    "category": "visualization",
+    "length": 183,
+    "source": "Tableau-like BI visualization platform"
+  },
+  {
+    "id": "realworld_grafana_1",
+    "command": "監視・可視化ダッシュボードを開発してください。時系列データグラフ、アラート設定、複数データソース対応(Prometheus, InfluxDB, Elasticsearch)、カスタムダッシュボード、変数・テンプレート、アノテーション、プラグインシステム、ユーザー・チーム管理、ログ統合、トレーシングを実装してください。",
+    "category": "visualization",
+    "length": 173,
+    "source": "Grafana-like monitoring dashboard"
+  },
+  {
+    "id": "realworld_jupyter_1",
+    "command": "ブラウザベースのデータサイエンスノートブック環境を構築してください。コード実行セル、Markdown サポート、インタラクティブ可視化、ファイル管理、カーネル管理(Python, R, Julia)、拡張機能、nbconvert、共同編集、バージョン管理統合、GPU サポート、スケジュール実行を実装してください。",
+    "category": "data_analysis",
+    "length": 168,
+    "source": "Jupyter-like notebook environment"
+  },
+  {
+    "id": "realworld_databricks_1",
+    "command": "統合データ分析プラットフォームを作成してください。Apache Spark クラスタ管理、ノートブック環境、Delta Lake ストレージ、ジョブスケジューリング、MLflow 統合、SQL Analytics、データパイプライン、コラボレーション、クラスタ自動スケーリング、データカタログ、権限管理を実装してください。",
+    "category": "data_analysis",
+    "length": 167,
+    "source": "Databricks-like analytics platform"
+  },
+  {
+    "id": "realworld_docker_hub_1",
+    "command": "コンテナイメージレジストリサービスを開発してください。イメージプッシュ・プル、レイヤーキャッシング、脆弱性スキャン、自動ビルド、webhook、タグ管理、アクセス制御、レート制限、イメージ署名、マルチアーキテクチャサポート、ストレージ最適化、使用統計を実装してください。",
+    "category": "docker",
+    "length": 153,
+    "source": "Docker Hub-like container registry"
+  },
+  {
+    "id": "realworld_kubernetes_1",
+    "command": "コンテナオーケストレーションプラットフォームを構築してください。ポッド管理、サービスディスカバリ、ロードバランシング、自動スケーリング、ローリングアップデート、設定管理(ConfigMap/Secret)、永続化ボリューム、ネットワークポリシー、RBAC、ヘルスチェック、ログ・監視統合を実装してください。",
+    "category": "docker",
+    "length": 168,
+    "source": "Kubernetes-like orchestration platform"
+  },
+  {
+    "id": "realworld_elasticsearch_1",
+    "command": "分散検索・分析エンジンを作成してください。全文検索、ファセット検索、集計分析、地理空間検索、オートコンプリート、フィルタリング、スコアリング、ハイライト、スナップショット・復元、クラスタ管理、インデックス最適化、RESTful API、リアルタイムインデックスを実装してください。",
+    "category": "data_analysis",
+    "length": 163,
+    "source": "Elasticsearch-like search engine"
+  },
+  {
+    "id": "realworld_postman_1",
+    "command": "API 開発・テストプラットフォームを開発してください。HTTPリクエスト作成、環境変数管理、テストスクリプト、自動テスト実行、モック サーバー、API ドキュメント生成、コレクション管理、チーム共有、バージョン管理、監視、ワークスペース、プリリクエストスクリプトを実装してください。",
+    "category": "api",
+    "length": 158,
+    "source": "Postman-like API development platform"
+  },
+  {
+    "id": "realworld_jira_1",
+    "command": "課題追跡・プロジェクト管理ツールを構築してください。イシュー作成・管理、カスタムワークフロー、スプリント計画、バックログ管理、カンバンボード、ガントチャート、レポート・ダッシュボード、アジャイルメトリクス、タイムトラッキング、コメント・メンション、検索・フィルタ、自動化ルールを実装してください。",
+    "category": "web_app",
+    "length": 172,
+    "source": "Jira-like issue tracking"
+  },
+  {
+    "id": "realworld_discord_1",
+    "command": "コミュニティチャットプラットフォームを作成してください。サーバー・チャンネル管理、音声・ビデオチャット、テキストメッセージング、ロール・権限システム、Bot統合、リッチメディア埋め込み、絵文字・スタンプ、ダイレクトメッセージ、スクリーン共有、モデレーション機能、検索、通知管理を実装してください。",
+    "category": "web_app",
+    "length": 164,
+    "source": "Discord-like community platform"
+  },
+  {
+    "id": "realworld_asana_1",
+    "command": "ワークマネジメントプラットフォームを開発してください。タスク作成・割り当て、プロジェクト管理、マイルストーン、依存関係設定、タイムライン表示、カレンダービュー、ポートフォリオ管理、カスタムフィールド、テンプレート、自動化、レポート、ワークロード管理、統合機能を実装してください。",
+    "category": "web_app",
+    "length": 157,
+    "source": "Asana-like work management"
+  },
+  {
+    "id": "realworld_miro_1",
+    "command": "オンラインコラボレーションホワイトボードを構築してください。無限キャンバス、付箋・図形・矢印、リアルタイム共同編集、テンプレート、ビデオチャット統合、投票機能、タイマー、コメント、プレゼンテーションモード、フレーム管理、エクスポート、バージョン履歴、統合機能を実装してください。",
+    "category": "web_app",
+    "length": 157,
+    "source": "Miro-like collaborative whiteboard"
+  },
+  {
+    "id": "realworld_canva_1",
+    "command": "オンライングラフィックデザインツールを作成してください。ドラッグ&ドロップエディタ、豊富なテンプレート、画像・動画ライブラリ、テキストエフェクト、フィルタ・調整、レイヤー管理、ブランドキット、共同編集、アニメーション、多様な出力形式、SNS連携、印刷サービス統合を実装してください。",
+    "category": "visualization",
+    "length": 159,
+    "source": "Canva-like design tool"
+  },
+  {
+    "id": "realworld_mailchimp_1",
+    "command": "メールマーケティングプラットフォームを開発してください。キャンペーン作成、ドラッグ&ドロップエディタ、テンプレート、リスト管理、セグメンテーション、A/Bテスト、自動化ワークフロー、ランディングページ、配信スケジュール、詳細分析、統合機能、CRM、フォーム作成を実装してください。",
+    "category": "web_app",
+    "length": 162,
+    "source": "Mailchimp-like email marketing"
+  },
+  {
+    "id": "realworld_wordpress_1",
+    "command": "コンテンツ管理システム(CMS)を構築してください。投稿・ページ管理、メディアライブラリ、テーマシステム、プラグインアーキテクチャ、ブロックエディタ、ユーザー・権限管理、コメントシステム、SEO機能、マルチサイト対応、RESTful API、カスタム投稿タイプ、ウィジェットを実装してください。",
+    "category": "web_app",
+    "length": 164,
+    "source": "WordPress-like CMS"
+  },
+  {
+    "id": "realworld_salesforce_1",
+    "command": "CRMプラットフォームを作成してください。リード・商談管理、顧客アカウント管理、営業パイプライン、タスク・活動追跡、レポート・ダッシュボード、予測分析、自動化ワークフロー、メール統合、モバイルアプリ、カスタムオブジェクト、AppExchange、AI機能を実装してください。",
+    "category": "web_app",
+    "length": 152,
+    "source": "Salesforce-like CRM"
+  },
+  {
+    "id": "realworld_zendesk_1",
+    "command": "カスタマーサポートプラットフォームを開発してください。チケット管理、マルチチャネルサポート(Email, Chat, Phone)、ヘルプセンター、ナレッジベース、コミュニティフォーラム、SLA管理、自動化・マクロ、レポート、顧客満足度調査、統合機能、AIチャットボット、チーム管理を実装してください。",
+    "category": "web_app",
+    "length": 172,
+    "source": "Zendesk-like support platform"
+  },
+  {
+    "id": "realworld_cloudflare_1",
+    "command": "CDN・Webセキュリティサービスを構築してください。グローバルCDN、DDoS保護、Web Application Firewall、ボット管理、レート制限、SSL/TLS証明書、DNS管理、ページルール、キャッシュ最適化、ロードバランシング、ワーカー(エッジコンピューティング)、分析ダッシュボードを実装してください。",
+    "category": "network",
+    "length": 172,
+    "source": "Cloudflare-like CDN security"
+  },
+  {
+    "id": "realworld_airtable_1",
+    "command": "クラウドコラボレーションデータベースを作成してください。スプレッドシート風インターフェース、データベースビュー(Grid, Calendar, Kanban, Gallery)、リレーショナル機能、フォーム、自動化、API、フィルタ・ソート・グループ化、添付ファイル、リッチフィールドタイプ、権限管理、統合機能、テンプレートを実装してください。",
+    "category": "data_analysis",
+    "length": 181,
+    "source": "Airtable-like collaborative database"
+  }
+]

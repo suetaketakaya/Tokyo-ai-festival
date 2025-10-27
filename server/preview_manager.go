@@ -28,15 +28,15 @@ type PreviewService struct {
 	LastAccess  time.Time `json:"last_access"`
 }
 
-// PreviewManager manages preview services lifecycle
-type PreviewManager struct {
+// ServicePreviewManager manages preview services lifecycle
+type ServicePreviewManager struct {
 	services map[string]*PreviewService
 	mutex    sync.RWMutex
 }
 
 // NewPreviewManager creates a new preview manager
-func NewPreviewManager() *PreviewManager {
-	return &PreviewManager{
+func NewPreviewManager() *ServicePreviewManager {
+	return &ServicePreviewManager{
 		services: make(map[string]*PreviewService),
 	}
 }
@@ -45,12 +45,12 @@ func NewPreviewManager() *PreviewManager {
 var globalPreviewManager = NewPreviewManager()
 
 // GetPreviewManager returns the global preview manager
-func GetPreviewManager() *PreviewManager {
+func GetPreviewManager() *ServicePreviewManager {
 	return globalPreviewManager
 }
 
 // RegisterService registers a new preview service
-func (pm *PreviewManager) RegisterService(service *PreviewService) {
+func (pm *ServicePreviewManager) RegisterService(service *PreviewService) {
 	pm.mutex.Lock()
 	defer pm.mutex.Unlock()
 
@@ -62,7 +62,7 @@ func (pm *PreviewManager) RegisterService(service *PreviewService) {
 }
 
 // UnregisterService removes a preview service
-func (pm *PreviewManager) UnregisterService(serviceID string) {
+func (pm *ServicePreviewManager) UnregisterService(serviceID string) {
 	pm.mutex.Lock()
 	defer pm.mutex.Unlock()
 
@@ -73,7 +73,7 @@ func (pm *PreviewManager) UnregisterService(serviceID string) {
 }
 
 // GetService gets a service by ID
-func (pm *PreviewManager) GetService(serviceID string) (*PreviewService, bool) {
+func (pm *ServicePreviewManager) GetService(serviceID string) (*PreviewService, bool) {
 	pm.mutex.RLock()
 	defer pm.mutex.RUnlock()
 
@@ -85,7 +85,7 @@ func (pm *PreviewManager) GetService(serviceID string) (*PreviewService, bool) {
 }
 
 // GetServicesByProject gets all services for a project
-func (pm *PreviewManager) GetServicesByProject(projectID string) []*PreviewService {
+func (pm *ServicePreviewManager) GetServicesByProject(projectID string) []*PreviewService {
 	pm.mutex.RLock()
 	defer pm.mutex.RUnlock()
 
@@ -99,7 +99,7 @@ func (pm *PreviewManager) GetServicesByProject(projectID string) []*PreviewServi
 }
 
 // GetAllServices gets all registered services
-func (pm *PreviewManager) GetAllServices() []*PreviewService {
+func (pm *ServicePreviewManager) GetAllServices() []*PreviewService {
 	pm.mutex.RLock()
 	defer pm.mutex.RUnlock()
 
@@ -111,7 +111,7 @@ func (pm *PreviewManager) GetAllServices() []*PreviewService {
 }
 
 // StartService starts a preview service
-func (pm *PreviewManager) StartService(projectID, serviceType string, port int) (*PreviewService, error) {
+func (pm *ServicePreviewManager) StartService(projectID, serviceType string, port int) (*PreviewService, error) {
 	containerID := getContainerID(projectID)
 	if containerID == "" {
 		return nil, fmt.Errorf("container not found for project %s", projectID)
@@ -192,7 +192,7 @@ func (pm *PreviewManager) StartService(projectID, serviceType string, port int) 
 }
 
 // StopService stops a preview service
-func (pm *PreviewManager) StopService(serviceID string) error {
+func (pm *ServicePreviewManager) StopService(serviceID string) error {
 	service, exists := pm.GetService(serviceID)
 	if !exists {
 		return fmt.Errorf("service %s not found", serviceID)
@@ -232,7 +232,7 @@ func (pm *PreviewManager) StopService(serviceID string) error {
 }
 
 // DeleteService removes a service completely
-func (pm *PreviewManager) DeleteService(serviceID string) error {
+func (pm *ServicePreviewManager) DeleteService(serviceID string) error {
 	// First stop the service
 	if err := pm.StopService(serviceID); err != nil {
 		log.Printf("⚠️ Warning during stop: %v", err)
@@ -246,7 +246,7 @@ func (pm *PreviewManager) DeleteService(serviceID string) error {
 }
 
 // isServiceRunning checks if a service is actually running
-func (pm *PreviewManager) isServiceRunning(service *PreviewService) bool {
+func (pm *ServicePreviewManager) isServiceRunning(service *PreviewService) bool {
 	containerID := getContainerID(service.ProjectID)
 	if containerID == "" {
 		return false
@@ -262,7 +262,7 @@ func (pm *PreviewManager) isServiceRunning(service *PreviewService) bool {
 }
 
 // UpdateServiceStatuses updates all service statuses
-func (pm *PreviewManager) UpdateServiceStatuses() {
+func (pm *ServicePreviewManager) UpdateServiceStatuses() {
 	pm.mutex.Lock()
 	defer pm.mutex.Unlock()
 
@@ -276,7 +276,7 @@ func (pm *PreviewManager) UpdateServiceStatuses() {
 }
 
 // CleanupStaleServices removes services that haven't been accessed recently
-func (pm *PreviewManager) CleanupStaleServices(maxIdleTime time.Duration) {
+func (pm *ServicePreviewManager) CleanupStaleServices(maxIdleTime time.Duration) {
 	pm.mutex.Lock()
 	defer pm.mutex.Unlock()
 
@@ -340,7 +340,7 @@ func (s *Server) handlePreviewControl(conn *websocket.Conn, msg map[string]inter
 	}
 }
 
-func (s *Server) handlePreviewStart(conn *websocket.Conn, pm *PreviewManager, data map[string]interface{}, projectID string) {
+func (s *Server) handlePreviewStart(conn *websocket.Conn, pm *ServicePreviewManager, data map[string]interface{}, projectID string) {
 	serviceType, ok := data["service_type"].(string)
 	if !ok {
 		s.sendError(conn, "Missing service_type")
@@ -374,7 +374,7 @@ func (s *Server) handlePreviewStart(conn *websocket.Conn, pm *PreviewManager, da
 	}
 }
 
-func (s *Server) handlePreviewStop(conn *websocket.Conn, pm *PreviewManager, data map[string]interface{}, projectID string) {
+func (s *Server) handlePreviewStop(conn *websocket.Conn, pm *ServicePreviewManager, data map[string]interface{}, projectID string) {
 	serviceID, ok := data["service_id"].(string)
 	if !ok {
 		s.sendError(conn, "Missing service_id")
@@ -401,7 +401,7 @@ func (s *Server) handlePreviewStop(conn *websocket.Conn, pm *PreviewManager, dat
 	}
 }
 
-func (s *Server) handlePreviewDelete(conn *websocket.Conn, pm *PreviewManager, data map[string]interface{}, projectID string) {
+func (s *Server) handlePreviewDelete(conn *websocket.Conn, pm *ServicePreviewManager, data map[string]interface{}, projectID string) {
 	serviceID, ok := data["service_id"].(string)
 	if !ok {
 		s.sendError(conn, "Missing service_id")
@@ -428,7 +428,7 @@ func (s *Server) handlePreviewDelete(conn *websocket.Conn, pm *PreviewManager, d
 	}
 }
 
-func (s *Server) handlePreviewListManaged(conn *websocket.Conn, pm *PreviewManager, projectID string) {
+func (s *Server) handlePreviewListManaged(conn *websocket.Conn, pm *ServicePreviewManager, projectID string) {
 	// Update service statuses before sending
 	pm.UpdateServiceStatuses()
 
@@ -449,7 +449,7 @@ func (s *Server) handlePreviewListManaged(conn *websocket.Conn, pm *PreviewManag
 	}
 }
 
-func (s *Server) handlePreviewCleanup(conn *websocket.Conn, pm *PreviewManager, projectID string) {
+func (s *Server) handlePreviewCleanup(conn *websocket.Conn, pm *ServicePreviewManager, projectID string) {
 	// Cleanup stale services (older than 1 hour)
 	pm.CleanupStaleServices(1 * time.Hour)
 

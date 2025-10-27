@@ -54,10 +54,14 @@ class RemoteClaudeMLModel:
         )
 
         # Text vectorizer for command analysis
+        # Enhanced for long-form prompts (500+ characters)
         self.vectorizer = TfidfVectorizer(
-            max_features=100,
-            ngram_range=(1, 3),
-            analyzer='char_wb'
+            max_features=500,        # 100→500 (5x increase for long prompts)
+            ngram_range=(1, 5),      # 1-5 character n-grams (capture longer phrases)
+            analyzer='char_wb',      # Character-level (language-agnostic)
+            max_df=0.95,             # Ignore terms in >95% of documents
+            min_df=2,                # Ignore terms in <2 documents
+            sublinear_tf=True        # Use log-scale term frequency
         )
 
         # Category mapping
@@ -69,7 +73,8 @@ class RemoteClaudeMLModel:
             "api",
             "jupyter",
             "docker",
-            "general"
+            "general",
+            "network"  # 追加
         ]
 
         self.category_to_idx = {cat: idx for idx, cat in enumerate(self.categories)}
@@ -82,12 +87,20 @@ class RemoteClaudeMLModel:
         classifier_path = os.path.join(self.model_dir, "classifier.pkl")
         confidence_path = os.path.join(self.model_dir, "confidence_estimator.pkl")
         vectorizer_path = os.path.join(self.model_dir, "vectorizer.pkl")
+        categories_path = os.path.join(self.model_dir, "categories.json")
 
         if os.path.exists(classifier_path):
             print(f"📂 Loading existing models from {self.model_dir}", file=sys.stderr)
             self.classifier = joblib.load(classifier_path)
             self.confidence_estimator = joblib.load(confidence_path)
             self.vectorizer = joblib.load(vectorizer_path)
+
+            # Load categories from saved model (overrides hardcoded list)
+            if os.path.exists(categories_path):
+                with open(categories_path, 'r') as f:
+                    self.categories = json.load(f)
+                self.category_to_idx = {cat: idx for idx, cat in enumerate(self.categories)}
+                print(f"📋 Loaded {len(self.categories)} categories: {self.categories}", file=sys.stderr)
         else:
             print(f"🎓 Initializing new models with training data", file=sys.stderr)
             self._train_initial_models()
@@ -119,7 +132,7 @@ class RemoteClaudeMLModel:
             ("gradient descent optimization", "machine_learning", 0.85),
             ("convolutional layer setup", "machine_learning", 0.89),
 
-            # Web App (15 samples)
+            # Web App (50 samples - 強化)
             ("React.jsを使用してTodoアプリを作成", "web_app", 0.92),
             ("Vueでダッシュボード作成", "web_app", 0.90),
             ("Next.jsでブログサイト", "web_app", 0.91),
@@ -135,6 +148,46 @@ class RemoteClaudeMLModel:
             ("interactive web form", "web_app", 0.84),
             ("bootstrap layout", "web_app", 0.83),
             ("tailwind css design", "web_app", 0.86),
+            # React特化
+            ("Reactコンポーネント作成", "web_app", 0.91),
+            ("React Hooksを使用", "web_app", 0.90),
+            ("React Router実装", "web_app", 0.89),
+            ("Redux状態管理", "web_app", 0.88),
+            ("Reactフォームバリデーション", "web_app", 0.87),
+            # Vue特化
+            ("Vue3 Composition API", "web_app", 0.90),
+            ("Vueコンポーネント設計", "web_app", 0.89),
+            ("Vuex store実装", "web_app", 0.88),
+            ("Vue Router設定", "web_app", 0.87),
+            # Next.js特化
+            ("Next.js SSR実装", "web_app", 0.91),
+            ("Next.js API Routes", "web_app", 0.90),
+            ("Next.js pages作成", "web_app", 0.89),
+            ("getStaticProps使用", "web_app", 0.88),
+            # フロントエンド全般
+            ("TypeScript Webアプリ", "web_app", 0.90),
+            ("SPAフロントエンド開発", "web_app", 0.89),
+            ("UIコンポーネントライブラリ", "web_app", 0.88),
+            ("フロントエンドフレームワーク", "web_app", 0.87),
+            ("Webアプリケーション構築", "web_app", 0.90),
+            ("モダンフロントエンド開発", "web_app", 0.89),
+            ("レスポンシブUI実装", "web_app", 0.88),
+            ("インタラクティブWeb画面", "web_app", 0.87),
+            # CSS/スタイリング
+            ("CSS Grid レイアウト", "web_app", 0.85),
+            ("Flexbox デザイン", "web_app", 0.84),
+            ("Material-UI使用", "web_app", 0.86),
+            ("Chakra UI実装", "web_app", 0.85),
+            ("styled-components設計", "web_app", 0.84),
+            # モバイル/その他
+            ("React Native アプリ", "web_app", 0.89),
+            ("モバイルアプリ開発", "web_app", 0.88),
+            ("PWA実装", "web_app", 0.87),
+            ("Webアプリデザイン", "web_app", 0.86),
+            ("ユーザーインターフェース構築", "web_app", 0.85),
+            ("フロントエンドアーキテクチャ", "web_app", 0.87),
+            ("Webページ作成", "web_app", 0.86),
+            ("Webサイト開発", "web_app", 0.85),
 
             # Visualization (12 samples)
             ("matplotlibでグラフを作成", "visualization", 0.90),
@@ -150,7 +203,8 @@ class RemoteClaudeMLModel:
             ("interactive chart", "visualization", 0.84),
             ("graph plotting", "visualization", 0.83),
 
-            # Data Analysis (12 samples)
+            # Data Analysis (42 samples - ENHANCED from 12)
+            # Basic pandas operations
             ("pandasでCSVデータを分析", "data_analysis", 0.88),
             ("numpyで統計分析", "data_analysis", 0.86),
             ("データクレンジング", "data_analysis", 0.85),
@@ -163,6 +217,47 @@ class RemoteClaudeMLModel:
             ("correlation matrix", "data_analysis", 0.83),
             ("feature engineering", "data_analysis", 0.82),
             ("data preprocessing", "data_analysis", 0.81),
+
+            # ETL and SQL specific
+            ("SQLクエリでデータ抽出", "data_analysis", 0.86),
+            ("ETLパイプライン構築", "data_analysis", 0.87),
+            ("データベースからデータ取得", "data_analysis", 0.85),
+            ("SQL JOINでテーブル結合", "data_analysis", 0.84),
+            ("データウェアハウスからの抽出", "data_analysis", 0.83),
+            ("SQL aggregation and groupby", "data_analysis", 0.85),
+            ("ETL data transformation", "data_analysis", 0.86),
+            ("database query optimization", "data_analysis", 0.84),
+
+            # Advanced pandas operations
+            ("pandasでpivot table作成", "data_analysis", 0.86),
+            ("DataFrameのgroupby集計", "data_analysis", 0.87),
+            ("時系列データのリサンプリング", "data_analysis", 0.85),
+            ("欠損値の補完処理", "data_analysis", 0.84),
+            ("pandas merge and concat", "data_analysis", 0.86),
+            ("DataFrame indexing and slicing", "data_analysis", 0.85),
+            ("pandas apply and map functions", "data_analysis", 0.84),
+
+            # Statistical analysis
+            ("統計的仮説検定の実施", "data_analysis", 0.86),
+            ("t検定とカイ二乗検定", "data_analysis", 0.85),
+            ("回帰分析とANOVA", "data_analysis", 0.87),
+            ("記述統計量の計算", "data_analysis", 0.84),
+            ("statistical hypothesis testing", "data_analysis", 0.85),
+            ("regression analysis", "data_analysis", 0.86),
+            ("descriptive statistics", "data_analysis", 0.84),
+
+            # Data quality and cleaning
+            ("外れ値検出と除去", "data_analysis", 0.85),
+            ("データ品質チェック", "data_analysis", 0.84),
+            ("重複データの削除", "data_analysis", 0.83),
+            ("outlier detection", "data_analysis", 0.85),
+            ("data quality assessment", "data_analysis", 0.84),
+            ("duplicate removal", "data_analysis", 0.83),
+
+            # File format specific
+            ("Excel複数シートの読み込み", "data_analysis", 0.84),
+            ("CSVファイルのバッチ処理", "data_analysis", 0.85),
+            ("JSONデータのフラット化", "data_analysis", 0.83),
 
             # API (10 samples)
             ("FastAPIでREST API作成", "api", 0.89),
@@ -196,7 +291,7 @@ class RemoteClaudeMLModel:
             ("container orchestration", "docker", 0.82),
             ("dockerfile build", "docker", 0.81),
 
-            # General (15 samples)
+            # General (50 samples - 大幅強化)
             ("Pythonスクリプト作成", "general", 0.75),
             ("ファイル読み込み処理", "general", 0.72),
             ("データ処理スクリプト", "general", 0.73),
@@ -212,6 +307,79 @@ class RemoteClaudeMLModel:
             ("general purpose code", "general", 0.67),
             ("simple script", "general", 0.66),
             ("basic implementation", "general", 0.65),
+            # ファイル処理特化
+            ("PDF テキスト抽出", "general", 0.76),
+            ("画像ファイル一括変換", "general", 0.75),
+            ("複数ファイルバッチ処理", "general", 0.74),
+            ("ディレクトリ走査処理", "general", 0.73),
+            ("ファイル自動バックアップ", "general", 0.72),
+            ("テキストファイル操作", "general", 0.71),
+            ("ログファイル解析", "general", 0.74),
+            ("設定ファイル管理", "general", 0.73),
+            # 自動化タスク
+            ("定期実行スクリプト", "general", 0.75),
+            ("cron job実装", "general", 0.74),
+            ("タスクスケジューリング", "general", 0.73),
+            ("自動化ワークフロー", "general", 0.72),
+            ("監視スクリプト", "general", 0.75),
+            ("アラート通知機能", "general", 0.74),
+            # CLIツール
+            ("コマンドラインツール", "general", 0.76),
+            ("CLI application", "general", 0.75),
+            ("引数パース処理", "general", 0.73),
+            ("対話型プログラム", "general", 0.72),
+            # データパイプライン
+            ("ETL パイプライン", "general", 0.71),
+            ("データ変換スクリプト", "general", 0.73),
+            ("フォーマット変換ツール", "general", 0.72),
+            # システム操作
+            ("システムモニタリング", "general", 0.74),
+            ("プロセス管理スクリプト", "general", 0.73),
+            ("リソース使用量チェック", "general", 0.72),
+            # その他汎用処理
+            ("メール送信機能", "general", 0.71),
+            ("Webスクレイピング", "general", 0.70),
+            ("設定読み込み処理", "general", 0.69),
+            ("環境変数管理", "general", 0.68),
+            ("ロギング実装", "general", 0.71),
+            ("エラーハンドリング", "general", 0.70),
+            ("リトライ処理", "general", 0.69),
+
+            # Network (30 samples - 新規追加)
+            ("HTTP APIクライアント", "network", 0.75),
+            ("WebSocket通信実装", "network", 0.76),
+            ("TCP/IP ソケット通信", "network", 0.74),
+            ("REST API呼び出し", "network", 0.73),
+            ("HTTPリクエスト送信", "network", 0.72),
+            ("network socket programming", "network", 0.75),
+            ("TCP server implementation", "network", 0.74),
+            ("UDP communication", "network", 0.73),
+            ("WebSocket client", "network", 0.75),
+            ("HTTP/2 protocol", "network", 0.74),
+            # プロトコル特化
+            ("gRPC通信", "network", 0.76),
+            ("MQTT メッセージング", "network", 0.75),
+            ("WebRTC実装", "network", 0.74),
+            ("SSH接続処理", "network", 0.73),
+            ("FTP ファイル転送", "network", 0.72),
+            # ネットワークツール
+            ("ポートスキャナー", "network", 0.75),
+            ("ネットワーク監視", "network", 0.74),
+            ("パケットキャプチャ", "network", 0.73),
+            ("DNSクエリ処理", "network", 0.72),
+            ("ping監視ツール", "network", 0.71),
+            # 通信機能
+            ("非同期HTTP通信", "network", 0.76),
+            ("並列リクエスト処理", "network", 0.75),
+            ("レート制限実装", "network", 0.74),
+            ("リトライロジック", "network", 0.73),
+            ("タイムアウト処理", "network", 0.72),
+            # セキュリティ
+            ("SSL/TLS通信", "network", 0.76),
+            ("証明書検証", "network", 0.75),
+            ("暗号化通信", "network", 0.74),
+            ("認証ヘッダー付与", "network", 0.73),
+            ("プロキシ経由通信", "network", 0.72),
         ]
 
         # Extract features and labels
@@ -285,9 +453,14 @@ class RemoteClaudeMLModel:
                         'matplotlib', 'seaborn', 'plotly', 'dashboard']
         features.extend([1 if kw in lower_cmd else 0 for kw in viz_keywords])
 
-        # Data keywords (10)
-        data_keywords = ['data', 'csv', 'pandas', 'numpy', 'データ', '分析',
-                         'analysis', 'dataframe', 'statistics', '統計']
+        # Data keywords (20 - ENHANCED from 10)
+        data_keywords = [
+            'data', 'csv', 'pandas', 'numpy', 'データ', '分析',
+            'analysis', 'dataframe', 'statistics', '統計',
+            # ETL/SQL specific
+            'sql', 'query', 'etl', 'join', 'merge', 'クエリ',
+            'groupby', 'pivot', 'aggregate', '集計'
+        ]
         features.extend([1 if kw in lower_cmd else 0 for kw in data_keywords])
 
         # API keywords (8)
@@ -324,26 +497,135 @@ class RemoteClaudeMLModel:
 
         return features
 
-    def predict(self, command, claude_cli_result=None):
+    def _split_long_prompt(self, command, max_length=300):
         """
-        Predict category and confidence for a command
+        Split long prompts into chunks for better processing
 
         Args:
-            command: User input command text
-            claude_cli_result: Optional dict with Claude CLI output
+            command: Input command text
+            max_length: Maximum chunk length in characters
 
         Returns:
-            dict with predicted category, confidence, and metadata
+            List of text chunks
+        """
+        if len(command) <= max_length:
+            return [command]
+
+        # Split by sentences first (period, exclamation, question mark)
+        import re
+        sentences = re.split(r'([。\.!?！？\n])', command)
+
+        # Reconstruct sentences with delimiters
+        reconstructed = []
+        for i in range(0, len(sentences) - 1, 2):
+            reconstructed.append(sentences[i] + sentences[i + 1])
+        if len(sentences) % 2 == 1:
+            reconstructed.append(sentences[-1])
+
+        # Combine sentences into chunks
+        chunks = []
+        current_chunk = ""
+
+        for sentence in reconstructed:
+            if len(current_chunk) + len(sentence) <= max_length:
+                current_chunk += sentence
+            else:
+                if current_chunk:
+                    chunks.append(current_chunk)
+                current_chunk = sentence
+
+        if current_chunk:
+            chunks.append(current_chunk)
+
+        return chunks if chunks else [command]
+
+    def _predict_long_prompt(self, command, claude_cli_result=None):
+        """
+        Predict category for long prompts using chunk-based ensemble
+
+        Args:
+            command: Long command text (>300 characters)
+            claude_cli_result: Optional Claude CLI result
+
+        Returns:
+            Aggregated prediction result
+        """
+        # Split into chunks
+        chunks = self._split_long_prompt(command, max_length=300)
+
+        if len(chunks) == 1:
+            # Fallback to normal prediction
+            return self._predict_single(command, claude_cli_result)
+
+        # Predict for each chunk
+        chunk_predictions = []
+        for chunk in chunks:
+            pred = self._predict_single(chunk, claude_cli_result)
+            chunk_predictions.append(pred)
+
+        # Ensemble: Majority voting for category
+        from collections import Counter
+        categories = [p['ml_category'] for p in chunk_predictions]
+        category_counts = Counter(categories)
+        final_category = category_counts.most_common(1)[0][0]
+
+        # Average confidence
+        avg_confidence = sum(p['ml_confidence'] for p in chunk_predictions) / len(chunk_predictions)
+
+        # Merge category probabilities
+        merged_probs = {}
+        for pred in chunk_predictions:
+            for cat, prob in pred['category_probabilities'].items():
+                merged_probs[cat] = merged_probs.get(cat, 0) + prob
+        for cat in merged_probs:
+            merged_probs[cat] /= len(chunk_predictions)
+
+        # Blend with Claude if available
+        if claude_cli_result:
+            claude_category = claude_cli_result.get('command_type', final_category)
+            claude_confidence = claude_cli_result.get('confidence', avg_confidence)
+
+            if claude_category == final_category:
+                final_confidence = min(1.0, avg_confidence * 0.7 + claude_confidence * 0.3 + 0.05)
+            else:
+                final_confidence = avg_confidence if avg_confidence > claude_confidence else claude_confidence
+                if avg_confidence < claude_confidence:
+                    final_category = claude_category
+        else:
+            final_confidence = avg_confidence
+
+        return {
+            "command_type": final_category,
+            "confidence": final_confidence,
+            "ml_category": final_category,
+            "ml_confidence": avg_confidence,
+            "category_probabilities": merged_probs,
+            "claude_category": claude_cli_result.get('command_type') if claude_cli_result else None,
+            "claude_confidence": claude_cli_result.get('confidence') if claude_cli_result else None,
+            "timestamp": datetime.now().isoformat(),
+            "chunks_processed": len(chunks)  # Additional metadata for long prompts
+        }
+
+    def _predict_single(self, command, claude_cli_result=None):
+        """
+        Single prediction (internal method used by both predict and _predict_long_prompt)
+
+        Args:
+            command: Command text
+            claude_cli_result: Optional Claude CLI result
+
+        Returns:
+            Prediction dict
         """
         # Vectorize command
         X_text = self.vectorizer.transform([command])
 
-        # Extract features
-        temp_category = claude_cli_result.get('command_type', 'general') if claude_cli_result else 'general'
-        X_features = np.array([self._extract_features(command, temp_category)])
+        # Extract engineered features (must match training)
+        X_features = self._extract_features(command)
+        X_features_array = np.array([X_features])
 
-        # Combine features
-        X_combined = np.hstack([X_text.toarray(), X_features])
+        # Combine text and engineered features (same as training)
+        X_combined = np.hstack([X_text.toarray(), X_features_array])
 
         # Predict category
         category_idx = self.classifier.predict(X_combined)[0]
@@ -352,20 +634,17 @@ class RemoteClaudeMLModel:
 
         # Predict confidence
         predicted_confidence = float(self.confidence_estimator.predict(X_combined)[0])
-        predicted_confidence = max(0.0, min(1.0, predicted_confidence))  # Clamp to [0, 1]
+        predicted_confidence = max(0.0, min(1.0, predicted_confidence))
 
         # If Claude CLI result exists, blend predictions
         if claude_cli_result:
             claude_category = claude_cli_result.get('command_type', predicted_category)
             claude_confidence = claude_cli_result.get('confidence', predicted_confidence)
 
-            # Weighted blend (70% ML, 30% Claude CLI)
             if claude_category == predicted_category:
-                # Agreement: boost confidence
                 final_confidence = min(1.0, predicted_confidence * 0.7 + claude_confidence * 0.3 + 0.05)
                 final_category = predicted_category
             else:
-                # Disagreement: use higher confidence source
                 if predicted_confidence > claude_confidence:
                     final_category = predicted_category
                     final_confidence = predicted_confidence
@@ -389,6 +668,26 @@ class RemoteClaudeMLModel:
             "claude_confidence": claude_cli_result.get('confidence') if claude_cli_result else None,
             "timestamp": datetime.now().isoformat()
         }
+
+    def predict(self, command, claude_cli_result=None):
+        """
+        Predict category and confidence for a command
+
+        Supports long prompts (500+ characters) via chunk-based prediction
+
+        Args:
+            command: User input command text
+            claude_cli_result: Optional dict with Claude CLI output
+
+        Returns:
+            dict with predicted category, confidence, and metadata
+        """
+        # Handle long prompts with chunk-based prediction
+        if len(command) > 300:
+            return self._predict_long_prompt(command, claude_cli_result)
+
+        # Short prompts: use single prediction
+        return self._predict_single(command, claude_cli_result)
 
     def _save_models(self):
         """Save trained models to disk"""
