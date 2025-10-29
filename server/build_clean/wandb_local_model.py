@@ -28,6 +28,16 @@ except ImportError:
     def get_product_category(text):
         return {'detected_products': [], 'suggested_category': None, 'confidence_boost': 0.0}
 
+# Short text feature extraction for <150 character commands
+try:
+    from short_text_features import extract_short_text_features
+    SHORT_TEXT_FEATURES_AVAILABLE = True
+except ImportError:
+    print("⚠️ Short text features not found. Running without short text enhancement.", file=sys.stderr)
+    SHORT_TEXT_FEATURES_AVAILABLE = False
+    def extract_short_text_features(text):
+        return [0] * 50  # Return 50 zero features as fallback
+
 class RemoteClaudeMLModel:
     """
     ML Model for command classification and confidence estimation
@@ -426,7 +436,14 @@ class RemoteClaudeMLModel:
         return np.array(features)
 
     def _extract_features(self, command, category=None):
-        """Extract 86+ engineered features from command text"""
+        """
+        Extract engineered features from command text
+
+        Feature dimensions:
+        - Base features: 106 dimensions
+        - Short text features (<150 chars): +50 dimensions
+        - Total: 156 dimensions for short text, 156 dimensions for long text (padded)
+        """
         lower_cmd = command.lower()
 
         features = []
@@ -504,6 +521,15 @@ class RemoteClaudeMLModel:
         features.append(1 if 'ください' in command else 0)
         features.append(1 if 'してください' in command else 0)
         features.append(1 if 'お願い' in command else 0)
+
+        # Short text features (50) - only for commands < 150 characters
+        # Target: Improve short text accuracy from 15.8% → 35-45%
+        if len(command) < 150 and SHORT_TEXT_FEATURES_AVAILABLE:
+            short_features = extract_short_text_features(command)
+            features.extend(short_features)
+        else:
+            # Pad with zeros for consistency in feature dimensions
+            features.extend([0] * 50)
 
         return features
 
